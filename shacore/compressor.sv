@@ -10,10 +10,7 @@ output HashState hash
 HashState oldhs;
 HashState newhs;
 
-HashStateFF hs(.clk, .in(newhs),.out(ofldhs));
-
-HashState calculatedhs;
-sha_round r(.in(oldhs),.out(calculatedhs),.K,.W);
+HashStateFF hs(.clk, .in(newhs),.out(oldhs));
 
 //A counter which keeps track of how many iterations have been applied.
 logic[5:0] counter_new;
@@ -27,6 +24,10 @@ logic[31:0] K;
 //Because the data gets fed in the clock cycle *after* the reset signal, we want the *old*
 // counter value for the lookup, which will be 0 on the first cycle that data is fed in.
 Klookup kl(.index(counter_old),.K);
+
+HashState calculatedhs;
+sha_round r(.in(oldhs),.out(calculatedhs),.K,.W);
+
 
 //If the next round will be the start of a new calculation, then feed in the input hash state.
 //Otherwise loop back the calculated state
