@@ -1,0 +1,10 @@
+
+Each unit leads into the next...
+
+1. block storage 
+2. flip-flop fan-out
+3. data stream muxers (+ index generators)
+4. SHA core
+5. Hash validator
+6. Victory encoder (+index generator)
+
