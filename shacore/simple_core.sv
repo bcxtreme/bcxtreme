@@ -5,7 +5,9 @@ module sha_simple_core(
 input logic clk,
 input logic rst,
 input logic[31:0] M,
-output HashState hash
+output logic input_ready,
+output HashState hash,
+output logic hash_valid
 );
 
 //Because we are only hashing 80 bits of data, we are really only dealing with two 512 bit blocks.
@@ -16,6 +18,7 @@ ff #(.WIDTH(7)) cycles(.clk,.data_i(newcycles),.data_o(oldcycles));
 
 assign newcycles=rst?7'd0:oldcycles+7'd1;
 
+assign hash_valid
 logic[31:0] W;
 
 HashState initialhashstate;
