@@ -1,0 +1,27 @@
+Master interface
+---
+
+[in]
+1 bit clock
+1 bit write
+1 bit reset
+
+32 bit in (80 bytes to be streamed in)
+
+
+[out]
+1 bit input_ready
+
+1 bit output_ready
+1 bit success 
+32 bit out
+
+
+
+
+
+
+
+
+
+
