@@ -42,14 +42,17 @@ endinterface
 
 interface all_inf(input bit clk);
 	logic rst;
-	logic valid;	
+	logic success;
+	logic valid;
+	logic [0:31] index;	
 	
 	clocking cb @(posedge clk);
 		output rst;
 		input valid;
-
+		input success;
+		input index;
 	endclocking
 
-	modport dut(input clk, input rst, output valid);
+	modport dut(input clk, input rst, output valid, output success, output index);
 	modport bench(clocking cb);
 endinterface
