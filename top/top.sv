@@ -3,9 +3,11 @@ module top();
 logic clk;
 logic rst;
 logic[31:0] M;
+logic input_valid;
+logic hash_valid;
 HashState hash;
 
-sha_simple_core s(.clk,.rst,.M,.hash);
+sha_simple_core s(.clk,.rst,.M,.hash,.input_valid,.hash_valid);
 
 initial $vcdpluson;
 

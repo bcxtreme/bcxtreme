@@ -10,7 +10,7 @@ output logic output_begin
 
 logic[4:0]  counter_in;
 logic[4:0]  counter_out;
-ff #(.WIDTH(4)) counter(.clk,.data_i(counter_in),.data_o(counter_out));
+ff #(.WIDTH(5)) counter(.clk,.data_i(counter_in),.data_o(counter_out));
 
 always_comb begin
    if(start)
@@ -24,7 +24,7 @@ end
 logic[31:0] shift_register_output;
 enabled_shift_register sr(.clk,.write_en(start),.in(hash),.data_o(shift_register_output));
 
-alwasy_comb begin
+always_comb begin
   casex (counter_out)
     5'b00xxx: word_o=shift_register_output;
     5'b01000: word_o=32'h80000000;  //First bit after data is set

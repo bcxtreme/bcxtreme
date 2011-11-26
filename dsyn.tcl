@@ -35,12 +35,12 @@ define_design_lib WORK -path ./WORK
 set RTL_PATH  "./rtl/"
 set myFiles [glob shared/* shacore/*]
 set fileFormat sverilog              ;# verilog or sverilog
-set basename sha_simple_core                     ;# Top-level module name
+set basename sha_round                     ;# Top-level module name
 set CLK "clk"                  ;# The name of your clock 
-set virtual 0                        ;# 1 if virtual clock, 0 if real clock
+set virtual 1                        ;# 1 if virtual clock, 0 if real clock
 
 # Timing and loading information                
-set clkPeriod_ns 10     ;# desired clock period (in ns) 
+set clkPeriod_ns 1     ;# desired clock period (in ns) 
 
 # Input delay tells DC how long after the clock before an input becomes
 # valid. 
@@ -73,7 +73,7 @@ set write_pow 1         ;# report file for power estimate
 set write_ref 1         ;# report file for power estimate
 
 # compiler switches...                  
-set useUltra 0                      ;# 1 for compile_ultra, 0 for compile
+set useUltra 1                      ;# 1 for compile_ultra, 0 for compile
                                      # mapEffort, useUngroup are for    
                                      # non-ultra compile...         
 set mapEffort1      low            ;# First pass - low, medium, or high
