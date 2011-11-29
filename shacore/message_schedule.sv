@@ -21,8 +21,10 @@ for(genvar i=0; i<16; i++) begin
    ff #(.WIDTH(32)) f(.clk,.data_i(history[i]),.data_o(history[i+1]));
 end
 
+
+logic[31:0] calculated;
 //Calculation of new W_j
-sha_message_expander_round(.history(history[16:1]),.W(calculated));
+sha_message_expander_round r(.history(history[16:1]),.W(calculated));
 
 
 //For the first 16, feed in the value directly
