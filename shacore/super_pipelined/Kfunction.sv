@@ -1,8 +1,7 @@
-//Because the compressor module is pipelined 1 stage behind the counter,
-//Our index for the stages when we are fetching K run from 1...62,63,0, instead of 0..61,62,63
-module Klookup(input logic[5:0] index, output logic[31:0] K);
-always_comb begin
-case (index-1)
+
+function int Kfunction(int index) begin
+int K=0;
+case (index)
 	0:K=32'h428a2f98; 1:K=32'h71374491; 2:K=32'hb5c0fbcf;
 	3:K=32'he9b5dba5; 4:K=32'h3956c25b; 5:K=32'h59f111f1;
 	6:K=32'h923f82a4; 7:K=32'hab1c5ed5; 8:K=32'hd807aa98;
@@ -26,5 +25,5 @@ case (index-1)
 	60:K=32'h90befffa; 61:K=32'ha4506ceb; 62:K=32'hbef9a3f7; 
 	63:K=32'hc67178f2;
 endcase
+Kfunction=K;
 end
-endmodule
