@@ -152,7 +152,7 @@ check_design
 # and do a second compile with incremental mapping        
 # or use the compile_ultra meta-command        
 if {  $useUltra == 1 } {
-   compile_ultra
+   compile_ultra -retime
 } else {
    if {  $useUngroup == 1 } {
      compile -ungoup_all -map_effort $mapEffort1
