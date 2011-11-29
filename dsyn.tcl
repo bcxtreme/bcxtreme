@@ -37,7 +37,7 @@ set myFiles [glob shared/* shacore/*]
 set fileFormat sverilog              ;# verilog or sverilog
 set basename sha_round                     ;# Top-level module name
 set CLK "clk"                  ;# The name of your clock 
-set virtual 1                        ;# 1 if virtual clock, 0 if real clock
+set virtual 0                        ;# 1 if virtual clock, 0 if real clock
 
 # Timing and loading information                
 set clkPeriod_ns 1     ;# desired clock period (in ns) 
@@ -99,11 +99,10 @@ uniquify
 # now you can create clocks for the design                 
 # and set other constraints                                
 if {  $virtual == 0 } {
-   create_clock -period $clkPeriod_ns $CLK
+   create_clock -period $clkPeriod_ns  $CLK
 } else {
-   create_clock -period $clkPeriod_ns -name $CLK
+   create_clock -period $clkPeriod_ns  -name $CLK
 }
-
 
 # Set the driving cell for all inputs except the clock     
 # The clock has infinite drive by default. This is usually  
@@ -162,6 +161,9 @@ if {  $useUltra == 1 } {
      compile -incremental_mapping -map_effort $mapEffort2
   }
 }
+
+create_clock -period 1 $CLK
+optimize_registers
 
 report_constraint -all_violators
 
