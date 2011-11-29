@@ -1,4 +1,4 @@
-module sha_super_pipelined_pre_stage #(parameter K)
+module sha_super_pipelined_pre_stage #(parameter K=0)
 (
 input logic clk,
 input HashState state_i,
@@ -15,7 +15,7 @@ ff #(.WIDTH(1)) newblock(.clk,.data_i(newblock_i),.data_o(newblock_o));
 
 HashState appliedstate;
 
-sha_round r(.in(state_i),.state_o(appliedstate),.K(K),.W);
+sha_round r(.clk,.in(state_i),.out(appliedstate),.K(K),.W);
 
-
-endmodule : sha_super_pipelined_stage
+HashStateFF hsff(.clk,.in(appliedstate),.out(state_o));
+endmodule : sha_super_pipelined_pre_stage

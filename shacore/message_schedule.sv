@@ -14,7 +14,7 @@ output logic[31:0] W
 
 
 //17 locations.
-logic[31:0] history[16:0];
+logic[16:0][31:0] history;
 
 //A chain of flip-flops which stores the last 16 values.
 for(genvar i=0; i<16; i++) begin

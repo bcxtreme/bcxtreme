@@ -1,4 +1,4 @@
-SHA_VERILOGS=shacore/*.sv
+SHA_VERILOGS=shacore/*.sv shacore/super_pipelined/*.sv
 SHARED_VERILOGS=shared/*.sv
 TOP_VERILOGS=top/*.sv
 
