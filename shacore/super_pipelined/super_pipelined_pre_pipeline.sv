@@ -42,7 +42,7 @@ end
 endgenerate
 
 /* assign the history values appropriately */
-assign history[0]=0'd640; //The size of the message in bits... appended as part of the padding.
+assign history[0]=32'd640; //The size of the message in bits... appended as part of the padding.
 
 generate
 for(n=1; n<3; n++) begin
@@ -56,7 +56,7 @@ counter c2(.clk,.rst(newblock_pipeline[14]),.count(history[3]));
 generate
 for(n=4; n<16; n++) begin
   assign history[n]=M[15-n];
-end 
+end
 endgenerate
 
 /* Generate the first 15 stages of the pipeline */

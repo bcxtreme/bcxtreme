@@ -33,14 +33,14 @@ define_design_lib WORK -path ./WORK
 ##################################################################
 
 set RTL_PATH  "./rtl/"
-set myFiles [glob shared/* shacore/*]
+set myFiles [glob shared/*.sv shacore/*.sv shacore/super_pipelined/*.sv]
 set fileFormat sverilog              ;# verilog or sverilog
-set basename sha_round                     ;# Top-level module name
+set basename sha_super_pipelined_core                     ;# Top-level module name
 set CLK "clk"                  ;# The name of your clock 
-set virtual 1                        ;# 1 if virtual clock, 0 if real clock
+set virtual 0                        ;# 1 if virtual clock, 0 if real clock
 
 # Timing and loading information                
-set clkPeriod_ns 1     ;# desired clock period (in ns) 
+set clkPeriod_ns 2     ;# desired clock period (in ns) 
 
 # Input delay tells DC how long after the clock before an input becomes
 # valid. 
@@ -152,7 +152,7 @@ check_design
 # and do a second compile with incremental mapping        
 # or use the compile_ultra meta-command        
 if {  $useUltra == 1 } {
-   compile_ultra -retime
+   compile_ultra 
 } else {
    if {  $useUngroup == 1 } {
      compile -ungoup_all -map_effort $mapEffort1
@@ -162,6 +162,9 @@ if {  $useUltra == 1 } {
      compile -incremental_mapping -map_effort $mapEffort2
   }
 }
+
+create_clock -period 2 $CLK
+optimize_registers
 
 report_constraint -all_violators
 
