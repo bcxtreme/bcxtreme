@@ -1,4 +1,5 @@
 module sha_round(
+input clk,
 input HashState in,
 output HashState out,
 input logic[31:0] K,
