@@ -32,7 +32,7 @@ assign M[0]=w1;
 assign M[1]=w2;
 assign M[2]=w3;
 //Note that as the reset signal is on a one cycle delay, we source it from the previous step in the pipeline.
-counter c1(.clk,.rst(newblock_pipeline[2]),.count(M[3]));
+counter c1(.clk,.rst(valid_pipeline[2]& newblock_pipeline[2]),.inc(valid_pipeline[2]),.count(M[3]));
 assign M[4]=32'h80000000; //The one bit of padding
 
 generate 
@@ -42,22 +42,23 @@ end
 endgenerate
 
 /* assign the history values appropriately */
-assign history[0]=32'd640; //The size of the message in bits... appended as part of the padding.
-
 generate
-for(n=1; n<3; n++) begin
-  assign history[n]=M[15-n];
+for(n=0; n<3; n++) begin
+  assign history[15-n]=M[n];
 end 
 endgenerate
 
 //Note that as the reset signal is on a one cycle delay, we source it from the previous step in the pipeline.
-counter c2(.clk,.rst(newblock_pipeline[14]),.count(history[3]));
+counter c2(.clk,.rst(valid_pipeline[14] & newblock_pipeline[14]),.inc(valid_pipeline[14]),.count(history[15-3]));
 
 generate
-for(n=4; n<16; n++) begin
-  assign history[n]=M[15-n];
+for(n=4; n<15; n++) begin
+  assign history[15-n]=M[n];
 end
 endgenerate
+
+assign history[15-15]=32'd640; //The size of the message in bits... appended as part of the padding.
+
 
 /* Generate the first 15 stages of the pipeline */
 for(genvar i=0; i<15; i++) begin
