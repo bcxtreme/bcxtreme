@@ -32,15 +32,15 @@ define_design_lib WORK -path ./WORK
 # below are parameters that you will want to set for each design 
 ##################################################################
 
-set RTL_PATH  "./rtl/"
-set myFiles [glob shared/*.sv shacore/*.sv shacore/super_pipelined/*.sv]
+set RTL_PATH  "./src/"
+set myFiles [glob ../../../shared/*.sv $RTL_PATH/*.sv]
 set fileFormat sverilog              ;# verilog or sverilog
-set basename sha_super_pipelined_stage                     ;# Top-level module name
+set basename sha_round                     ;# Top-level module name
 set CLK "clk"                  ;# The name of your clock 
 set virtual 0                        ;# 1 if virtual clock, 0 if real clock
 
 # Timing and loading information                
-set clkPeriod_ns 2     ;# desired clock period (in ns) 
+set clkPeriod_ns 3.1     ;# desired clock period (in ns) 
 
 # Input delay tells DC how long after the clock before an input becomes
 # valid. 
@@ -77,7 +77,7 @@ set useUltra 1                      ;# 1 for compile_ultra, 0 for compile
                                      # mapEffort, useUngroup are for    
                                      # non-ultra compile...         
 set mapEffort1      low            ;# First pass - low, medium, or high
-set mapEffort2      low            ;# second pass - low, medium, or high
+set mapEffort2      high            ;# second pass - low, medium, or high
 set useUngroup 0                    ;# 0 if no flatten, 1 if flatten
 
 #*********************************************************
@@ -85,7 +85,6 @@ set useUngroup 0                    ;# 0 if no flatten, 1 if flatten
 #*********************************************************
 
 # analyze and elaborate the files 
-read_file sha_round_synth.v
 analyze -format $fileFormat -lib WORK $myFiles
 elaborate $basename -lib WORK -update
 current_design $basename
@@ -153,7 +152,7 @@ check_design
 # and do a second compile with incremental mapping        
 # or use the compile_ultra meta-command        
 if {  $useUltra == 1 } {
-   compile_ultra 
+   compile_ultra
 } else {
    if {  $useUngroup == 1 } {
      compile -ungroup_all -map_effort $mapEffort1
@@ -166,6 +165,7 @@ if {  $useUltra == 1 } {
 
 create_clock -period 2 $CLK
 optimize_registers
+compile -incremental_mapping -map_effort high
 
 report_constraint -all_violators
 
