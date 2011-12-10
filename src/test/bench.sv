@@ -10,8 +10,13 @@ program bench
 	nonceBufferIfc.reader nonBufRd
 );
 
+	environ env;
 
 	initial begin
+		
+		env = new();
+		env.initialize();
+		
 		rst <= 1;
 		@(posedge clk)
 		rst <= 0;

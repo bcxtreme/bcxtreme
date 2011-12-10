@@ -1,13 +1,13 @@
 TOP=top.sv
 INTERFACES=interfaces/blockStoreIfc.sv interfaces/nonceBufferIfc.sv
-BENCH=bench.sv
+BENCH=test/environ.sv test/bench.sv
 DUT=bcminer.sv
 
 .PHONY: help clean bench
 
 
 bench:
-	vcs -PP -sverilog +define+SV +define+VPD $(TOP) $(INTERFACES) $(DUT) $(BENCH) -o testbench.exe
+	vcs -PP -sverilog +define+SV +define+VPD $(TOP) $(INTERFACES) $(DUT) $(BENCH) -o simulator.exe
 
 help:
 	@echo "The following make targets are supported:"; \
