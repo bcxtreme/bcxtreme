@@ -1,45 +1,47 @@
 int CONSTANT_DENSITY_SCALE = 1000;
 
 class transaction;
-		
-endclass
-
-
-class test;
-	bit rst;
 	
-	function void golden_result;
-		if(rst) begin
-
-		end	
-	endfunction
 endclass
-
-
 
 
 class block_test;
 	bit rst;
-	bit write_valid;
-	bit [7:0] block_data;
-
-	function block_test_result;
+	bit writeValid;
+	bit [7:0] blockData;
+	bit [7:0] storedBlocks [352:0];//should be 352 bits
+	int index = 0;
+	
+	function block_test_result;		
 		if(rst) begin
-			for(/*all block data entries*/) begin
-				//set all stored block data to 0;
+			for(int i=0; i<352; i++) begin
+				stored_blocks[i] = 0; //set all stored block data to 0;
 			end		
 		end
 
 		if(write_valid) begin
-
-			//save block data to next entry
+					
+			stored_blocks[index] = block_data;//save block data to next entry
+			index = index + 1;
 		end
 
 	endfunction
 endclass
 
 
-class sha_test
+
+class sha256;
+
+	function void sha256;
+		//PLACE C IMPLEMENTATION OF SHA256 HERE AND MAKE MODIFICATION TO VERILOG
+	
+	endfunction
+
+endclass
+
+
+
+class sha_test;
 	bit valid_in;
 	bit newblock_in;
 	bit[352:0] inital_state;
@@ -49,22 +51,20 @@ class sha_test
 	bit [256:0] hash;
 	int difficulty;
 
-	function void sha256;
-		//PLACE C IMPLEMENTATION OF SHA256 HERE AND MAKE MODIFICATION TO VERILOG
-	
-	endfunction
+	sha256 sha; //make an array of sha256's when pipelined
 
 
 	function void do_sha;
 		if(valid_in && newblock_in) begin		
-			sha256();
+			sha.sha256();
 		end;
 	
 	endfunction
 endclass
 
 
-class hash_validate_test
+
+class hash_validate_test;
 	int difficulty;
 	bit valid_in;
 	bit newblock_in;
@@ -99,6 +99,31 @@ class hash_validate_test
 		end
 	endfunction
 endclass
+
+
+
+
+class encoder_test;
+	bit valid_in;		//make array when pipelined
+	bit newblock_in;	// "
+	bit success_in;		// "
+
+	bit valid_out;
+	bit succes_out;
+	bit [31:0] nonce;
+
+	function void victoryencoder_result;
+		if(valid_in) begin
+				//check the hashes
+
+
+
+		end
+	endfunction
+endclass
+
+
+
 
 class checker;
 	function bit check_result ( bit verbose); 
