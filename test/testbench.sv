@@ -5,7 +5,7 @@ class transaction;
 endclass
 
 
-class rst_test;
+class test;
 	bit rst;
 	
 	function void golden_result;
@@ -15,24 +15,95 @@ class rst_test;
 	endfunction
 endclass
 
-class indexgen_test;
 
+
+
+class block_test;
+	bit rst;
+	bit write_valid;
+	bit [7:0] block_data;
+
+	function block_test_result;
+		if(rst) begin
+			for(/*all block data entries*/) begin
+				//set all stored block data to 0;
+			end		
+		end
+
+		if(write_valid) begin
+
+			//save block data to next entry
+		end
+
+	endfunction
 endclass
 
-class sha_test;
+
+class sha_test
+	bit valid_in;
+	bit newblock_in;
+	bit[352:0] inital_state;
+
+	bit valid_out;
+	bit newblock_out;
+	bit [256:0] hash;
+	int difficulty;
+
+	function void sha256;
+		//PLACE C IMPLEMENTATION OF SHA256 HERE AND MAKE MODIFICATION TO VERILOG
+	
+	endfunction
+
+
+	function void do_sha;
+		if(valid_in && newblock_in) begin		
+			sha256();
+		end;
+	
+	endfunction
+endclass
+
+
+class hash_validate_test
+	int difficulty;
+	bit valid_in;
+	bit newblock_in;
+	bit [255:0] hash;
+	
+	bit valid_out;
+	bit newblock_out;
+	bit_success;
+
+	function bit[256] difficulty_calc(difficulty)
+		//calculate 256 bit number using diffuclty
+		valid_out = 1;
+
+	endfunction
+	
+	function void hash_validate_result;
+		if (valid_in) begin
+			//check if the output matches the difficulty
 		
+			if(newblock_in) begin
+				newblock_out = 1;
+			end
+			
+			
+			if(hash < difficulty_calc(difficulty)) begin
+				//check if the output matches difficulty
+				success = 1;
+			end
+			else begin
+				success = 0;
+			end
+		end
+	endfunction
 endclass
-
-class all_test;
-		
-
-endclass
-
 
 class checker;
 	function bit check_result ( bit verbose); 
-        bit passed;
-        if(verbose) begin
+		bit passed;
+		if(verbose) begin
 			
 		end
         if(passed) begin
@@ -201,7 +272,7 @@ program tb (all_ifc.bench all_ds);
         // testing
         repeat (env.max_transactions) begin
             do_cycle();
-       /*    checker.check_result(all_ds.cb.search_valid, test.search_valid, 
+       /ll*    checker.check_result(all_ds.cb.search_valid, test.search_valid, 
 					all_ds.cb.search_index, test.search_index,
 					all_ds.cb.read_valid, test.read_valid,
 					all_ds.cb.read_value, test.read_value,

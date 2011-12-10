@@ -6,10 +6,11 @@ module top();
 	
 	initial $vcdpluson;
 	
+	ifc IFC(clk);
 	rst_ifc rst_IFC(clk);
 	indexgen_ifc indexgen_IFC(clk);
 	sha_ifc sha_IFC(clk);
 	all_ifc all_IFC(clk);
 
-	tb bench(all_IFC.bench);
+	tb bench(IFC.bench);
 endmodule

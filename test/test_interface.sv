@@ -1,3 +1,18 @@
+interface input_com_ifc(input bit clk);
+	logic rst;
+	
+	clocking cb @(posedge clk);
+		output rst;
+
+	endclocking
+
+	modport dut(input clk, input rst);
+	modport bench(clocking cb);
+endinterface
+
+
+
+
 interface rst_ifc(input bit clk);
 	logic rst;	
 	
