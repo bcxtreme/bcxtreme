@@ -48,7 +48,7 @@ class environ;
 					density_reset = read_real(fd);
 					$display("* density_reset = %f", density_reset);
 				end
-				"": ;
+				"": /* Skip blanks */;
 				default: error({"Unknown config parameter: '", param, "'"});
 			endcase
 		end
