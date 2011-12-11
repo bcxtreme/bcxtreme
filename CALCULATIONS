@@ -1,0 +1,71 @@
+Calculations
+-------------
+
+Because the cost of the chip is so high, we are ignoring the cost of electricity compared to that.
+
+Thus we are maximizing the performance/cost metric.  Since each 100mm^2 die costs a constant amount, we can reduce this to optimizing for performance/chip.
+
+Thus maximizing value is
+
+
+performance/chip	~ frequency*NumCores
+			= frequency*(100mm^2-OverheadArea)/CoreArea
+			~ frequency/(CoreBaseArea+NStages*CoreFFarea)  //Note that the factor removed is constant.
+
+			                                NStages
+                        =       -------------------------------------------------------------
+                                (CombDelay+FFDelay*NStages)*(CoreBaseArea+NStages*CoreFFArea)
+
+Thus the parameters we are entering are:
+OverheadArea: The total area taken up shared circuitry
+FFDelay:  The setup time + clock-to-Q time of the flip-flop used
+CoreBaseArea: The total area of the combinational logic in the core
+CoreFFArea: The total number of flip-flops which need to be added to accomodate an additional stage in the pipeline
+
+Measured Values:
+One Stage:
+Area Of Stage: 42532.25 micrometers^2
+
+Thus we estimate
+
+42532 um^2 * 129= 5486628 um^2 = CoreBaseArea + 1 * CoreFFArea
+
+Two Stage:
+Area of stage: 61881.617398 micrometers^2
+
+61881 um^2 *129 = 7982649 um^2 = CoreBaseArea + 2 * CoreFFArea.
+
+Thus CoreFFArea = 2496021 um^2,  CoreBaseArea= 2990607 um^2
+
+Compiling many times the round with different options finds CombDelay =~2ns
+
+From the DesignWare documentation, the DXFF1 delay is 213 ps=0.213 ns.
+
+Thus we can plug our values into the equation getting
+
+                          NStages
+ ------------------------------------------------------------
+  (2ns+0.213ns*NStages)*(2990607 um^2+NStages*2496021 um^2)
+
+Dividing out by constant factors, we get
+
+              NStages
+--------------------------------------------
+ (1+0.1065*NStages)*(1+0.83462*NStages)
+
+Differentiating with respect to NStages, we get
+
+               1-0.1065*0.83462*NStages^2
+d/dN=  --------------------------------------------
+        ((1+0.1065*NStages)*(1+0.83462*NStages))^2
+
+setting d/dN=0, we get
+
+0.1065*0.83462*NStages^2 = 1 
+
+NStages^2=11.025
+
+0.08888703*NStages^2 = 1
+
+NStages = 3.35
+
