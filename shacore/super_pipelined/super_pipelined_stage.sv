@@ -15,11 +15,8 @@ output logic newblock_o
 ff #(.WIDTH(1)) valid(.clk,.data_i(valid_i),.data_o(valid_o));
 ff #(.WIDTH(1)) newblock(.clk,.data_i(newblock_i),.data_o(newblock_o));
 
-HashState appliedstate;
 
-sha_round r(.clk, .in(state_i),.out(appliedstate),.K(K),.W(W_i[0]));
-
-HashStateFF hsff(.clk,.in(appliedstate),.out(state_o));
+sha_round r(.clk, .in(state_i),.out(state_o),.K(K),.W(W_i[0]));
 
 sha_message_expander_pipeline pl(.clk,.W_i,.W_o);
 

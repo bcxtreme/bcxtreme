@@ -12,10 +12,7 @@ input HashState inputhashstate,
 output HashState hash
 );
 
-HashState oldhs;
 HashState newhs;
-
-HashStateFF hs(.clk, .in(newhs),.out(oldhs));
 
 //Fetch the constant K which depends on the round number.
 logic[31:0] K;
@@ -24,7 +21,7 @@ logic[31:0] K;
 Klookup kl(.index(counter),.K);
 
 HashState calculatedhs;
-sha_round r(.clk,.in(oldhs),.out(calculatedhs),.K,.W);
+sha_round r(.clk,.in(newhs),.out(calculatedhs),.K,.W);
 
 
 //If the next round will be the start of a new calculation, then feed in the input hash state.

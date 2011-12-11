@@ -5,6 +5,7 @@ TOP_VERILOGS=top/*.sv
 VCSARGS= \
 -PP -sverilog\
 +define+SV +define+VPD +lint=all\
+-debug_pp\
 #-cm_tgl mda -debug -lca -cm line+cond+fsm+tgl+path
 
 all: shacore_design

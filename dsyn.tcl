@@ -33,7 +33,7 @@ define_design_lib WORK -path ./WORK
 ##################################################################
 
 set RTL_PATH  "./rtl/"
-set myFiles [glob shared/*.sv shacore/*.sv shacore/super_pipelined/*.sv]
+set myFiles [glob shared/* shacore/* shacore/super_pipelined/*]
 set fileFormat sverilog              ;# verilog or sverilog
 set basename sha_super_pipelined_stage                     ;# Top-level module name
 set CLK "clk"                  ;# The name of your clock 
@@ -46,7 +46,7 @@ set clkPeriod_ns 2     ;# desired clock period (in ns)
 # valid. 
 set inDelay_ns [expr $clkPeriod_ns*.1]  ;# delay from clock to inputs valid
 set outDelay_ns [expr $clkPeriod_ns*.1] ;# delay from clock to output valid
-set inputDrive INVX16_LVT
+set inputDrive INVX16
 set LoadLib $design_db         ;# name of library the cell comes from
 set myLoadPin "ZN"             ;# name of pin that the outputs drive
 set CLK_SKEW 0.10
@@ -73,11 +73,11 @@ set write_pow 1         ;# report file for power estimate
 set write_ref 1         ;# report file for power estimate
 
 # compiler switches...                  
-set useUltra 1                      ;# 1 for compile_ultra, 0 for compile
+set useUltra 0                      ;# 1 for compile_ultra, 0 for compile
                                      # mapEffort, useUngroup are for    
                                      # non-ultra compile...         
-set mapEffort1      low            ;# First pass - low, medium, or high
-set mapEffort2      low            ;# second pass - low, medium, or high
+set mapEffort1      low           ;# First pass - low, medium, or high
+set mapEffort2      high            ;# second pass - low, medium, or high
 set useUngroup 0                    ;# 0 if no flatten, 1 if flatten
 
 #*********************************************************
@@ -85,7 +85,10 @@ set useUngroup 0                    ;# 0 if no flatten, 1 if flatten
 #*********************************************************
 
 # analyze and elaborate the files 
-read_file sha_round_synth.v
+read_file shacore/precompiled/sharound/sha_round_synth.ddc
+#set_dont_touch sha_round
+read_file shacore/precompiled/messageschedule/sha_message_expander_pipeline_synth.ddc
+#set_dont_touch sha_message_expander_pipeline
 analyze -format $fileFormat -lib WORK $myFiles
 elaborate $basename -lib WORK -update
 current_design $basename
@@ -100,11 +103,10 @@ uniquify
 # now you can create clocks for the design                 
 # and set other constraints                                
 if {  $virtual == 0 } {
-   create_clock -period $clkPeriod_ns $CLK
+   create_clock -period $clkPeriod_ns  $CLK
 } else {
-   create_clock -period $clkPeriod_ns -name $CLK
+   create_clock -period $clkPeriod_ns  -name $CLK
 }
-
 
 # Set the driving cell for all inputs except the clock     
 # The clock has infinite drive by default. This is usually  
@@ -112,7 +114,7 @@ if {  $virtual == 0 } {
 # tools (like SOC Encounter) to build the clock tree        
 # (or define it by hand).              
 if {  $virtual == 0 } {
-    set_driving_cell  -library $LoadLib -lib_cell $inputDrive [all_inputs] \
+    set_driving_cell  -library $LoadLib -lib_cell $inputDrive [all_inputs] 
 } else {
    set_driving_cell  -library $LoadLib -lib_cell $inputDrive  \
          [remove_from_collection [all_inputs] $CLK]
@@ -160,12 +162,14 @@ if {  $useUltra == 1 } {
      compile -incremental_mapping -map_effort $mapEffort2
   } else {
      compile -map_effort $mapEffort1
-     compile -incremental_mapping -map_effort $mapEffort2
+     #compile -incremental_mapping -map_effort $mapEffort2
   }
 }
 
-create_clock -period 2 $CLK
-optimize_registers
+#create_clock -period 2 $CLK
+#optimize_registers
+#compile -incremental_maping -map_effort high
+
 
 report_constraint -all_violators
 
