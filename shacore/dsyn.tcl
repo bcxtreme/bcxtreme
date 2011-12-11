@@ -86,9 +86,9 @@ set useUngroup 0                    ;# 0 if no flatten, 1 if flatten
 
 # analyze and elaborate the files 
 read_file shacore/precompiled/sharound/sha_round_synth.ddc
-#set_dont_touch sha_round
+set_dont_touch sha_round
 read_file shacore/precompiled/messageschedule/sha_message_expander_pipeline_synth.ddc
-#set_dont_touch sha_message_expander_pipeline
+set_dont_touch sha_message_expander_pipeline
 analyze -format $fileFormat -lib WORK $myFiles
 elaborate $basename -lib WORK -update
 current_design $basename

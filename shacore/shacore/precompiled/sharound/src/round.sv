@@ -41,14 +41,33 @@ sha_eADDER ead(.d(in.d),.h(in.h),.sum1(sum1_tmp),.ch(ch_tmp),.K,.W,.e);
 //assign T1=in.h+sum1_tmp+ch_tmp+K+W;
 //assign T2=sum0_tmp+maj_tmp;
 
-ff #(.WIDTH(32)) h(.clk,.data_i(in.g),.data_o(out.h));
-ff #(.WIDTH(32)) g(.clk,.data_i(in.f),.data_o(out.g));
-ff #(.WIDTH(32)) f(.clk,.data_i(in.e),.data_o(out.f));
-ff #(.WIDTH(32)) e1(.clk,.data_i(e),.data_o(out.e));
-ff #(.WIDTH(32)) d(.clk,.data_i(in.c),.data_o(out.d));
-ff #(.WIDTH(32)) c(.clk,.data_i(in.b),.data_o(out.c));
-ff #(.WIDTH(32)) b(.clk,.data_i(in.a),.data_o(out.b));
-ff #(.WIDTH(32)) a1(.clk,.data_i(a),.data_o(out.a));
+logic[31:0] at;
+logic[31:0] bt;
+logic[31:0] ct;
+logic[31:0] dt;
+logic[31:0] et;
+logic[31:0] ft;
+logic[31:0] gt;
+logic[31:0] ht;
+
+ff #(.WIDTH(32)) h(.clk,.data_i(in.g),.data_o(ht));
+ff #(.WIDTH(32)) g(.clk,.data_i(in.f),.data_o(gt));
+ff #(.WIDTH(32)) f(.clk,.data_i(in.e),.data_o(ft));
+ff #(.WIDTH(32)) e1(.clk,.data_i(e),.data_o(et));
+ff #(.WIDTH(32)) d(.clk,.data_i(in.c),.data_o(dt));
+ff #(.WIDTH(32)) c(.clk,.data_i(in.b),.data_o(ct));
+ff #(.WIDTH(32)) b(.clk,.data_i(in.a),.data_o(bt));
+ff #(.WIDTH(32)) a1(.clk,.data_i(a),.data_o(at));
+
+
+ff #(.WIDTH(32)) ha(.clk,.data_i(ht),.data_o(out.h));
+ff #(.WIDTH(32)) ga(.clk,.data_i(gt),.data_o(out.g));
+ff #(.WIDTH(32)) fa(.clk,.data_i(ft),.data_o(out.f));
+ff #(.WIDTH(32)) e1a(.clk,.data_i(et),.data_o(out.e));
+ff #(.WIDTH(32)) da(.clk,.data_i(dt),.data_o(out.d));
+ff #(.WIDTH(32)) ca(.clk,.data_i(ct),.data_o(out.c));
+ff #(.WIDTH(32)) ba(.clk,.data_i(bt),.data_o(out.b));
+ff #(.WIDTH(32)) a1a(.clk,.data_i(at),.data_o(out.a));
 //assign out.h=in.g;
 //assign out.g=in.f;
 //assign out.f=in.e;
