@@ -27,6 +27,7 @@ class hash_validate_test;
 				//check if the output matches difficulty
 				success = 1;
 			end
+
 			else begin
 				success = 0;
 			end
