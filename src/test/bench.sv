@@ -45,9 +45,6 @@ program bench
 		$display("%t: [rst %b] [writeValid %b] [blockData %d] [readReady %b]", $time, gb.rst_i, gb.writeValid_i, gb.blockData_i, gb.readReady_i);
 	endtask
 
-	task print_error(string m);
-	endtask
-
 	task print_outputs();
 		$display("%t:                                                      [writeReady %b] [resultValid %b] [success %b] [nonce %b] [overflow %b]", $time, gb.writeReady_o, gb.resultValid_o, gb.success_o, gb.nonce_o, gb.overflow_o);
 	endtask
