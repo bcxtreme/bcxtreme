@@ -40,6 +40,9 @@ program bench
 		$display("%t: [rst %b] [writeValid %b] [blockData %d] [readReady %b]", $time, gb.rst_i, gb.writeValid_i, gb.blockData_i, gb.readReady_i);
 	endtask
 
+	task print_error(string m);
+	endtask
+
 	task print_outputs();
 		$display("%t:                                                      [writeReady %b] [resultValid %b] [success %b] [nonce %b] [overflow %b]", $time, gb.writeReady_o, gb.resultValid_o, gb.success_o, gb.nonce_o, gb.overflow_o);
 	endtask
@@ -47,23 +50,23 @@ program bench
 	function int verify_outputs();
 		int err_count = 0;
 		if (gb.writeReady_o != blkWrt.writeReady) begin
-			$display(">> DUT writeReady: %b", blkWrt.writeReady);
+			if (env.verbose) $display(">> DUT writeReady: %b", blkWrt.writeReady);
 			err_count += 1;
 		end
 		if (gb.resultValid_o != resultValid) begin
-			$display(">> DUT resultValid: %b", resultValid);
+			if (env.verbose) $display(">> DUT resultValid: %b", resultValid);
 			err_count += 1;
 		end
 		if (gb.resultValid_o && (gb.success_o != success)) begin
-			$display(">> DUT success: %b", success);
+			if (env.verbose) $display(">> DUT success: %b", success);
 			err_count += 1;
 		end
 		if (gb.nonce_o != nonBufRd.nonce) begin
-			$display(">> DUT nonce: %b", nonBufRd.nonce);
+			if (env.verbose) $display(">> DUT nonce: %b", nonBufRd.nonce);
 			err_count += 1;
 		end
 		if (gb.overflow_o != nonBufRd.overflow) begin
-			$display(">> DUT overflow: %b", nonBufRd.overflow);
+			if (env.verbose) $display(">> DUT overflow: %b", nonBufRd.overflow);
 			err_count += 1;
 		end
 		return err_count;
@@ -87,8 +90,10 @@ program bench
 			.readReady(0)
 		);
 		
-		$display("BEGIN TEST");
-		$display("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+		if (env.verbose) begin
+			$display("BEGIN TEST");
+			$display("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+		end
 
 		set_rst(1);
 		do_cycle();
@@ -98,14 +103,16 @@ program bench
 
 		for (int i = 0; i < env.max_cycles; i++) begin
 			set_inputs();
-			print_inputs();
+			if (env.verbose) print_inputs();
 			do_cycle();
-			print_outputs();
+			if (env.verbose) print_outputs();
 			err_count += verify_outputs();
 		end
 
-		$display("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
-		$display("TEST COMPLETE");
+		if (env.verbose) begin
+			$display("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+			$display("TEST COMPLETE");
+		end
 		$display("Errors: %d", err_count);
 		if (err_count == 0)
 			$display("[ PASS ]");

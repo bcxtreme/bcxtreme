@@ -1,7 +1,8 @@
 
 class environ;
 
-	integer max_cycles;
+	bit verbose;
+	int max_cycles;
 	real density_reset;
 
 	task error(string m);
@@ -47,6 +48,10 @@ class environ;
 				"density_reset": begin
 					density_reset = read_real(fd);
 					$display("* density_reset = %f", density_reset);
+				end
+				"verbose": begin
+					verbose = read_int(fd);
+					$display("* verbose = $b", verbose);
 				end
 				"": /* Skip blanks */;
 				default: error({"Unknown config parameter: '", param, "'"});
