@@ -98,10 +98,14 @@ program bench
 		end
 
 		set_rst(1);
+		if (env.verbose) print_inputs();
 		do_cycle();
+		if (env.verbose) print_outputs();
 
 		set_rst(0);
+		if (env.verbose) print_inputs();
 		do_cycle();
+		if (env.verbose) print_outputs();
 
 		for (int i = 0; i < env.max_cycles; i++) begin
 			set_inputs();

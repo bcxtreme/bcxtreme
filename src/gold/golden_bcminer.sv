@@ -3,17 +3,23 @@ class golden_bcminer;
 
 
 	bit rst_i;
-
+	
+	// Block Storage Interface
 	bit writeValid_i;
 	bit writeReady_o;
 	bit[7:0] blockData_i;
 
+	// Result Outputs
 	bit resultValid_o;
 	bit success_o;
 
+	// Nonce Buffer Interface
 	bit readReady_i;
 	bit nonce_o;
 	bit overflow_o;
+
+	// Golden units
+	local golden_blockstorage gblock;
 
 	// Reset the output pins and the internal state
 	task reset();
@@ -22,6 +28,8 @@ class golden_bcminer;
 		success_o = 0;
 		nonce_o = 0;
 		overflow_o = 0;
+
+		gblock = new();
 	endtask
 
 	// Simulate a cycle
@@ -31,8 +39,22 @@ class golden_bcminer;
 			return;
 		end
 
-		resultValid_o = writeValid_i;
-		success_o = ^ (blockData_i);
+		if (writeValid_i) gblock.write_chunk(blockData_i);
+		writeReady_o = gblock.isWriteReady();
+
+		if (gblock.has_data_to_send()) begin
+			bit[351:0] raw_data;
+			bit new_block;
+
+			new_block = gblock.is_new_block();
+			raw_data = gblock.get_data();
+
+			resultValid_o = 1;
+			success_o = ^ (raw_data);
+		end else begin
+			resultValid_o = 0;
+			success_o = 0;
+		end
 	endtask
 
 endclass
