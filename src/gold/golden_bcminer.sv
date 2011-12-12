@@ -23,7 +23,7 @@ class golden_bcminer;
 
 	// Reset the output pins and the internal state
 	task reset();
-		writeReady_o = 1;
+		writeReady_o = 0;
 		resultValid_o = 0;
 		success_o = 0;
 		nonce_o = 0;
@@ -47,7 +47,7 @@ class golden_bcminer;
 			bit new_block;
 
 			new_block = gblock.is_new_block();
-			raw_data = gblock.get_data();
+			raw_data = gblock.broadcast_data();
 
 			resultValid_o = 1;
 			success_o = ^ (raw_data);

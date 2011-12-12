@@ -36,6 +36,8 @@ class golden_blockstorage;
 			can_send = 1;
 			wrt_index = 0;
 		end
+
+			
 	endtask
 
 	function bit has_data_to_send();
@@ -47,7 +49,7 @@ class golden_blockstorage;
 		return (wrt_index == 0) ? 1 : 0;
 	endfunction
 
-	function bit[351:0] get_data();
+	function bit[351:0] broadcast_data();
 		CheckHasDataToSend: assert( can_send == 1 );
 		wrt_index += 1;
 		if (wrt_index == 16) begin	// NOTE: Eventually this will send 2^32 / N times instead of 16
