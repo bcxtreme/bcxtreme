@@ -6,11 +6,15 @@ GOLD=gold/golden_bcminer.sv
 BLOCKSTORAGE=blockStorage/blockStorage.sv
 DUT=$(BLOCKSTORAGE) bcminer.sv
 
-.PHONY: help clean bench
+.PHONY: help clean bench test
 
 
 bench:
 	vcs -PP -sverilog +define+SV +define+VPD $(TOP) $(INTERFACES) $(DUT) $(GOLD) $(BENCH) -o simulator.exe
+
+test: bench
+	./simulator.exe
+	
 
 help:
 	@echo "The following make targets are supported:"; \
