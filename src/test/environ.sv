@@ -3,7 +3,8 @@ class environ;
 
 	bit verbose;
 	int max_cycles;
-	real density_reset;
+	real density_rst;
+	real density_writeValid;
 
 	task error(string m);
 		$display({"* Error: ", m});
@@ -41,24 +42,21 @@ class environ;
 
 			param = read_string(fd);
 			case (param)
-				"max_cycles": begin
-					max_cycles = read_int(fd);
-					$display("* max_cycles = %d", max_cycles);
-				end
-				"density_reset": begin
-					density_reset = read_real(fd);
-					$display("* density_reset = %f", density_reset);
-				end
-				"verbose": begin
-					verbose = read_int(fd);
-					$display("* verbose = $b", verbose);
-				end
-				"": /* Skip blanks */;
+				"max_cycles": max_cycles = read_int(fd);
+				"density_rst": density_rst = read_real(fd);
+				"density_writeValid": density_writeValid = read_real(fd);
+				"verbose": verbose = read_int(fd);
+				"": /* skip blanks */;
 				default: error({"Unknown config parameter: '", param, "'"});
 			endcase
 		end
 
 		$fclose(fd);
+
+		$display("* max_cycles = %d", max_cycles);
+		$display("* density_rst = %f", density_rst);
+		$display("* density_writeValid = %f", density_writeValid);
+		$display("* verbose = %b", verbose);
 		$display("* * * * * * * * * * * * * * * * * * * * * * *");
 	endtask
 

@@ -11,6 +11,7 @@ program bench
 );
 
 	environ env;
+	inputs inp;
 	golden_bcminer gb;
 
 	task set_rst(bit val);
@@ -28,12 +29,16 @@ program bench
 		blkWrt.blockData <= val;
 	endtask
 
-	int tmp = 0;
+	task set_readReady(bit val);
+		gb.readReady_i = val;
+		nonBufRd.readReady <= val;
+	endtask
+
 	task set_inputs();
-		set_rst(0);
-		set_blockData(tmp);
-		tmp = tmp + 1;
-		set_writeValid(1);
+		set_rst(inp.rst);
+		set_writeValid(inp.writeValid);
+		set_blockData(inp.blockData);
+		set_readReady(0);
 	endtask
 
 	task print_inputs();
@@ -48,7 +53,8 @@ program bench
 	endtask
 
 	function int verify_outputs();
-		int err_count = 0;
+		int err_count;
+		err_count = 0;
 		if (gb.writeReady_o != blkWrt.writeReady) begin
 			if (env.verbose) $display(">> DUT writeReady: %b", blkWrt.writeReady);
 			err_count += 1;
@@ -75,6 +81,7 @@ program bench
 	task do_cycle();
 		@(posedge clk)
 		gb.cycle();
+		inp.generate_inputs();
 	endtask
 
 	initial begin
@@ -82,14 +89,9 @@ program bench
 		int err_count = 0;
 		env = new();
 		env.initialize();
+		inp = new(.density_rst(env.density_rst), .density_writeValid(env.density_writeValid));
 
-		gb = new(
-			.rst(0),
-			.writeValid(0),
-			.blockData(0),
-			.readReady(0)
-		);
-		
+		gb = new();
 		if (env.verbose) begin
 			$display("BEGIN TEST");
 			$display("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");

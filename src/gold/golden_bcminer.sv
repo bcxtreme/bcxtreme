@@ -15,15 +15,6 @@ class golden_bcminer;
 	bit nonce_o;
 	bit overflow_o;
 
-
-	function new(bit rst, bit writeValid, bit[7:0] blockData, readReady);
-		// Provide initial values for the input pins
-		rst_i = rst;
-		writeValid_i = writeValid;
-		blockData_i = blockData;
-		readReady_i = readReady;
-	endfunction
-
 	// Reset the output pins and the internal state
 	task reset();
 		writeReady_o = 1;
