@@ -10,12 +10,20 @@ module bcminer
 	nonceBufferIfc.writer nonBufWrt
 );
 
-	assign blkRd.writeReady = 1;
+	logic [351:0] st;
+	logic tmp1, tmp2;
 
-	assign resultValid = blkRd.writeValid;
-	assign success = ^ (blkRd.blockData);
+	blockStorage bs(
+		.clk,
+		.rst,
+		.blkRd,
+		.validOut(resultValid),
+		.newBlock(success),
+		.initialState(st)
+	);
 
-
+	assign nonBufWrt.nonce = 0;
+	assign nonBufWrt.overflow = 0;
 
 endmodule
 	

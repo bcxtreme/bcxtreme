@@ -2,7 +2,9 @@ TOP=top.sv
 INTERFACES=interfaces/blockStoreIfc.sv interfaces/nonceBufferIfc.sv
 BENCH=test/environ.sv test/bench.sv
 GOLD=gold/golden_bcminer.sv
-DUT=bcminer.sv
+
+BLOCKSTORAGE=blockStorage/blockStorage.sv
+DUT=$(BLOCKSTORAGE) bcminer.sv
 
 .PHONY: help clean bench
 
