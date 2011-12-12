@@ -10,7 +10,7 @@ module bcminer
 	nonceBufferIfc.writer nonBufWrt
 );
 
-	assign blkRd.writeReady = 0;
+	assign blkRd.writeReady = 1;
 
 	assign resultValid = blkRd.writeValid;
 	assign success = ^ (blkRd.blockData);
