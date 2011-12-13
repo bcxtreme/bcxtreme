@@ -15,7 +15,7 @@ HashState doublehash;
 
 
 
-sha_super_pipelined_core sp(.clk,.rst,.input_valid,.newblock_i,.round1,. w1,.w2,.w3,.output_valid,.newblock_o,.doublehash);
+sha_last_pipelined_core sp(.clk,.rst,.input_valid,.newblock_i,.round1,. w1,.w2,.w3,.output_valid,.newblock_o,.doublehash);
 
 initial $vcdpluson;
 

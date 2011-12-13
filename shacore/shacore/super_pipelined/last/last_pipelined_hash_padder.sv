@@ -1,4 +1,4 @@
-module sha_super_pipelined_pad_hash(
+module sha_last_pipelined_pad_hash(
 input logic clk,
 input logic rst,
 input HashState instate,

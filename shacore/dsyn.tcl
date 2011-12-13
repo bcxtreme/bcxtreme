@@ -227,4 +227,4 @@ if {  $write_ref == 1 } {
     redirect $filename { report_reference -nosplit -hierarchy }
 }
 
-quit
+#quit
