@@ -60,15 +60,16 @@ module blockStorage
 		.data_o(wrt_o)
 	);
 
-	logic need_new_block, can_broadcast, need_data, last_broadcast, currently_accepting_data;
+	logic need_new_block, can_broadcast, need_data, last_broadcast, currently_accepting_data, last_chunk;
 
 	assign need_new_block = (ix_o == 0);
+	assign last_chunk = (ix_o == 43);
 	assign can_broadcast = (ix_o == 44);
 
-	assign need_data = !can_broadcast;
+	assign need_data = !(last_chunk || can_broadcast);
 	assign last_broadcast = (wrt_o == 15);
 
-	initial $monitor("**: chunk_ix: %d; wrt_ix: %d", ix_o, wrt_o);
+	initial $monitor("currently_accepting_data: %b; chunk_ix: %d; chunk: %d; last_chunk: %b; xor_i: %b; xor_enable: %b; xor_o: %b", currently_accepting_data, ix_o, blkRd.blockData, last_chunk, xor_i, xor_enable, xor_o);
 
 
 
@@ -76,27 +77,22 @@ module blockStorage
 	//
 	// writeReady: signal the world when we're ready for a new block
 	//
-	assign blkRd.writeReady = (need_new_block && !accept_data_enable) || last_broadcast || (need_new_block && !currently_accepting_data);
+	assign blkRd.writeReady = ((ix_o == 0) && !(accept_data_now && blkRd.writeValid)) || (wrt_o == 15);
 
 	//
 	// accept_data_now: True iff writes should be accepted
 	//
 	always_comb begin
-		if (need_new_block) begin
+		if ((ix_o == 0 && !accept_data_now) || wrt_o == 15) begin
 			accept_data_enable = 1;
 			accept_data_next_cycle = 1;
-		end else if (can_broadcast) begin
+		end else if (ix_o == 43) begin
 			accept_data_enable = 1;
 			accept_data_next_cycle = 0;
-		end
+		end else
+			accept_data_enable = 0;
 	end
 		
-	//
-	// currently_accepting_data: True when we previously sent the writeReady signal, and the writeValid is happening,
-	//                           and we still have space to write the data
-	//
-	assign currently_accepting_data = accept_data_now && blkRd.writeValid;
-
 	//
 	// block: Read in data into the block if necessary
 	//
@@ -111,10 +107,10 @@ module blockStorage
 	// XXX: eventually delete this!
 	//
 	always_comb begin
-		if (currently_accepting_data) begin
+		if (accept_data_now && blkRd.writeValid && !(ix_o == 43)) begin
 			xor_enable = 1;
 			xor_i = (^ blkRd.blockData) ^ xor_o;
-		end else if (last_broadcast) begin
+		end else if (wrt_o == 15) begin
 			xor_enable = 1;
 			xor_i = 0;
 		end else
@@ -126,7 +122,7 @@ module blockStorage
 	//           we're ready for more data.
 	//
 	always_comb begin
-		if (currently_accepting_data && need_data) begin
+		if (accept_data_now && blkRd.writeValid) begin
 			ix_enable = 1;
 			ix_i = ix_o + 1;
 		end else if (last_broadcast) begin
@@ -140,14 +136,14 @@ module blockStorage
 	// wrt_ix: increment every time we broadcast the block data, otherwise sit at 0
 	//
 	always_comb begin
-		wrt_enable = can_broadcast;
-		wrt_i = last_broadcast ? 0 : wrt_o + 1;
+		wrt_enable = (ix_o == 44);
+		wrt_i = (wrt_o == 15) ? 0 : wrt_o + 1;
 	end
 
 	//
 	// validOut: if we can broadcast, we do. So it's the same thing
 	//
-	assign validOut = can_broadcast;
+	assign validOut = (ix_o == 43) || (ix_o == 44 && wrt_o != 15);
 
 	//
 	// newBlock: True when this broadcast is the first of a new block

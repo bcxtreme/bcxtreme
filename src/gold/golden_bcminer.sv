@@ -40,7 +40,6 @@ class golden_bcminer;
 		end
 
 		if (writeValid_i) gblock.write_chunk(blockData_i);
-		writeReady_o = gblock.isWriteReady();
 
 		if (gblock.has_data_to_send()) begin
 			bit[351:0] raw_data;
@@ -53,8 +52,10 @@ class golden_bcminer;
 			success_o = ^ (raw_data);
 		end else begin
 			resultValid_o = 0;
-			success_o = 0;
+			success_o = gblock.tmp_xor;
 		end
+
+		writeReady_o = gblock.isWriteReady();
 	endtask
 
 endclass

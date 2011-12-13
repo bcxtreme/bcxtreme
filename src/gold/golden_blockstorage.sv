@@ -21,14 +21,20 @@ class golden_blockstorage;
 		return 0;
 	endfunction
 
+	bit tmp_xor;
 	task write_chunk(bit[7:0] chunk);
 		if (!currently_reading)
 			return;
 
+		tmp_xor ^= (^ chunk);
+
+		$display("[Wrote golden_chunk[%d] = %d (xor: %b) ]", read_index, chunk, (^ chunk) );
+
 		write_ready = 0;
-		CheckBlockStorageIndex: assert( read_index >= 0 && read_index < 44 );
+		// CheckBlockStorageIndex: assert( read_index >= 0 && read_index < 44 );
 		block[read_index] = chunk;
 		read_index += 1;
+
 
 		if (read_index == 44) begin
 			read_index = 0;
@@ -45,16 +51,18 @@ class golden_blockstorage;
 	endfunction
 
 	function bit is_new_block();
-		CheckHasDataToSend: assert( can_send == 1 );
+		// CheckHasDataToSendA: assert( can_send == 1 );
 		return (wrt_index == 0) ? 1 : 0;
 	endfunction
 
 	function bit[351:0] broadcast_data();
-		CheckHasDataToSend: assert( can_send == 1 );
+		// CheckHasDataToSendB: assert( can_send == 1 );
 		wrt_index += 1;
 		if (wrt_index == 16) begin	// NOTE: Eventually this will send 2^32 / N times instead of 16
 			can_send = 0;
 			write_ready = 1;
+			wrt_index = 0;
+			tmp_xor = 0;
 		end
 		return block;
 	endfunction

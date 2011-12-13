@@ -106,10 +106,11 @@ program bench
 		#2 if (env.verbose) print_outputs();
 
 		for (int i = 0; i < env.max_cycles; i++) begin
-			set_inputs();
-			#2 if (env.verbose) print_inputs();
+			#1 set_inputs();
+			if (env.verbose) print_inputs();
+			#1
 			do_cycle();
-			#2 if (env.verbose) print_outputs();
+			#1 if (env.verbose) print_outputs();
 			err_count += verify_outputs();
 		end
 
