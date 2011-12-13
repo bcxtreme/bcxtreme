@@ -22,4 +22,4 @@ logic core2_inputready;
 
 sha_simple_core #(.ROUNDS(1),.CYCLESWIDTH(6)) core2(.clk,.rst(core2begin),.M(core2_input),.hash_valid,.input_valid(core2_inputready));
 
-endmodule;
+endmodule

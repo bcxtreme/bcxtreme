@@ -1,5 +1,5 @@
 module sha_message_expander_round(
-input logic[31:0] history[15:0],
+input logic[15:0][31:0] history,
 output logic[31:0] W);
 
 logic[31:0] tmp1;

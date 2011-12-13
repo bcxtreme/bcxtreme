@@ -1,10 +1,11 @@
-SHA_VERILOGS=shacore/*.sv
+SHA_VERILOGS=shacore/*.sv shacore/precompiled/*/src/*.sv shacore/super_pipelined/*.sv shacore/super_pipelined/*/*.sv
 SHARED_VERILOGS=shared/*.sv
 TOP_VERILOGS=top/*.sv
 
 VCSARGS= \
 -PP -sverilog\
 +define+SV +define+VPD +lint=all\
+-debug_pp\
 #-cm_tgl mda -debug -lca -cm line+cond+fsm+tgl+path
 
 all: shacore_design
