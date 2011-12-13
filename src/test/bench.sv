@@ -52,6 +52,7 @@ program bench
 	function int verify_outputs();
 		int err_count;
 		err_count = 0;
+
 		if (gb.writeReady_o != blkWrt.writeReady) begin
 			if (env.verbose) $display(">> DUT writeReady: %b", blkWrt.writeReady);
 			err_count += 1;
@@ -95,20 +96,21 @@ program bench
 		end
 
 		set_rst(1);
-		if (env.verbose) print_inputs();
+		#2 if (env.verbose) print_inputs();
 		do_cycle();
-		if (env.verbose) print_outputs();
+		#2 if (env.verbose) print_outputs();
 
 		set_rst(0);
-		if (env.verbose) print_inputs();
+		#2 if (env.verbose) print_inputs();
 		do_cycle();
-		if (env.verbose) print_outputs();
+		#2 if (env.verbose) print_outputs();
 
 		for (int i = 0; i < env.max_cycles; i++) begin
-			set_inputs();
+			#1 set_inputs();
 			if (env.verbose) print_inputs();
+			#1
 			do_cycle();
-			if (env.verbose) print_outputs();
+			#1 if (env.verbose) print_outputs();
 			err_count += verify_outputs();
 		end
 
