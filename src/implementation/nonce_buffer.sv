@@ -42,7 +42,7 @@ logic nonce_new;
 logic nonce_will_be_new;
 ff #(.WIDTH(1)) n(.clk,.data_i(nonce_will_be_new),.data_o(nonce_was_new));
 
-assign nonce_will_be_new=((write && !counting) | nonce_new) && !read);
+assign nonce_will_be_new=((write && ~counting) | nonce_new) && ~read);
 
 assign nonce_o=stored_nonce_[0];
 

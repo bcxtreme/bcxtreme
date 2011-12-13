@@ -13,11 +13,11 @@ module bcminer
 	logic [351:0] st;
 	logic tmp1, tmp2;
 
-	blockStorage bs(
+	block_storage bs(
 		.clk,
 		.rst,
 		.blkRd,
-		.validOut(resultValid),
+		.outputValid(resultValid),
 		.newBlock(success),
 		.initialState(st)
 	);
