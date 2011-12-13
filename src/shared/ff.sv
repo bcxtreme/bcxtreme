@@ -13,10 +13,8 @@ module ff #(parameter WIDTH = 1)
 	always_ff @(posedge clk) begin
 		if (rst)
 			mem <= 0;
-		else if (enable)
-			mem <= data_i;
 		else
-			mem <= mem;
+			mem <= enable ? data_i : mem;
 	end
 	assign data_o = mem;
 endmodule

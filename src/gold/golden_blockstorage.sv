@@ -28,7 +28,7 @@ class golden_blockstorage;
 
 		tmp_xor ^= (^ chunk);
 
-		$display("[Wrote golden_chunk[%d] = %d (xor: %b) ]", read_index, chunk, (^ chunk) );
+		$display("[Wrote golden_chunk[%d] = %d (cum xor: %b) ]", read_index, chunk, (^ tmp_xor) );
 
 		write_ready = 0;
 		// CheckBlockStorageIndex: assert( read_index >= 0 && read_index < 44 );
@@ -43,7 +43,6 @@ class golden_blockstorage;
 			wrt_index = 0;
 		end
 
-			
 	endtask
 
 	function bit has_data_to_send();

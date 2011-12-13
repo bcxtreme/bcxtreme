@@ -60,17 +60,6 @@ module blockStorage
 		.data_o(wrt_o)
 	);
 
-	logic need_new_block, can_broadcast, need_data, last_broadcast, currently_accepting_data, last_chunk;
-
-	assign need_new_block = (ix_o == 0);
-	assign last_chunk = (ix_o == 43);
-	assign can_broadcast = (ix_o == 44);
-
-	assign need_data = !(last_chunk || can_broadcast);
-	assign last_broadcast = (wrt_o == 15);
-
-	initial $monitor("currently_accepting_data: %b; chunk_ix: %d; chunk: %d; last_chunk: %b; xor_i: %b; xor_enable: %b; xor_o: %b", currently_accepting_data, ix_o, blkRd.blockData, last_chunk, xor_i, xor_enable, xor_o);
-
 
 
 
@@ -83,10 +72,10 @@ module blockStorage
 	// accept_data_now: True iff writes should be accepted
 	//
 	always_comb begin
-		if ((ix_o == 0 && !accept_data_now) || wrt_o == 15) begin
+		if (wrt_o == 15 || (!accept_data_now && ix_o == 0)) begin
 			accept_data_enable = 1;
 			accept_data_next_cycle = 1;
-		end else if (ix_o == 43) begin
+		end else if (ix_o == 44) begin
 			accept_data_enable = 1;
 			accept_data_next_cycle = 0;
 		end else
@@ -107,25 +96,20 @@ module blockStorage
 	// XXX: eventually delete this!
 	//
 	always_comb begin
-		if (accept_data_now && blkRd.writeValid && !(ix_o == 43)) begin
-			xor_enable = 1;
-			xor_i = (^ blkRd.blockData) ^ xor_o;
-		end else if (wrt_o == 15) begin
-			xor_enable = 1;
-			xor_i = 0;
-		end else
-			xor_enable = 0;
+		xor_enable = (accept_data_now && ix_o != 44 && blkRd.writeValid) || (wrt_o == 15);
+		xor_i = (wrt_o == 15) ? 0 : ((^ blkRd.blockData) ^ xor_o);
 	end
+	initial $monitor("[%t] xor_i: %b, xor_o: %b; ix_o: %d", $time, xor_i, xor_o, ix_o);
 
 	//
 	// chunk_ix: increment every time we read a chunk. Sit at 44 when we're done until
 	//           we're ready for more data.
 	//
 	always_comb begin
-		if (accept_data_now && blkRd.writeValid) begin
-			ix_enable = 1;
+		if (accept_data_now && ix_o != 44) begin
+			ix_enable = blkRd.writeValid;
 			ix_i = ix_o + 1;
-		end else if (last_broadcast) begin
+		end else if (wrt_o == 15) begin
 			ix_enable = 1;
 			ix_i = 0;
 		end else
@@ -143,7 +127,7 @@ module blockStorage
 	//
 	// validOut: if we can broadcast, we do. So it's the same thing
 	//
-	assign validOut = (ix_o == 43) || (ix_o == 44 && wrt_o != 15);
+	assign validOut = (ix_o == 44);
 
 	//
 	// newBlock: True when this broadcast is the first of a new block
