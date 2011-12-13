@@ -28,7 +28,7 @@ class golden_blockstorage;
 
 		tmp_xor ^= (^ chunk);
 
-		$display("[Wrote golden_chunk[%d] = %d (cum xor: %b) ]", read_index, chunk, (^ tmp_xor) );
+		$display("DEBUG(GOLD): chunk[%d] = %d (cum xor: %b) ]", read_index, chunk, (^ tmp_xor) );
 
 		write_ready = 0;
 		// CheckBlockStorageIndex: assert( read_index >= 0 && read_index < 44 );

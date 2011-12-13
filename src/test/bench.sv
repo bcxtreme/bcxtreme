@@ -54,23 +54,23 @@ program bench
 		err_count = 0;
 
 		if (gb.writeReady_o != blkWrt.writeReady) begin
-			if (env.verbose) $display(">> DUT writeReady: %b", blkWrt.writeReady);
+			if (env.verbose) $display("ERROR: DUT writeReady: %b", blkWrt.writeReady);
 			err_count += 1;
 		end
 		if (gb.resultValid_o != resultValid) begin
-			if (env.verbose) $display(">> DUT resultValid: %b", resultValid);
+			if (env.verbose) $display("ERROR: DUT resultValid: %b", resultValid);
 			err_count += 1;
 		end
 		if (gb.resultValid_o && (gb.success_o != success)) begin
-			if (env.verbose) $display(">> DUT success: %b", success);
+			if (env.verbose) $display("ERROR: DUT success: %b", success);
 			err_count += 1;
 		end
 		if (gb.nonce_o != nonBufRd.nonce) begin
-			if (env.verbose) $display(">> DUT nonce: %b", nonBufRd.nonce);
+			if (env.verbose) $display("ERROR: DUT nonce: %b", nonBufRd.nonce);
 			err_count += 1;
 		end
 		if (gb.overflow_o != nonBufRd.overflow) begin
-			if (env.verbose) $display(">> DUT overflow: %b", nonBufRd.overflow);
+			if (env.verbose) $display("ERROR: DUT overflow: %b", nonBufRd.overflow);
 			err_count += 1;
 		end
 		return err_count;
