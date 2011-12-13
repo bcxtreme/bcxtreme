@@ -1,5 +1,6 @@
-
-function int Kfunction(int index) begin
+function automatic int Kfunction; 
+input int index;
+begin
 int K=0;
 case (index)
 	0:K=32'h428a2f98; 1:K=32'h71374491; 2:K=32'hb5c0fbcf;
@@ -27,3 +28,4 @@ case (index)
 endcase
 Kfunction=K;
 end
+endfunction
