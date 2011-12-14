@@ -3,7 +3,7 @@ INTERFACES=interfaces/blockStoreIfc.sv interfaces/nonceBufferIfc.sv
 BENCH=test/inputs.sv test/environ.sv test/bench.sv
 GOLD=gold/golden_blockstorage.sv gold/golden_bcminer.sv
 
-SHARED=shared/ff.sv
+SHARED=shared/eff.sv
 BLOCKSTORAGE=blockStorage/blockStorage.sv
 DUT=$(SHARED) $(BLOCKSTORAGE) bcminer.sv
 
