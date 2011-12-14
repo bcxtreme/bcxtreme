@@ -52,7 +52,7 @@ class golden_bcminer;
 			success_o = ^ (raw_data);
 		end else begin
 			resultValid_o = 0;
-			success_o = gblock.tmp_xor;
+			success_o = 0;
 		end
 
 		writeReady_o = gblock.isWriteReady();
