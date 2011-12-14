@@ -99,7 +99,6 @@ module blockStorage
 		xor_enable = (accept_data_now && ix_o != 44 && blkRd.writeValid) || (wrt_o == 15);
 		xor_i = (wrt_o == 15) ? 0 : ((^ blkRd.blockData) ^ xor_o);
 	end
-	initial $monitor("DEBUG(DUT):%d xor_i: %b, xor_o: %b; ix_o: %d", $time, xor_i, xor_o, ix_o);
 
 	//
 	// chunk_ix: increment every time we read a chunk. Sit at 44 when we're done until

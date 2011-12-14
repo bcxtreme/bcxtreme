@@ -38,7 +38,7 @@ class environ;
 		if (fd == 0) error("Could not open or find config.ini");
 
 		while (!$feof(fd)) begin
-			string param;
+			string param, dummy_string;
 
 			param = read_string(fd);
 			case (param)
@@ -46,6 +46,8 @@ class environ;
 				"density_rst": density_rst = read_real(fd);
 				"density_writeValid": density_writeValid = read_real(fd);
 				"verbose": verbose = read_int(fd);
+				"/*": /* skip comments */ while ("*/" != read_string(fd));
+				"#": /* skip lines with comments */ while ($fgetc(fd) != "\n");
 				"": /* skip blanks */;
 				default: error({"Unknown config parameter: '", param, "'"});
 			endcase

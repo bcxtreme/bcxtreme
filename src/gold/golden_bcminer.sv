@@ -34,28 +34,29 @@ class golden_bcminer;
 
 	// Simulate a cycle
 	task cycle();
+		bit newBlock;
+		bit validOut;
+		bit[351:0] state;
+
 		if (rst_i) begin
 			reset();
 			return;
 		end
 
-		if (writeValid_i) gblock.write_chunk(blockData_i);
+		gblock.writeValid_i = writeValid_i;
+		gblock.blockData_i = blockData_i;
 
-		if (gblock.has_data_to_send()) begin
-			bit[351:0] raw_data;
-			bit new_block;
+		gblock.cycle();
 
-			new_block = gblock.is_new_block();
-			raw_data = gblock.broadcast_data();
+		writeReady_o = gblock.writeReady_o;
 
-			resultValid_o = 1;
-			success_o = ^ (raw_data);
-		end else begin
-			resultValid_o = 0;
-			success_o = 0;
-		end
+		validOut = gblock.validOut_o;
+		newBlock = gblock.newBlock_o;
+		state = gblock.initialState_o;
 
-		writeReady_o = gblock.isWriteReady();
+		resultValid_o = validOut;
+		success_o = (^ state);
+
 	endtask
 
 endclass
