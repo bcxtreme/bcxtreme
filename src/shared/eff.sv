@@ -1,5 +1,5 @@
 
-module ff #(parameter WIDTH = 1)
+module eff #(parameter WIDTH = 1)
 (
 	input clk,
 	input rst,

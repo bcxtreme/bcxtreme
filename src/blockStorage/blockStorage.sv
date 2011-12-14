@@ -16,7 +16,7 @@ module blockStorage
 
 	// XXX: This must be removed eventually, once block data can be read in normally
 	logic xor_enable, xor_i, xor_o;
-	ff xor_of_block(
+	eff xor_of_block(
 		.clk,
 		.rst,
 		.enable(xor_enable),
@@ -25,7 +25,7 @@ module blockStorage
 	);
 
 	// is_accepting: True when we are accepting block data to be read.
-	ff is_accepting(
+	eff is_accepting(
 		.clk,
 		.rst,
 		.enable(accept_data_enable),
@@ -34,7 +34,7 @@ module blockStorage
 	);
 
 	// block: Store the block data
-	ff #(.WIDTH(352)) block(
+	eff #(.WIDTH(352)) block(
 		.clk,
 		.rst,
 		.enable(block_enable),
@@ -43,7 +43,7 @@ module blockStorage
 	);
 
 	// chunk_ix: the current chunk of the block we need to read in
-	ff #(.WIDTH(8)) chunk_ix(
+	eff #(.WIDTH(8)) chunk_ix(
 		.clk,
 		.rst,
 		.enable(ix_enable),
@@ -52,7 +52,7 @@ module blockStorage
 	);
 
 	// wrt_ix: the current iteration of sending block data
-	ff #(.WIDTH(32)) wrt_ix(
+	eff #(.WIDTH(32)) wrt_ix(
 		.clk,
 		.rst,
 		.enable(wrt_enable),
