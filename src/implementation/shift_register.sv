@@ -1,5 +1,5 @@
-module shift_register (
-input logic clk,
+module shift_register #(parameter COUNTBITS=6) 
+(input logic clk,
 input logic write_valid,
 input logic read,
 input logic[7:0] block_data,
@@ -9,10 +9,10 @@ output logic[351:0] out
 logic shift;
 assign shift=write_valid & (~full);
 
-logic[32:0] count;
+logic[COUNTBITS:0] count;
 logic start_counter;
 logic inc_counter;
-counter #(.WIDTH(33)) c(.clk,.inc(inc_counter),.rst(start_counter),.count);
+counter #(.WIDTH(COUNTBITS+1)) c(.clk,.inc(inc_counter),.rst(start_counter),.count);
 
 assign inc_counter= shift; 
 assign full=count[0];

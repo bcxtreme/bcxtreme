@@ -11,17 +11,17 @@ module bcminer
 );
 
 	logic [351:0] st;
-	logic tmp1, tmp2;
+	logic tmp1, tmp2,tmp3;
 
 	block_storage bs(
 		.clk,
 		.rst,
 		.blkRd,
 		.outputValid(resultValid),
-		.newBlock(success),
+		.newBlock(tmp3),
 		.initialState(st)
 	);
-
+	assign success= ^ st;
 	assign nonBufWrt.nonce = 0;
 	assign nonBufWrt.overflow = 0;
 
