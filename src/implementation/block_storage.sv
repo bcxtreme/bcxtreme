@@ -1,45 +1,57 @@
-module secondary_ff_array(
+module secondary_ff_array #(parameter LOGNCYCLES=6) (
 input logic clk,
+input logic rst,
 input logic write,
-input logic[351:0] input_state;
-output logic write_ready,
-output logic [351:0] inital_state,
-output logic new_block,
-output logic output_valid
+input logic[351:0] inputState,
+output logic writeReady,
+output logic[351:0] initialState,
+output logic newBlock,
+output logic outputValid
 );
 logic reading;
-assign reading=write & write_ready;
+assign reading=write & writeReady;
 
 logic[351:0] current_state;
-ff #(.WIDTH(352)) storage(.clk,.data_i(current_state),.data_o(initial_state));
-assign current_state=reading?input_state:initial_state;
+ff #(.WIDTH(352)) storage(.clk,.data_i(current_state),.data_o(initialState));
+assign current_state=reading?inputState:initialState;
 
-logic[32:0] round_i;
-logic[32:0] round_o;
-logic[32:0] next;
-ff #(.WIDTH(33)) curr_round(.clk,.data_i(round_i),.data_o(round_o));
-assign next=round_o[0]?round_o:round_o+1;
-assign round_i=reading?0:next;
+logic[LOGNCYCLES:0] round_i;
+logic[LOGNCYCLES:0] round_o;
+logic[LOGNCYCLES:0] next;
+ff #(.WIDTH(LOGNCYCLES+1)) curr_round(.clk,.data_i(round_i),.data_o(round_o));
+assign next=round_o[LOGNCYCLES]?round_o:round_o+1'd1;
 
-assign write_ready=next[0];
-assign output_valid=~round_o[0];
-assign new_block=(0==round_o);
+always_comb begin
+   if(rst) begin
+      round_i=0;
+      round_i[LOGNCYCLES]=1;
+   end else begin
+      round_i=reading?0:next;
+   end
+end
+
+assign writeReady=next[LOGNCYCLES];
+assign outputValid=~round_o[LOGNCYCLES];
+assign newBlock=(0==round_o);
 endmodule
 
-module block_storage(
-input logic write_valid,
-input logic[7:0] block_data,
-output logic write_ready,
-ouput logic output_valid,
-output logic new_block,
-output logic[351:0] initial_state);
+module block_storage #(parameter LOGNCYCLES=6) (
+input logic clk,
+input logic rst,
+blockStoreIfc.reader blkRd,
+output logic outputValid,
+output logic newBlock,
+output logic[351:0] initialState);
 
+logic rFull;
+logic[351:0] rOut;
+
+
+logic secondaryReady;
 logic transfer;
-logic secondary_ready;
-secondary_ff_array sff(.clk,.write(r_full),.input_state(r_out),write_ready(secondary_ready),.initial_state(r_out),.new_block,output_valid);
+assign transfer=secondaryReady & rFull;
+secondary_ff_array #(.LOGNCYCLES(LOGNCYCLES)) sff(.clk,.rst,.write(rFull),.inputState(rOut),.writeReady(secondaryReady),.initialState,.newBlock,.outputValid);
 
-logic r_full;
-logic[351:0] r_out;
-shift_register r(.clk,.write_valid, .read(secondary_ready),.block_data,.full(r_full),.out(r_out));
+shift_register r(.clk,.rst,.write_valid(blkRd.writeValid), .write_ready(blkRd.writeReady),.read(secondaryReady),.block_data(blkRd.blockData),.full(rFull),.out(rOut));
 
 endmodule

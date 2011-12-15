@@ -1,5 +1,5 @@
 
-class golden_bcminer;
+class golden_bcminer  #(parameter COUNTBITS = 6);
 
 
 	bit rst_i;
@@ -19,7 +19,7 @@ class golden_bcminer;
 	bit overflow_o;
 
 	// Golden units
-	local golden_blockstorage gblock;
+	local golden_blockstorage #(.COUNTBITS(COUNTBITS)) gblock;
 
 	// Reset the output pins and the internal state
 	task reset();
@@ -55,6 +55,7 @@ class golden_bcminer;
 		state = gblock.initialState_o;
 
 		resultValid_o = validOut;
+		//$display("%x",state);
 		success_o = (^ state);
 
 	endtask

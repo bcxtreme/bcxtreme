@@ -3,15 +3,15 @@ INTERFACES=interfaces/blockStoreIfc.sv interfaces/nonceBufferIfc.sv
 BENCH=test/inputs.sv test/environ.sv test/bench.sv
 GOLD=gold/golden_blockstorage.sv gold/golden_bcminer.sv
 
-SHARED=shared/eff.sv
-BLOCKSTORAGE=blockStorage/blockStorage.sv
+SHARED=shared/eff.sv implementation/shared/*.sv
+BLOCKSTORAGE=implementation/shift_register.sv implementation/block_storage.sv
 DUT=$(SHARED) $(BLOCKSTORAGE) bcminer.sv
 
 .PHONY: help clean bench test
 
 
 bench:
-	vcs -PP -sverilog +define+SV +define+VPD $(TOP) $(INTERFACES) $(DUT) $(GOLD) $(BENCH) -o simulator.exe
+	vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all $(TOP) $(INTERFACES) $(DUT) $(GOLD) $(BENCH) -o simulator.exe
 
 test: bench
 	./simulator.exe

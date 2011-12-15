@@ -1,5 +1,5 @@
 
-interface blockStoreIfc();
+interface blockStoreIfc(input logic clk);
 
 	logic writeValid;
 	logic writeReady;
@@ -12,8 +12,7 @@ interface blockStoreIfc();
 	endclocking
 
 	modport writer(
-		output writeValid, output blockData,
-		input writeReady
+		clocking cb
 	);
 
 	modport reader(

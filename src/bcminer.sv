@@ -1,6 +1,6 @@
 
 
-module bcminer
+module bcminer #(parameter COUNTBITS = 6)
 (
 	input clk,
 	input rst,
@@ -11,17 +11,17 @@ module bcminer
 );
 
 	logic [351:0] st;
-	logic tmp1, tmp2;
+	logic tmp1, tmp2,tmp3;
 
-	blockStorage bs(
+	block_storage  #(.LOGNCYCLES(COUNTBITS)) bs(
 		.clk,
 		.rst,
 		.blkRd,
-		.validOut(resultValid),
-		.newBlock(success),
+		.outputValid(resultValid),
+		.newBlock(tmp3),
 		.initialState(st)
 	);
-
+	assign success= ^ st;
 	assign nonBufWrt.nonce = 0;
 	assign nonBufWrt.overflow = 0;
 

@@ -88,9 +88,7 @@ class golden_blockstorage #(parameter COUNTBITS = 6);
 
 
 		try_do_broadcast();
-
 		writeReady_o = is_write_ready();
-
 	endtask
 endclass
 
