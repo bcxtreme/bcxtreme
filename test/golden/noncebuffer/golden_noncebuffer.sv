@@ -1,8 +1,8 @@
 class golden_noncebuffer;
-	bit rst
+	bit rst;
 		
 	bit validIn;
-	bit success:
+	bit success;
 	bit [31:0] nonceIn;
 	bit [31:0] buffer;
 	
