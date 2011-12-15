@@ -11,7 +11,7 @@ class hashvalidate_test;
 	bit newblock_out;
 	bit success;
 
-	bit[255:0] diff;
+	bit[255:0] diff;//difficulty max_target / current_target
 
 	function void get_target();
 		//calculate 256 bit target using diffuclty
@@ -22,21 +22,15 @@ class hashvalidate_test;
 		le_diff[15:8] = difficulty[23:16];
 		le_diff[7:0] = difficulty[31:24];	
 		
-		//$display("%x", le_diff);
-		
 		target =  le_diff[23:0]* 2 **(8*(le_diff[31:24]-3));
-		//$display("%x",target);
 
-		$display("%x", max_target);
 		diff = max_target / target;
-		$display(diff);
+
 		valid_out = 1;
 	endfunction
 	
 	function void hashvalidate_result();
 		if (valid_in) begin
-				
-		
 			if(newblock_in) begin
 				newblock_out = 1;
 			end
@@ -44,8 +38,7 @@ class hashvalidate_test;
 			get_target();
 			
 
-			if(hash < diff) begin
-				//check if the output matches difficulty
+			if(hash < diff) begin //check if the output matches difficulty
 				success = 1;
 			end
 

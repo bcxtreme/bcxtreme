@@ -96,21 +96,21 @@ program bench
 		end
 
 		set_rst(1);
-		#2 if (env.verbose) print_inputs();
+		if (env.verbose) print_inputs();
 		do_cycle();
-		#2 if (env.verbose) print_outputs();
+		if (env.verbose) print_outputs();
 
 		set_rst(0);
-		#2 if (env.verbose) print_inputs();
+		if (env.verbose) print_inputs();
 		do_cycle();
-		#2 if (env.verbose) print_outputs();
+		if (env.verbose) print_outputs();
 
 		for (int i = 0; i < env.max_cycles; i++) begin
-			#1 set_inputs();
+			set_inputs();
 			if (env.verbose) print_inputs();
-			#1
+
 			do_cycle();
-			#1 if (env.verbose) print_outputs();
+			if (env.verbose) print_outputs();
 			err_count += verify_outputs();
 		end
 
