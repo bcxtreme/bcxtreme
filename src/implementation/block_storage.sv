@@ -35,7 +35,7 @@ assign outputValid=~round_o[LOGNCYCLES];
 assign newBlock=(0==round_o);
 endmodule
 
-module block_storage(
+module block_storage #(parameter LOGNCYCLES=6) (
 input logic clk,
 input logic rst,
 blockStoreIfc.reader blkRd,
@@ -50,9 +50,8 @@ logic[351:0] rOut;
 logic secondaryReady;
 logic transfer;
 assign transfer=secondaryReady & rFull;
-secondary_ff_array sff(.clk,.rst,.write(rFull),.inputState(rOut),.writeReady(secondaryReady),.initialState,.newBlock,.outputValid);
+secondary_ff_array #(.LOGNCYCLES(LOGNCYCLES)) sff(.clk,.rst,.write(rFull),.inputState(rOut),.writeReady(secondaryReady),.initialState,.newBlock,.outputValid);
 
 shift_register r(.clk,.rst,.write_valid(blkRd.writeValid), .write_ready(blkRd.writeReady),.read(secondaryReady),.block_data(blkRd.blockData),.full(rFull),.out(rOut));
 
-always @(initialState) $display("DUT: %x",initialState);
 endmodule

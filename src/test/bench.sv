@@ -1,6 +1,6 @@
 
 
-program bench
+program bench #(parameter COUNTBITS=6) 
 (
 	input clk,
 	output logic rst,
@@ -12,21 +12,21 @@ program bench
 
 	environ env;
 	inputs inp;
-	golden_bcminer gb;
+	golden_bcminer #(.COUNTBITS(COUNTBITS)) gb;
 
 	task set_rst(bit val);
 		gb.rst_i = val;
-		rst <= val;
+		rst = val;
 	endtask
 
 	task set_writeValid(bit val);
 		gb.writeValid_i = val;
-		blkWrt.writeValid <= val;
+		blkWrt.cb.writeValid <= val;
 	endtask
 
 	task set_blockData(bit[7:0] val);
 		gb.blockData_i = val;
-		blkWrt.blockData <= val;
+		blkWrt.cb.blockData <= val;
 	endtask
 
 	task set_readReady(bit val);
@@ -53,8 +53,8 @@ program bench
 		int err_count;
 		err_count = 0;
 
-		if (gb.writeReady_o != blkWrt.writeReady) begin
-			if (env.verbose) $display("ERROR: DUT writeReady: %b", blkWrt.writeReady);
+		if (gb.writeReady_o != blkWrt.cb.writeReady) begin
+			if (env.verbose) $display("ERROR: DUT writeReady: %b", blkWrt.cb.writeReady);
 			err_count += 1;
 		end
 		if (gb.resultValid_o != resultValid) begin
@@ -77,10 +77,8 @@ program bench
 	endfunction
 
 	task do_cycle();
-		$display("before posedge %t",$time);
-		@(posedge clk)
+		@(blkWrt.cb)
 		gb.cycle();
-		$display("after posedge %t",$time);
 		inp.generate_inputs();
 	endtask
 
@@ -113,7 +111,8 @@ program bench
 			if (env.verbose) print_inputs();
 
 			do_cycle();
-			if (env.verbose) print_outputs();
+                  	 if (env.verbose) print_outputs();
+		
 			err_count += verify_outputs();
 		end
 

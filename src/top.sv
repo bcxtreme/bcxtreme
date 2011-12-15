@@ -1,19 +1,19 @@
 
 `timescale 1ns/1ns
 
-module top;
+module top #(parameter COUNTBITS=8);
 	bit clk = 0;
 	always #5 clk = ~clk;
 
 	initial $vcdpluson;
 
 	bit rst;
-	blockStoreIfc blkStore();
+	blockStoreIfc blkStore(clk);
 	bit resultValid;
 	bit success;
 	nonceBufferIfc nonBuf();
 
-	bcminer dut (
+	bcminer #(.COUNTBITS(COUNTBITS)) dut (
 		.clk,
 		.rst,
 		.blkRd(blkStore.reader),
@@ -22,7 +22,7 @@ module top;
 		.nonBufWrt(nonBuf.writer)
 	);
 
-	bench tb (
+	bench #(.COUNTBITS(COUNTBITS)) tb (
 		.clk,
 		.rst,
 		.blkWrt(blkStore.writer),

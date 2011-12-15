@@ -24,8 +24,6 @@ assign start_counter = (read & full);
 
 assign write_ready= start_counter | (count==0);
 
-always @(write_ready or block_data) $display("Write ready: %x %b %t",block_data, write_ready, $time);
-
 logic[7:0] ffin[43:0];
 logic[7:0] ffout[43:0];
 generate
