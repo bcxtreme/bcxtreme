@@ -55,6 +55,7 @@ class golden_bcminer;
 		state = gblock.initialState_o;
 
 		resultValid_o = validOut;
+		//$display("%x",state);
 		success_o = (^ state);
 
 	endtask

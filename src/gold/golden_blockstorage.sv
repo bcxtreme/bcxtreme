@@ -88,9 +88,8 @@ class golden_blockstorage #(parameter COUNTBITS = 6);
 
 
 		try_do_broadcast();
-
+		$display("Determining whether we have room.  According to us we will write to %d",bufA_next);
 		writeReady_o = is_write_ready();
-
 	endtask
 endclass
 

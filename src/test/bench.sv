@@ -42,7 +42,7 @@ program bench
 	endtask
 
 	task print_inputs();
-		$display("%t: [rst %b] [writeValid %b] [blockData %d] [readReady %b]", $time, gb.rst_i, gb.writeValid_i, gb.blockData_i, gb.readReady_i);
+		$display("%t: [rst %b] [writeValid %b] [blockData %x] [readReady %b]", $time, gb.rst_i, gb.writeValid_i, gb.blockData_i, gb.readReady_i);
 	endtask
 
 	task print_outputs();
@@ -77,8 +77,10 @@ program bench
 	endfunction
 
 	task do_cycle();
+		$display("before posedge %t",$time);
 		@(posedge clk)
 		gb.cycle();
+		$display("after posedge %t",$time);
 		inp.generate_inputs();
 	endtask
 
@@ -101,6 +103,7 @@ program bench
 		if (env.verbose) print_outputs();
 
 		set_rst(0);
+		set_inputs();
 		if (env.verbose) print_inputs();
 		do_cycle();
 		if (env.verbose) print_outputs();

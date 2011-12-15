@@ -11,7 +11,7 @@ DUT=$(SHARED) $(BLOCKSTORAGE) bcminer.sv
 
 
 bench:
-	vcs -PP -sverilog +define+SV +define+VPD $(TOP) $(INTERFACES) $(DUT) $(GOLD) $(BENCH) -o simulator.exe
+	vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all $(TOP) $(INTERFACES) $(DUT) $(GOLD) $(BENCH) -o simulator.exe
 
 test: bench
 	./simulator.exe
