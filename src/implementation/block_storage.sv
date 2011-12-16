@@ -35,6 +35,9 @@ assign outputValid=~round_o[LOGNCYCLES];
 assign newBlock=(0==round_o);
 endmodule
 
+
+
+
 module block_storage #(parameter LOGNCYCLES=6) (
 input logic clk,
 input logic rst,
@@ -55,3 +58,4 @@ secondary_ff_array #(.LOGNCYCLES(LOGNCYCLES)) sff(.clk,.rst,.write(rFull),.input
 shift_register r(.clk,.rst,.write_valid(blkRd.writeValid), .write_ready(blkRd.writeReady),.read(secondaryReady),.block_data(blkRd.blockData),.full(rFull),.out(rOut));
 
 endmodule
+
