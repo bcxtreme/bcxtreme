@@ -6,7 +6,45 @@
 // only three words in the 2nd chunk are needed. nonce is the 4th word and the rest are padding - remember the last word of padding is the length - 640 (80 bytes) if newBlock and valid high then nonce is 0, else previous + 1 eh? 
 
 
+function automatic bit[255:0] little_endian_sha256( bit[31:0] _h[8], bit data[], int round_number );
+
+  bit [0:31] _h_be[8];
+  bit data_be[];
+
+  bit[0:255] result_be;
+  bit[255:0] result;
+
+  // convert data
+  data_be = new[data.size()];
+  for ( int i = 0; i < data.size(); i++ ) begin
+    data_be[i] = data[(data.size() -1) - i];
+  end
+
+  // convert _h
+  for ( int j = 0; j < 8; j++ ) begin
+    for ( int i = 0; i < 32; i++ ) begin
+      _h_be[i] = _h[i][(31) - i];
+    end   
+  end
+
+  // now do it all in big-endian
+  result_be = bitcoin_sha256( _h_be, data_be, round_number );
+
+  // convert result
+  for ( int i = 0; i < 256; i++ ) begin
+    result[i] = result_be[255 - i];
+  end  
+
+  return result;
+
+endfunction : little_endian_sha256
+
+
+
+// round_number is 1 based!
 function automatic bit[0:255] bitcoin_sha256( bit[0:31] _h[8], bit data[], int round_number ); //, bit[0:31] w1, bit[0:31] w2, bit[0:31] w3, int round_number ) {
+
+  int start_point;
 
   bit[0:255] result;
   bit _data[];
@@ -28,11 +66,13 @@ function automatic bit[0:255] bitcoin_sha256( bit[0:31] _h[8], bit data[], int r
   };
 
   // just in case the function can skip some of the rounds
+  /*
   if ( round_number == 1 ) begin
     _h = {
       32'h6a09e667, 32'hbb67ae85, 32'h3c6ef372, 32'ha54ff53a, 32'h510e527f, 32'h9b05688c, 32'h1f83d9ab, 32'h5be0cd19
     };
   end
+  */
 
   _data = data;
 
@@ -138,7 +178,15 @@ function automatic bit[0:255] bitcoin_sha256( bit[0:31] _h[8], bit data[], int r
     //  c := b
     //  b := a
     //  a := t1 + t2
-    for ( int i = 0; i < 64; i++ ) begin
+
+    if ( chunk == 0 ) begin
+      start_point = round_number - 1;
+      $display( "start_point=%d", start_point );
+    end
+    else
+      start_point = 0;
+
+    for ( int i = start_point; i < 64; i++ ) begin
       /*
       int s0 = rightrotate( a, 2 ) ^ rightrotate( a, 13 ) ^ rightrotate( a, 22 );
       int maj = (a & b) ^ (a & c) ^ (b & c);
@@ -179,14 +227,13 @@ function automatic bit[0:255] bitcoin_sha256( bit[0:31] _h[8], bit data[], int r
     _h[7] += h;
 
   end
-
+ 
   result = { _h[0], _h[1], _h[2], _h[3], _h[4], _h[5], _h[6], _h[7] };
   
   return result;
 
   //$display( "%h", result );
-  
-   
+     
 endfunction
 
 
@@ -200,6 +247,8 @@ function automatic bit[0:255] sha256( string message );
   bit [0:31] _h[8] = {
     32'h6a09e667, 32'hbb67ae85, 32'h3c6ef372, 32'ha54ff53a, 32'h510e527f, 32'h9b05688c, 32'h1f83d9ab, 32'h5be0cd19
   };
+
+  bit [0:31] __h[8];
 
   //Initialize table of round constants
   //(first 32 bits of the fractional parts of the cube roots of the first 64 primes 2..311):
@@ -227,6 +276,7 @@ function automatic bit[0:255] sha256( string message );
   longint binary_message_size;
   bit[0:63] binary_message_size_as_binary;
   bit binary_message[];
+  bit binary_message_original[];
   int padding;
   int minus;
 
@@ -254,7 +304,8 @@ function automatic bit[0:255] sha256( string message );
     end
   end
  
-  //$display( "%h", bitcoin_sha256( placeholder, binary_message, 1 ) );
+  binary_message_original = binary_message;
+  $display( "%h", bitcoin_sha256( _h, binary_message_original, 1 ) );
 
   //for ( int j = 0; j < binary_message.size(); j++ ) begin
     //$display( binary_message[j] );    
@@ -316,7 +367,9 @@ function automatic bit[0:255] sha256( string message );
   //for each chunk
   //  break chunk into sixteen 32-bit big-endian words w[0..15]
   for ( int chunk = 0; chunk < binary_message.size() / 512; chunk++ ) begin
-    
+
+
+
     bit[0:31] a = _h[0];
     bit[0:31] b = _h[1];
     bit[0:31] c = _h[2];
@@ -374,6 +427,13 @@ function automatic bit[0:255] sha256( string message );
     //  b := a
     //  a := t1 + t2
     for ( int i = 0; i < 64; i++ ) begin
+
+      if ( chunk == 0 && i == 0 ) begin
+        //__h = { a, b, c, d, e, f, g, h };
+        __h = { _h[0], _h[1], _h[2], _h[3], _h[4], _h[5], _h[6], _h[7] };
+        $display( "%h", bitcoin_sha256( __h, binary_message_original, i + 1) );
+      end
+
       /*
       int s0 = rightrotate( a, 2 ) ^ rightrotate( a, 13 ) ^ rightrotate( a, 22 );
       int maj = (a & b) ^ (a & c) ^ (b & c);
@@ -391,7 +451,9 @@ function automatic bit[0:255] sha256( string message );
       b = a;
       a = t1 + t2;
       */
+
       single_round( a, b, c, d, e, f, g, h, i, w[i] );
+
     end
 
 
