@@ -16,7 +16,7 @@ end
 endgenerate
 
 logic[23:0] mantissa_as_number;
-for(genvar i=0; i<3; i++) begin
+for(genvar j=0; j<3; j++) begin
   assign mantissa_as_number[(i+1)*8:i*8]=difficulty[24-i*8:24-(i+1)*8];
 end
 

@@ -1,7 +1,7 @@
 TOP=top.sv
 INTERFACES=interfaces/*.sv
 BENCH=test/inputs.sv test/environ.sv test/bench.sv
-GOLD=gold/*.sv
+GOLD=gold/golden_blockstorage.sv gold/golden_bcminer.sv
 
 SHARED=shared/eff.sv implementation/shared/*.sv
 IMPLEMENTATION=implementation/*.sv

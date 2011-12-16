@@ -1,4 +1,4 @@
-module bxctreme_first_processor #(parameter PARTITIONBITS=1, parameter PROCESSSORNUMBER) (
+module bxctreme_first_processor (
 input logic clk,
 input logic rst,
 //Initial inputs.
@@ -6,7 +6,12 @@ coreInputsIfc.reader inputs,
 coreInputsIfc.writer nextInputs,
 processorResultsIfc.writer results
 );
+    parameter PARTITIONBITS=1;
+    parameter PROCESSORNUMBER=0;
 
+    logic valid_i;
+    logic newblock_i;
+    
 //Processing pipline.
 HashState oh;
 sha_standard_pipelined_core core(.clk,.rst,.in(inputs),.doublehash(oh));
@@ -25,5 +30,5 @@ ff #(.WIDTH(32)) w2ff(.clk,.data_i(inputs.w2),.data_o(nextInputs.w2));
 ff #(.WIDTH(32)) w3ff(.clk,.data_i(inputs.w3),.data_o(nextInputs.w3));
 ff #(.WIDTH(1)) vaff(.clk,.data_i(valid_i),.data_o(nextInputs.valid));
 ff #(.WIDTH(1)) nbff(.clk,.newblock_i(newblock_i),.data_o(nextInputs.newblock));
-a
+
 endmodule
