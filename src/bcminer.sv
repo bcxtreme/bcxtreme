@@ -10,20 +10,42 @@ module bcminer #(parameter COUNTBITS = 6)
 	nonceBufferIfc.writer nonBufWrt
 );
 
-	logic [351:0] st;
-	logic tmp1, tmp2,tmp3;
+	logic bs_valid, bs_new;
+	logic [351:0] bs_state;
+
+	logic sha_valid, sha_new;
+	logic [255:0] sha_hash;
+	logic [31:0] sha_difficulty;
+
 
 	block_storage  #(.LOGNCYCLES(COUNTBITS)) bs(
 		.clk,
 		.rst,
 		.blkRd,
-		.outputValid(resultValid),
-		.newBlock(tmp3),
-		.initialState(st)
+		.outputValid(bs_valid),
+		.newBlock(bs_new),
+		.initialState(bs_state)
 	);
-	assign success= ^ st;
-	assign nonBufWrt.nonce = 0;
-	assign nonBufWrt.overflow = 0;
+
+	logic tmp_xor;
+	assign tmp_xor = ^ bs_state;
+
+	dummy_sha #(.COUNTBITS(COUNTBITS), .DELAY_C(0)) sha (
+		.clk,
+		.rst,
+		.validIn(bs_valid),
+		.newBlockIn(tmp_xor),
+		.initialState(bs_state),
+		.validOut(sha_valid),
+		.newBlockOut(sha_new),
+		.hash(sha_hash),
+		.difficulty(sha_difficulty)
+	);
+
+	assign success = sha_new;
+	assign resultValid = sha_valid;
+	assign nonBufWrt.nonce = 1'b0;
+	assign nonBufWrt.overflow = 1'b0;
 
 endmodule
 	

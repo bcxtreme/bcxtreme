@@ -1,17 +1,4 @@
 
-class golden_dummy_sha #(parameter COUNTBITS = 6);
-	bit validIn_i;
-	bit newBlockIn_i;
-	bit[351:0] initialState_i;
-
-	task cycle();
-	endtask
-
-	bit validOut_o;
-	bit newBlock_o;
-	bit[255:0] hash_o;
-endclass
-
 class golden_bcminer  #(parameter COUNTBITS = 6);
 
 
@@ -33,7 +20,7 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 
 	// Golden units
 	local golden_blockstorage #(.COUNTBITS(COUNTBITS)) gblock;
-	local golden_dummy_sha #(.COUNTBITS(COUNTBITS)) sha;
+	local golden_dummy_sha #(.COUNTBITS(COUNTBITS), .DELAY_C(0)) sha;
 
 	// Reset the output pins and the internal state
 	task reset();
@@ -69,17 +56,14 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 
 		// Sha Core
 		sha.validIn_i = gblock.validOut_o;
-		sha.newBlockIn_i = gblock.newBlock_o;
+		// sha.newBlockIn_i = gblock.newBlock_o;
+		sha.newBlockIn_i = (^ gblock.initialState_o);
 		sha.initialState_i = gblock.initialState_o;
 
 		sha.cycle();
 
-		validOut = sha.validOut_o;
-		newBlock = sha.newBlock_o;
-		success_o = (^ sha.hash_o);
-		
-		
-
+		resultValid_o = sha.validOut_o;
+		success_o = sha.newBlockOut_o;
 
 	endtask
 
