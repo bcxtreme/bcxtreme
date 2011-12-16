@@ -1,4 +1,17 @@
 
+class golden_dummy_sha #(parameter COUNTBITS = 6);
+	bit validIn_i;
+	bit newBlockIn_i;
+	bit[351:0] initialState_i;
+
+	task cycle();
+	endtask
+
+	bit validOut_o;
+	bit newBlock_o;
+	bit[255:0] hash_o;
+endclass
+
 class golden_bcminer  #(parameter COUNTBITS = 6);
 
 
@@ -20,6 +33,7 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 
 	// Golden units
 	local golden_blockstorage #(.COUNTBITS(COUNTBITS)) gblock;
+	local golden_dummy_sha #(.COUNTBITS(COUNTBITS)) sha;
 
 	// Reset the output pins and the internal state
 	task reset();
@@ -30,6 +44,7 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 		overflow_o = 0;
 
 		gblock = new();
+		sha = new();
 	endtask
 
 	// Simulate a cycle
@@ -43,6 +58,7 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 			return;
 		end
 
+		// Block Storage
 		gblock.writeValid_i = writeValid_i;
 		gblock.blockData_i = blockData_i;
 
@@ -50,13 +66,20 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 
 		writeReady_o = gblock.writeReady_o;
 
-		validOut = gblock.validOut_o;
-		newBlock = gblock.newBlock_o;
-		state = gblock.initialState_o;
 
-		resultValid_o = validOut;
-		//$display("%x",state);
-		success_o = (^ state);
+		// Sha Core
+		sha.validIn_i = gblock.validOut_o;
+		sha.newBlockIn_i = gblock.newBlock_o;
+		sha.initialState_i = gblock.initialState_o;
+
+		sha.cycle();
+
+		validOut = sha.validOut_o;
+		newBlock = sha.newBlock_o;
+		success_o = (^ sha.hash_o);
+		
+		
+
 
 	endtask
 
