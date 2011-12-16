@@ -107,13 +107,17 @@ program bench #(parameter COUNTBITS=6)
 		if (env.verbose) print_outputs();
 
 		for (int i = 0; i < env.max_cycles; i++) begin
+                        bit is_resetting;
+                        is_resetting = inp.rst;
+ 
+
 			set_inputs();
 			if (env.verbose) print_inputs();
 
 			do_cycle();
-                  	 if (env.verbose) print_outputs();
+                 	if (env.verbose) print_outputs();
 		
-			err_count += verify_outputs();
+			if (!is_resetting) err_count += verify_outputs();
 		end
 
 		if (env.verbose) begin
