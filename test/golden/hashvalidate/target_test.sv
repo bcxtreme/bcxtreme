@@ -1,19 +1,26 @@
 program target_test();
-	
-	bit[31:0] D;
-	bit[255:0] X;
-	hashvalidate_test gettarget;
+	bit[31:0] le_diff;
+	hashvalidate_test test;
 initial begin	
-	gettarget = new();
+	test = new();
 	
+	test.rst = 0;
+		
 
-	D = 'hcb04041b;
-	X = 256'h00000000000404cb000000000000000000000000000000000000000000000000;
 
-//	$display("%x",X);
+	test.hash = 256'h000000000000000000000000000000000000000000000000bb04040000000000;
+	test.valid_in = 1;
+	test.newblock_in  = 1; 
+	test.difficulty = 'hcb04041b;
+
+	test.hashvalidate_result();
+
+	$display("newblock %x",test.newblock_out);
+	$display("validout %x",test.valid_out);
+	$display("success %x",test.success);
 		
 	
-	//gettarget.reverse_hash(X);
+	
 end
 
 
