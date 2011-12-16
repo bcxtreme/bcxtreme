@@ -1,4 +1,4 @@
-interface processorResultsIfc(input logic clk);
+interface processorResultsIfc #(parameter PARTITIONBITS=6) (input logic clk);
 logic victory;
 logic[PARTITIONBITS-1:0] nonce_start;
 

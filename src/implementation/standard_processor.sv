@@ -1,4 +1,4 @@
-module bxctreme_standard_processor #(parameter PARTITIONBITS=1, parameter PROCESSSORNUMBER) (
+module bxctreme_standard_processor  (
 input logic clk,
 input logic rst,
 coreInputsIfc.reader inputs,
@@ -6,6 +6,8 @@ coreInputsIfc.writer nextInputs,
 processorResultsIfc.reader previousResults,
 processorResultsIfc.writer results
 );
+    parameter PARTITIONBITS=1;
+    parameter PROCESSORNUMBER=0;
 
 //Processing pipline.
 HashState oh;
@@ -17,8 +19,15 @@ standard_hash_validator hv(.clk, .hash({oh.a,oh.b,oh.c,oh.d,oh.e,oh.f,oh.g,oh.h}
 
 //Muxing the previous results
 logic victory;
-logic[PARTITIONBITS-1:0] nonce_start
-victory_selector #(.PARTITIONBITS(PARTITIONBITS)) vs(.clk,.victory1(success),.nonce_start1(PROCESSORNUMBER),.in2(previousResults),.victory_o(victory), nonce_start_o(nonce_start));
+logic[PARTITIONBITS-1:0] nonce_start;
+victory_selector #(.PARTITIONBITS(PARTITIONBITS)) vs(
+  .clk,
+  .victory1(success),
+  .nonce_start1(PROCESSORNUMBER),
+  .in2(previousResults),
+  .victory_o(victory),
+   .nonce_start_o(nonce_start)
+);
 
 ff #(.WIDTH(1)) viff(.clk,.data_i(victory),.data_o(results.victory));
 ff #(.WIDTH(PARTITIONBITS)) nsff(.clk,.data_i(nonce_start),.data_o(results.nonce_start));
