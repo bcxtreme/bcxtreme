@@ -1,25 +1,25 @@
 TOP=top.sv
-INTERFACES=interfaces/blockStoreIfc.sv interfaces/nonceBufferIfc.sv
+INTERFACES=interfaces/*.sv
 BENCH=test/inputs.sv test/environ.sv test/bench.sv
-GOLD=gold/golden_blockstorage.sv gold/golden_bcminer.sv
+GOLD=gold/*.sv
 
 SHARED=shared/eff.sv implementation/shared/*.sv
-BLOCKSTORAGE=implementation/shift_register.sv implementation/block_storage.sv
-DUT=$(SHARED) $(BLOCKSTORAGE) bcminer.sv
+IMPLEMENTATION=implementation/*.sv
+DUT=$(IMPLEMENTATION) 
 
-HASHVALIDATOR_TOP=hashvalidator_top.sv
-HASHVALIDATOR_BENCH=test/hashvalidator/inputs.sv test/hashvalidator/environ.sv test/hashvalidator/bench.sv
+SHACORE_TOP=shacore_top.sv
+SHACORE_BENCH=test/shacore/*.sv
 
 VCS=vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all
 
-.PHONY: help clean bench hashvalidator_bench test
+.PHONY: help clean bench shacore_bench test
 
 
 bench:
-	$(VCS) $(TOP) $(INTERFACES) $(DUT) $(GOLD) $(BENCH) -o simulator.exe
+	$(VCS) $(TOP) $(SHARED) $(INTERFACES) $(DUT) $(GOLD) $(BENCH) -o simulator.exe
 
-hashvalidator_bench:
-	$(VCS) $(HASHVALIDATOR_TOP) $(INTERFACES) $(DUT) $(GOLD) $(HASHVALIDATOR_BENCH) -o simulator.exe
+shacore_bench:
+	$(VCS) $(SHACORE_TOP) $(SHARED) $(INTERFACES) $(DUT) $(GOLD) $(SHACORE_BENCH) -o simulator.exe
 
 test: bench
 	./simulator.exe
