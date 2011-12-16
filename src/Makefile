@@ -7,15 +7,22 @@ SHARED=shared/eff.sv implementation/shared/*.sv
 BLOCKSTORAGE=implementation/shift_register.sv implementation/block_storage.sv
 DUT=$(SHARED) $(BLOCKSTORAGE) bcminer.sv
 
-.PHONY: help clean bench test
+HASHVALIDATOR_TOP=hashvalidator_top.sv
+HASHVALIDATOR_BENCH=test/hashvalidator/inputs.sv test/hashvalidator/environ.sv test/hashvalidator/bench.sv
+
+VCS=vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all
+
+.PHONY: help clean bench hashvalidator_bench test
 
 
 bench:
-	vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all $(TOP) $(INTERFACES) $(DUT) $(GOLD) $(BENCH) -o simulator.exe
+	$(VCS) $(TOP) $(INTERFACES) $(DUT) $(GOLD) $(BENCH) -o simulator.exe
+
+hashvalidator_bench:
+	$(VCS) $(HASHVALIDATOR_TOP) $(INTERFACES) $(DUT) $(GOLD) $(HASHVALIDATOR_BENCH) -o simulator.exe
 
 test: bench
 	./simulator.exe
-	
 
 help:
 	@echo "The following make targets are supported:"; \
