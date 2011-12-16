@@ -1,4 +1,6 @@
 class hashvalidate_test;
+	bit rst;
+	
 	bit [31:0] difficulty;
 	bit valid_in;
 	bit newblock_in;
@@ -78,6 +80,12 @@ class hashvalidate_test;
 			else begin
 				success = 0;
 			end
+		end
+
+		if(rst) begin
+			valid_out = 0;
+			newblock_out = 0;
+			success = 0;
 		end
 	endfunction
 endclass

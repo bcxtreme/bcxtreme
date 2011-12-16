@@ -4,7 +4,7 @@ class environ;
 	bit verbose;
 	int max_cycles;
 	real density_rst;
-	real density_writeValid;
+	real density_valid;
 
 	task error(string m);
 		$display({"* Error: ", m});
@@ -34,7 +34,7 @@ class environ;
 
 		$display("* * * * * * * * * * * * * * * * * * * * * * *");
 		$display("* Reading config.ini...");
-		fd = $fopen("config.ini", "r");
+		fd = $fopen("config_shacore.ini", "r");
 		if (fd == 0) error("Could not open or find config.ini");
 
 		while (!$feof(fd)) begin
@@ -44,7 +44,7 @@ class environ;
 			case (param)
 				"max_cycles": max_cycles = read_int(fd);
 				"density_rst": density_rst = read_real(fd);
-				"density_writeValid": density_writeValid = read_real(fd);
+				"density_valid": density_valid = read_real(fd);
 				"verbose": verbose = read_int(fd);
 				"/*": /* skip comments */ while ("*/" != read_string(fd));
 				"#": /* skip lines with comments */ while ($fgetc(fd) != "\n");
@@ -57,7 +57,7 @@ class environ;
 
 		$display("* max_cycles = %d", max_cycles);
 		$display("* density_rst = %f", density_rst);
-		$display("* density_writeValid = %f", density_writeValid);
+		$display("* density_valid = %f", density_writeValid);
 		$display("* verbose = %b", verbose);
 		$display("* * * * * * * * * * * * * * * * * * * * * * *");
 	endtask

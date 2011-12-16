@@ -32,6 +32,4 @@ ff #(.WIDTH(32)) w3ff(.clk,.data_i(inputs.w3),.data_o(nextInputs.w3));
 ff #(.WIDTH(1)) vaff(.clk,.data_i(inputs.valid),.data_o(nextInputs.valid));
 ff #(.WIDTH(1)) nbff(.clk,.newblock_i(inputs.newblock),.data_o(nextInputs.newblock));
 
-
-
 endmodule
