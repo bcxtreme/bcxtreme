@@ -1,17 +1,12 @@
 module sha_standard_pipelined_core(
 input logic clk,
 input logic rst,
-input logic input_valid,
-input logic newblock_i,
-input HashState round1, //The hash state after 1 round has been applied.
-input logic[31:0] w1, //last 32 bits of the merkle root
-input logic[31:0] w2, //timestamp
-input logic[31:0] w3, //difficulty target
+coreInputsIfc.reader in,
 output HashState doublehash
 );
 
 HashState round1delayed; //The round 1 state, but delayed 64 cycles.
-hash_state_delay_buffer #(.DELAY(64)) hsdb(.clk,.newblock(newblock_i),.in(round1),.out(round1delayed));
+hash_state_delay_buffer #(.DELAY(64)) hsdb(.clk,.newblock(in.newblock),.in(in.hashstate),.out(round1delayed));
 
 HashState hashstate_pipeline[64:15];
 logic[15:0][31:0] W_pipeline[64:15];
@@ -19,7 +14,7 @@ logic[15:0][31:0] W_pipeline[64:15];
 logic newblock_discard; //Discard the output
 logic valid_discard;
 //For the first 16 rounds, feed in the data directly.
-sha_pipelined_pre_pipeline pre(.clk,.rst,.input_valid,.output_valid(valid_discard),.newblock_i,.newblock_o(newblock_discard),.state_in(round1),.w1,.w2,.w3,.history(W_pipeline[15]),.state_out(hashstate_pipeline[15]));
+sha_pipelined_pre_pipeline pre(.clk,.rst,.in,.output_valid(valid_discard),.newblock_o(newblock_discard),.history(W_pipeline[15]),.state_out(hashstate_pipeline[15]));
 
 //Standard sha rounds with attached message expander for the rest.
 for(genvar i=15; i<64; i++) begin

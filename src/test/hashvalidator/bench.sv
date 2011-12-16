@@ -1,26 +1,18 @@
-
-
 program bench #(parameter LOGNCORES=3)
 (
 	input clk,
-	output logic rst,
-	input resultValid,
-	input success,
-	nonceBufferIfc.reader nonBufRd
+	input victory,
+	output logic[255:0] hash,
+	output logic[31:0] difficulty
 );
 
 	environ env;
 	inputs inp;
-	golden_hashvalidator #(.COUNTBITS(COUNTBITS)) gb;
+	golden_hashvalidator gb;
 
-	task set_rst(bit val);
-		gb.rst_i = val;
-		rst = val;
-	endtask
-
-	task set_writeValid(bit val);
-		gb.writeValid_i = val;
-		blkWrt.cb.writeValid <= val;
+	task set_hash(logic[255:0]);
+		gb.hash_i = val;
+		blkWrt.cb.h<= val;
 	endtask
 
 	task set_blockData(bit[7:0] val);

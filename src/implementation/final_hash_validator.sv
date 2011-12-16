@@ -8,7 +8,7 @@ output logic valid_o,
 output logic newblock_o,
 output logic success
 );
-ff #(.WIDTH(1)) valid(.clk,.data_i(valid_i),.data_o(valid_o));
+ff #(.WIDTH(1)) v(.clk,.data_i(valid_i),.data_o(valid_o));
 ff #(.WIDTH(1)) newblock(.clk,.data_i(newblock_i),.data_o(newblock_o));
 
 logic succ;
@@ -33,6 +33,6 @@ assign exp=difficulty[31:24];
 logic[255:0] target;
 assign target=mantissa_as_number << 8*(exp-3);
 
-assign succ= hash_as_number <= target;
+assign succ= (hash_as_number <= target);
 
 endmodule

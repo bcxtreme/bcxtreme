@@ -1,12 +1,7 @@
 module sha_pipelined_pre_pipeline(
 input logic clk,
 input logic rst,
-input logic input_valid,
-input logic newblock_i,
-input HashState state_in,
-input logic[31:0] w1, //last 32 bits of the merkle root
-input logic[31:0] w2, //timestamp
-input logic[31:0] w3, //difficulty target
+coreInputsIfc.reader in,
 output logic output_valid,
 output logic newblock_o,
 output logic[15:0][31:0] history,
@@ -14,11 +9,11 @@ output HashState state_out
 );
 
 logic valid_pipeline[15:0];
-assign valid_pipeline[0]=input_valid;
+assign valid_pipeline[0]=in.valid;
 assign output_valid=valid_pipeline[15];
 
 logic newblock_pipeline[15:0];
-assign newblock_pipeline[0]=newblock_i;
+assign newblock_pipeline[0]=in.newblock;
 assign newblock_o=newblock_pipeline[15];
 
 HashState hashstate_pipeline[15:0];
@@ -28,9 +23,9 @@ assign state_out=hashstate_pipeline[15];
 logic[31:0] M[14:0];
 
 /* feed in the M values to the first 15 stages */
-assign M[0]=w1;
-assign M[1]=w2;
-assign M[2]=w3;
+assign M[0]=in.w1;
+assign M[1]=in.w2;
+assign M[2]=in.w3;
 //Note that as the reset signal is on a one cycle delay, we source it from the previous step in the pipeline.
 counter c1(.clk,.rst(valid_pipeline[2]& newblock_pipeline[2]),.inc(valid_pipeline[2]),.count(M[3]));
 assign M[4]=32'h80000000; //The one bit of padding
