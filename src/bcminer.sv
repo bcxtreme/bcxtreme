@@ -30,7 +30,7 @@ module bcminer #(parameter COUNTBITS = 6)
 	logic tmp_xor;
 	assign tmp_xor = ^ bs_state;
 
-	dummy_sha #(.COUNTBITS(COUNTBITS), .DELAY_C(2)) sha (
+	dummy_sha #(.COUNTBITS(COUNTBITS), .DELAY_C(0)) sha (
 		.clk,
 		.rst,
 		.validIn(bs_valid),
