@@ -35,12 +35,14 @@ class environ;
 		bit[351:0] new_block;
 		string raw_block;
 		int c;
+		int ix;
 
 		raw_block = read_string(fd);
 		new_block = raw_block.atohex();
+		ix = $size(blocks);
 
-		blocks = new[$size(blocks) + 1](blocks);
-		blocks[$size(blocks)-1] = new_block;
+		blocks = new[ix + 1](blocks);
+		blocks[ix] = new_block;
 	endfunction
 
 	task initialize;

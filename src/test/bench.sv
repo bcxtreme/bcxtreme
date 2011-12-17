@@ -29,7 +29,7 @@ program bench #(parameter COUNTBITS=6)
 
 	task set_readReady(bit val);
 		gb.readReady_i = val;
-		nonBufRd.readReady <= val;
+		nonBufRd.cb.readReady <= val;
 	endtask
 
 	task set_inputs();
@@ -65,12 +65,12 @@ program bench #(parameter COUNTBITS=6)
 				err_count += 1;
 			end
 		end
-		if (gb.nonce_o != nonBufRd.nonce) begin
-			if (env.verbose) $display("ERROR: DUT nonce: %b", nonBufRd.nonce);
+		if (gb.nonce_o != nonBufRd.cb.nonce) begin
+			if (env.verbose) $display("ERROR: DUT nonce: %b", nonBufRd.cb.nonce);
 			err_count += 1;
 		end
-		if (gb.overflow_o != nonBufRd.overflow) begin
-			if (env.verbose) $display("ERROR: DUT overflow: %b", nonBufRd.overflow);
+		if (gb.overflow_o != nonBufRd.cb.overflow) begin
+			if (env.verbose) $display("ERROR: DUT overflow: %b", nonBufRd.cb.overflow);
 			err_count += 1;
 		end
 		return err_count;

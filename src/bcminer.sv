@@ -42,7 +42,7 @@ module bcminer #(parameter COUNTBITS = 6)
 		.difficulty(sha_difficulty)
 	);
 
-	standard_hash_validator (
+	standard_hash_validator hval (
 		.clk,
 		.hash(sha_hash),
 		.difficulty(sha_difficulty),

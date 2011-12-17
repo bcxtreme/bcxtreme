@@ -11,8 +11,8 @@ module dummy_sha #(parameter COUNTBITS=6, parameter DELAY_C = 10) (
 	output[31:0] difficulty
 );
 
-	wire [255:0] hash_in;
-	wire [31:0] difficult_in;
+	wire [255:0]hash_in;
+	wire [31:0]difficult_in;
 
 	// The "hash" is the lower 256 bits of the input. The difficulty is the final 32 bits
 	assign hash_in = initialState[255:0];

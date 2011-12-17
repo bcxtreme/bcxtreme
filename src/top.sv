@@ -9,7 +9,7 @@ module top #(parameter COUNTBITS=8);
 
 	minerIfc miner(clk);
 	blockStoreIfc blkStore(clk);
-	nonceBufferIfc nonBuf();
+	nonceBufferIfc nonBuf(clk);
 
 	bcminer #(.COUNTBITS(COUNTBITS)) dut (
 		.clk,
