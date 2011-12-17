@@ -6,6 +6,8 @@ class environ;
 	real density_rst;
 	real density_writeValid;
 
+	bit[351:0] blocks [];
+
 	task error(string m);
 		$display({"* Error: ", m});
 		$exit;
@@ -29,6 +31,18 @@ class environ;
 		return ret;
 	endfunction
 
+	function void read_block(int fd);
+		bit[351:0] new_block;
+		string raw_block;
+		int c;
+
+		raw_block = read_string(fd);
+		new_block = raw_block.atohex();
+
+		blocks = new[$size(blocks) + 1](blocks);
+		blocks[$size(blocks)-1] = new_block;
+	endfunction
+
 	task initialize;
 		int fd;
 
@@ -46,6 +60,7 @@ class environ;
 				"density_rst": density_rst = read_real(fd);
 				"density_writeValid": density_writeValid = read_real(fd);
 				"verbose": verbose = read_int(fd);
+				"try": read_block(fd);
 				"/*": /* skip comments */ while ("*/" != read_string(fd));
 				"#": /* skip lines with comments */ while ($fgetc(fd) != "\n");
 				"": /* skip blanks */;
@@ -59,6 +74,9 @@ class environ;
 		$display("* density_rst = %f", density_rst);
 		$display("* density_writeValid = %f", density_writeValid);
 		$display("* verbose = %b", verbose);
+		$display("* BLOCKS:");
+		for (int i = 0; i < $size(blocks); i++)
+			$display("* -- 0x%x", blocks[i]);
 		$display("* * * * * * * * * * * * * * * * * * * * * * *");
 	endtask
 

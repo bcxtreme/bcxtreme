@@ -84,6 +84,72 @@ program bench #(parameter COUNTBITS=6)
 		inp.generate_inputs();
 	endtask
 
+	task do_reset();
+		set_rst(1);
+		if (env.verbose) print_inputs();
+		do_cycle();
+		if (env.verbose) print_outputs();
+
+		set_rst(0);
+		set_writeValid(0);
+		set_blockData(0);
+		set_readReady(0);
+		if (env.verbose) print_inputs();
+		do_cycle();
+		if (env.verbose) print_outputs();
+
+	endtask
+
+	task do_block_testing();
+		int ix_block = 0; 		// # block we're currently sending
+		int ix_result = 0;		// # result we're expecting next
+		int ix = 0;			// # byte in the current block
+		byte data;			// Next byte to send
+		bit is_writing = 0;		// True if we're mid-block sending
+		
+		if (env.verbose) begin
+			$display("BEGIN MANUAL BLOCK TEST");
+			$display("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+		end
+
+		do_reset();
+		
+		while (1) begin
+			if (is_writing && ix_block < $size(env.blocks)) begin
+				set_writeValid(1);
+				set_blockData(env.blocks[ix_block][ix*8+7 -: 8]);
+				ix++;
+				if (ix == 44) begin
+					ix = 0;
+					ix_block++;
+					is_writing = 0;
+					$display("Ending block");
+				end
+			end else begin
+				set_writeValid(0);
+				set_blockData(0);
+			end
+
+			if (env.verbose) print_inputs();
+			do_cycle();
+			verify_outputs();
+                 	if (env.verbose) print_outputs();
+
+			if (gb.writeReady_o) begin
+				is_writing = 1;
+				$display("Begining block");
+			end
+			if (gb.resultValid_o) begin
+				ix_result++;
+				$display("* RESULT %d [GOLD]: %b", ix_result, gb.success_o);
+			end
+			if (resultValid)
+				$display("* RESULT [DUT]: %b", success);
+
+			if (ix_result == $size(env.blocks)) return;
+		end
+	endtask
+
 	initial begin
 		
 		int err_count = 0;
@@ -92,21 +158,15 @@ program bench #(parameter COUNTBITS=6)
 		inp = new(.density_rst(env.density_rst), .density_writeValid(env.density_writeValid));
 
 		gb = new();
+
+		if ($size(env.blocks) > 0) do_block_testing();
+
 		if (env.verbose) begin
-			$display("BEGIN TEST");
+			$display("BEGIN RANDOMIZED TEST");
 			$display("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
 		end
 
-		set_rst(1);
-		if (env.verbose) print_inputs();
-		do_cycle();
-		if (env.verbose) print_outputs();
-
-		set_rst(0);
-		set_inputs();
-		if (env.verbose) print_inputs();
-		do_cycle();
-		if (env.verbose) print_outputs();
+		do_reset();
 
 		for (int i = 0; i < env.max_cycles; i++) begin
                         bit is_resetting;
