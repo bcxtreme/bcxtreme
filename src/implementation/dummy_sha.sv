@@ -11,20 +11,20 @@ module dummy_sha #(parameter COUNTBITS=6, parameter DELAY_C = 10) (
 	output[31:0] difficulty
 );
 
+	wire [255:0] hash_in;
+	wire [31:0] difficult_in;
 
-	// XOR the initial stage on top of itself:
-	wire [255:0] upper_half, lower_half;
-	logic [255:0] hash_in;
-	assign lower_half[255:0] = initialState[255:0];
-	assign upper_half[95:0] = initialState[351:256];
-	assign upper_half[255:96] = 0;
-	assign hash_in = upper_half ^ lower_half;
+	// The "hash" is the lower 256 bits of the input. The difficulty is the final 32 bits
+	assign hash_in = initialState[255:0];
+	assign difficulty_in = initialState[351:320];
 
 	// Store the value for DELAY_C cycles
 	wire [255:0] trans[DELAY_C + 1];
+	wire [31:0] trans_difficulty[DELAY_C + 1];
 	wire trans_valid[DELAY_C + 1];
 	wire trans_new[DELAY_C + 1];
 	assign trans[0] = hash_in;
+	assign trans_difficulty[0] = difficulty_in;
 	assign trans_valid[0] = validIn;
 	assign trans_new[0] = newBlockIn;
 	for (genvar n = 0; n < DELAY_C; n++) begin
@@ -34,6 +34,13 @@ module dummy_sha #(parameter COUNTBITS=6, parameter DELAY_C = 10) (
 			.enable(1'b1),
 			.data_i(trans[n]),
 			.data_o(trans[n + 1])
+		);
+		eff #(.WIDTH(32)) dif (
+			.clk,
+			.rst,
+			.enable(1'b1),
+			.data_i(trans_difficulty[n]),
+			.data_o(trans_difficulty[n + 1])
 		);
 		eff bnew (
 			.clk,
@@ -51,10 +58,9 @@ module dummy_sha #(parameter COUNTBITS=6, parameter DELAY_C = 10) (
 		);
 	end
 	assign hash = trans[DELAY_C];
+	assign difficulty = trans_difficulty[DELAY_C];
 	assign validOut = trans_valid[DELAY_C];
 	assign newBlockOut = trans_new[DELAY_C];
-
-	assign difficulty = 0;
 
 endmodule
 
