@@ -4,6 +4,12 @@ interface nonceBufferIfc();
 	logic nonce;
 	logic overflow;
 
+	clocking cb @(posedge clk)
+		output readReady;
+		output nonce;
+		output overflow;
+	endclocking
+
 	modport writer(
 		input readReady,
 		output nonce,
