@@ -27,14 +27,11 @@ module bcminer #(parameter COUNTBITS = 6)
 		.initialState(bs_state)
 	);
 
-	logic tmp_xor;
-	assign tmp_xor = ^ bs_state;
-
 	dummy_sha #(.COUNTBITS(COUNTBITS), .DELAY_C(64)) sha (
 		.clk,
 		.rst,
 		.validIn(bs_valid),
-		.newBlockIn(tmp_xor),
+		.newBlockIn(bs_new),
 		.initialState(bs_state),
 		.validOut(sha_valid),
 		.newBlockOut(sha_new),
@@ -44,7 +41,7 @@ module bcminer #(parameter COUNTBITS = 6)
 
 	assign success = sha_new;
 	assign resultValid = sha_valid;
-	assign nonBufWrt.nonce = 1'b0;
+	assign nonBufWrt.nonce = (^ sha_hash);
 	assign nonBufWrt.overflow = 1'b0;
 
 endmodule

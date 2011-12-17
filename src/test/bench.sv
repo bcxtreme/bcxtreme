@@ -65,7 +65,7 @@ program bench #(parameter COUNTBITS=6)
 			if (env.verbose) $display("ERROR: DUT success: %b", success);
 			err_count += 1;
 		end
-		if (gb.nonce_o != nonBufRd.nonce) begin
+		if (gb.resultValid_o && (gb.nonce_o != nonBufRd.nonce)) begin
 			if (env.verbose) $display("ERROR: DUT nonce: %b", nonBufRd.nonce);
 			err_count += 1;
 		end

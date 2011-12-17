@@ -53,19 +53,18 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 
 		// Sha Core
 		sha.validIn_i = gblock.validOut_o;
-		// sha.newBlockIn_i = gblock.newBlock_o;
-		sha.newBlockIn_i = (^ gblock.initialState_o);
+		sha.newBlockIn_i = gblock.newBlock_o;
 		sha.initialState_i = gblock.initialState_o;
 
 		sha.cycle();
 
 		writeReady_o = gblock.writeReady_o;
-		$display("newBlockOut: %b", sha.newBlockOut_o);
 
 
 
 		resultValid_o = sha.validOut_o;
 		success_o = sha.newBlockOut_o;
+		nonce_o = (^ sha.hash_o);
 
 	endtask
 
