@@ -18,28 +18,29 @@ class golden_noncebuffer;
 		if(rst) begin
 			buffer = 0;
 		end
-
-
-		if(validIn && success) begin
-			storing = 1;
-			if(storing) begin
-				if(clockingout) begin //if second nonce is found before first is clocked out
-					overflow = 1;
+		
+		else begin
+			if(validIn && success) begin
+				storing = 1;
+				if(storing) begin
+					if(clockingout) begin //if second nonce is found before first is clocked out
+						overflow = 1;
+					end
+					else begin
+						buffer = nonceIn; //store nonceIn
+					end
 				end
-				else begin
-					buffer = nonceIn; //store nonceIn
-				end
+				storing = 0;
 			end
-			storing = 0;
-		end
 
-		if(readReady) begin
-			clockingout = 1;
-			if(clockingout) begin
+			if(readReady) begin
+				clockingout = 1;
+				if(clockingout) begin
 				
-				nonceOut = buffer[0];//clock out most recent nonce
+					nonceOut = buffer[0];//clock out most recent nonce
+				end
+				clockingout = 0;
 			end
-			clockingout = 0;
 		end
 	endfunction
 endclass

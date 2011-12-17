@@ -11,7 +11,7 @@ DUT=$(BLOCKSTORAGE) bcminer.sv
 
 
 bench:
-	vcs -PP -sverilog +define+SV +define+VPD hashvalidate_test.sv target_test.sv -o test.exe
+	vcs -PP -sverilog +define+SV +define+VPD golden_hashvalidator.sv golden_hashvalidator_pipeline.sv target_test.sv -o test.exe
 
 test: bench
 	./simulator.exe

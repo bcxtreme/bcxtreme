@@ -11,7 +11,7 @@ DUT=$(BLOCKSTORAGE) bcminer.sv
 
 
 bench:
-	vcs -PP -sverilog +define+SV +define+VPD golden_noncebuffer.sv -o test.exe
+	vcs -PP -sverilog +define+SV +define+VPD golden_noncebuffer.sv nonce_test.sv -o test.exe
 
 test: bench
 	./simulator.exe
