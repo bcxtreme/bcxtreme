@@ -7,27 +7,21 @@ module top #(parameter COUNTBITS=8);
 
 	initial $vcdpluson;
 
-	bit rst;
+	minerIfc miner(clk);
 	blockStoreIfc blkStore(clk);
-	bit resultValid;
-	bit success;
 	nonceBufferIfc nonBuf();
 
 	bcminer #(.COUNTBITS(COUNTBITS)) dut (
 		.clk,
-		.rst,
+		.chip(miner.dut),
 		.blkRd(blkStore.reader),
-		.resultValid,
-		.success,
 		.nonBufWrt(nonBuf.writer)
 	);
 
 	bench #(.COUNTBITS(COUNTBITS)) tb (
 		.clk,
-		.rst,
+		.chip(miner.bench),
 		.blkWrt(blkStore.writer),
-		.resultValid,
-		.success,
 		.nonBufRd(nonBuf.reader)
 	);
 

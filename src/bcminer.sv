@@ -3,12 +3,14 @@
 module bcminer #(parameter COUNTBITS = 6)
 (
 	input clk,
-	input rst,
+	minerIfc.dut chip,
 	blockStoreIfc.reader blkRd,
-	output resultValid,
-	output success,
 	nonceBufferIfc.writer nonBufWrt
 );
+
+	wire rst = chip.rst;
+	wire success = chip.success;
+	wire resultValid = chip.resultValid;
 
 	logic bs_valid, bs_new;
 	logic [351:0] bs_state;

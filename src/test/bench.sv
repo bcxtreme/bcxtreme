@@ -3,10 +3,8 @@
 program bench #(parameter COUNTBITS=6) 
 (
 	input clk,
-	output logic rst,
+	minerIfc.bench chip,
 	blockStoreIfc.writer blkWrt,
-	input resultValid,
-	input success,
 	nonceBufferIfc.reader nonBufRd
 );
 
@@ -16,7 +14,7 @@ program bench #(parameter COUNTBITS=6)
 
 	task set_rst(bit val);
 		gb.rst_i = val;
-		rst = val;
+		chip.cb.rst <= val;
 	endtask
 
 	task set_writeValid(bit val);
@@ -57,13 +55,13 @@ program bench #(parameter COUNTBITS=6)
 			if (env.verbose) $display("ERROR: DUT writeReady: %b", blkWrt.cb.writeReady);
 			err_count += 1;
 		end
-		if (gb.resultValid_o != resultValid) begin
-			if (env.verbose) $display("ERROR: DUT resultValid: %b", resultValid);
+		if (gb.resultValid_o != chip.cb.resultValid) begin
+			if (env.verbose) $display("ERROR: DUT resultValid: %b", chip.cb.resultValid);
 			err_count += 1;
 		end
 		if (gb.resultValid_o) begin
-			if (gb.success_o != success) begin
-				if (env.verbose) $display("ERROR: DUT success: %b", success);
+			if (gb.success_o != chip.cb.success) begin
+				if (env.verbose) $display("ERROR: DUT success: %b", chip.cb.success);
 				err_count += 1;
 			end
 		end
@@ -143,8 +141,8 @@ program bench #(parameter COUNTBITS=6)
 				ix_result++;
 				$display("* RESULT %d [GOLD]: %b", ix_result, gb.success_o);
 			end
-			if (resultValid)
-				$display("* RESULT [DUT]: %b", success);
+			if (chip.cb.resultValid)
+				$display("* RESULT [DUT]: %b", chip.cb.success);
 
 			if (ix_result == $size(env.blocks)) return;
 		end
