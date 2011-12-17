@@ -39,9 +39,9 @@ module bcminer #(parameter COUNTBITS = 6)
 		.difficulty(sha_difficulty)
 	);
 
-	assign success = sha_new;
+	assign success = (^ sha_hash);
 	assign resultValid = sha_valid;
-	assign nonBufWrt.nonce = (^ sha_hash);
+	assign nonBufWrt.nonce = sha_new;
 	assign nonBufWrt.overflow = 1'b0;
 
 endmodule

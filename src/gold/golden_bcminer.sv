@@ -69,7 +69,6 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 	
 		hval.cycle();
 
-
 		writeReady_o = gblock.writeReady_o;
 		resultValid_o = hval.validOut_o;
 		success_o = hval.success_o;
