@@ -4,8 +4,10 @@ GOLD=gold/golden_hashvalidator.sv gold/golden_dummy_sha.sv gold/golden_blockstor
 BENCH=test/inputs.sv test/environ.sv test/bench.sv
 
 SHARED=shared/eff.sv implementation/shared/*.sv
-BLOCKSTORAGE=implementation/dummy_sha.sv implementation/shift_register.sv implementation/block_storage.sv
-DUT=$(SHARED) $(BLOCKSTORAGE) bcminer.sv
+BLOCKSTORAGE=implementation/shift_register.sv implementation/block_storage.sv
+SHACORE=implementation/dummy_sha.sv
+HASHVAL=implementation/standard_hash_validator.sv
+DUT=$(SHARED) $(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) bcminer.sv
 
 .PHONY: help clean bench test
 
