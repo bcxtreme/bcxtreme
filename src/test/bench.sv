@@ -8,6 +8,8 @@ program bench #(parameter COUNTBITS=6)
 	nonceBufferIfc.reader nonBufRd
 );
 
+	int ix_cycle = 0;
+
 	environ env;
 	inputs inp;
 	golden_bcminer #(.COUNTBITS(COUNTBITS)) gb;
@@ -40,11 +42,11 @@ program bench #(parameter COUNTBITS=6)
 	endtask
 
 	task print_inputs();
-		$display("%t: [rst %b] [writeValid %b] [blockData %x] [readReady %b]", $time, gb.rst_i, gb.writeValid_i, gb.blockData_i, gb.readReady_i);
+		$display("%d: [rst %b] [writeValid %b] [blockData %x] [readReady %b]", ix_cycle, gb.rst_i, gb.writeValid_i, gb.blockData_i, gb.readReady_i);
 	endtask
 
 	task print_outputs();
-		$display("%t:                                                      [writeReady %b] [resultValid %b] [success %b] [nonce %b] [overflow %b]", $time, gb.writeReady_o, gb.resultValid_o, gb.success_o, gb.nonce_o, gb.overflow_o);
+		$display("%d:                                                      [writeReady %b] [resultValid %b] [success %b] [nonce %b] [overflow %b]", ix_cycle, gb.writeReady_o, gb.resultValid_o, gb.success_o, gb.nonce_o, gb.overflow_o);
 	endtask
 
 	function int verify_outputs();
@@ -80,6 +82,7 @@ program bench #(parameter COUNTBITS=6)
 		@(blkWrt.cb)
 		gb.cycle();
 		inp.generate_inputs();
+		ix_cycle++;
 	endtask
 
 	task do_reset();
