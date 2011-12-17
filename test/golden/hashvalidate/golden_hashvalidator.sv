@@ -1,4 +1,4 @@
-class hashvalidate_test;
+class golden_hashvalidator;
 	bit rst;
 	
 	bit [31:0] difficulty;

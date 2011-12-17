@@ -1,6 +1,6 @@
 program target_test();
 	bit[31:0] le_diff;
-	hashvalidate_test test;
+	golden_hashvalidator_pipeline test;
 initial begin	
 	test = new();
 	
@@ -8,7 +8,7 @@ initial begin
 		
 
 
-	test.hash = 256'h000000000000000000000000000000000000000000000000bb04040000000000;
+	/*test.hash = 256'h000000000000000000000000000000000000000000000000bb04040000000000;
 	test.valid_in = 1;
 	test.newblock_in  = 1; 
 	test.difficulty = 'hcb04041b;
@@ -17,7 +17,7 @@ initial begin
 
 	$display("newblock %x",test.newblock_out);
 	$display("validout %x",test.valid_out);
-	$display("success %x",test.success);
+	$display("success %x",test.success);*/
 		
 	
 	
