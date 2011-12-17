@@ -13,24 +13,24 @@ class golden_dummy_sha #(parameter COUNTBITS = 6, parameter DELAY_C = 10);
 	bit[31:0] difficulty_o;
 
 	// Internal State
-	bit[255:0] hash_buf[DELAY_C + 1];
-	bit valid_buf[DELAY_C + 1];
-	bit new_buf[DELAY_C + 1];
+	local bit[255:0] hash_buf[DELAY_C + 1];
+	local bit valid_buf[DELAY_C + 1];
+	local bit new_buf[DELAY_C + 1];
 
 	function new();
 		for (int i = 0; i <= DELAY_C; i++) begin
 			hash_buf[i] = 0;
-			valid_buf[i] = 0;
-			new_buf[i] = 0;
+			valid_buf[i] = 1'b0;
+			new_buf[i] = 1'b0;
 		end
 	endfunction
 			
 
 	task cycle();
-		for (int i = 0; i < DELAY_C; i++) begin
-			valid_buf[i + 1] = valid_buf[i];
-			hash_buf[i + 1] = hash_buf[i];
-			new_buf[i + 1] = new_buf[i];
+		for (int i = DELAY_C; i > 0; i--) begin
+			valid_buf[i] = valid_buf[i - 1];
+			hash_buf[i] = hash_buf[i - 1];
+			new_buf[i] = new_buf[i - 1];
 		end
 
 		valid_buf[0] = validIn_i;
@@ -41,7 +41,7 @@ class golden_dummy_sha #(parameter COUNTBITS = 6, parameter DELAY_C = 10);
 		validOut_o = valid_buf[DELAY_C];
 		hash_o = hash_buf[DELAY_C];
 		newBlockOut_o = new_buf[DELAY_C];
-
+		$display("[ %b, %b, %b, %b ]",  valid_buf[DELAY_C - 3],  valid_buf[DELAY_C - 2],  valid_buf[DELAY_C - 1], valid_buf[DELAY_C]);
 
 	endtask
 

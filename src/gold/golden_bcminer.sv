@@ -20,7 +20,7 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 
 	// Golden units
 	local golden_blockstorage #(.COUNTBITS(COUNTBITS)) gblock;
-	local golden_dummy_sha #(.COUNTBITS(COUNTBITS), .DELAY_C(0)) sha;
+	local golden_dummy_sha #(.COUNTBITS(COUNTBITS), .DELAY_C(64)) sha;
 
 	// Reset the output pins and the internal state
 	task reset();
@@ -60,6 +60,7 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 		sha.cycle();
 
 		writeReady_o = gblock.writeReady_o;
+		$display("newBlockOut: %b", sha.newBlockOut_o);
 
 
 
