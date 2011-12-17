@@ -89,8 +89,6 @@ class golden_blockstorage #(parameter COUNTBITS = 6);
 		if (writeValid_i)
 			try_write_chunk(blockData_i);
 
-
-		$display("%t Outputting %b",$time, validOut_o);
 	endtask
 endclass
 
