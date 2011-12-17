@@ -1,6 +1,6 @@
 TOP=top.sv
 INTERFACES=interfaces/blockStoreIfc.sv interfaces/nonceBufferIfc.sv
-GOLD=gold/golden_dummy_sha.sv gold/golden_blockstorage.sv gold/golden_bcminer.sv
+GOLD=gold/golden_hashvalidator.sv gold/golden_dummy_sha.sv gold/golden_blockstorage.sv gold/golden_bcminer.sv
 BENCH=test/inputs.sv test/environ.sv test/bench.sv
 
 SHARED=shared/eff.sv implementation/shared/*.sv
