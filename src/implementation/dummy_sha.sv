@@ -1,7 +1,7 @@
 
-module dummy_sha #(parameter COUNTBITS=6, parameter DELAY_C = 10) (
+module dummy_sha #(parameter COUNTBITS=6, parameter DELAY_C = 0) (
 	input clk,
-	input logic rst,
+	input rst,
 	input validIn,
 	input newBlockIn,
 	input[351:0] initialState,
@@ -12,7 +12,7 @@ module dummy_sha #(parameter COUNTBITS=6, parameter DELAY_C = 10) (
 );
 
 	wire [255:0]hash_in;
-	wire [31:0]difficult_in;
+	wire [31:0]difficulty_in;
 
 	// The "hash" is the lower 256 bits of the input. The difficulty is the final 32 bits
 	assign hash_in = initialState[255:0];
@@ -61,6 +61,7 @@ module dummy_sha #(parameter COUNTBITS=6, parameter DELAY_C = 10) (
 	assign difficulty = trans_difficulty[DELAY_C];
 	assign validOut = trans_valid[DELAY_C];
 	assign newBlockOut = trans_new[DELAY_C];
+//	initial $monitor("valid: %b %b %b %b", trans_valid[0], trans_valid[1], trans_valid[2], trans_valid[3]);
 
 endmodule
 

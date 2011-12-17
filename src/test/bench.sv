@@ -93,6 +93,10 @@ program bench #(parameter COUNTBITS=6)
 		do_cycle();
 		if (env.verbose) print_outputs();
 
+		if (env.verbose) print_inputs();
+		do_cycle();
+		if (env.verbose) print_outputs();
+
 		set_rst(0);
 		set_writeValid(0);
 		set_blockData(0);
@@ -115,6 +119,7 @@ program bench #(parameter COUNTBITS=6)
 			$display("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
 		end
 
+		do_cycle();
 		do_reset();
 		
 		while (1) begin

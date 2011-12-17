@@ -8,10 +8,6 @@ module bcminer #(parameter COUNTBITS = 6)
 	nonceBufferIfc.writer nonBufWrt
 );
 
-	wire rst = chip.rst;
-	wire success = chip.success;
-	wire resultValid = chip.resultValid;
-
 	logic bs_valid, bs_new;
 	logic [351:0] bs_state;
 
@@ -23,16 +19,17 @@ module bcminer #(parameter COUNTBITS = 6)
 
 	block_storage  #(.LOGNCYCLES(COUNTBITS)) bs(
 		.clk,
-		.rst,
+		.rst(chip.rst),
 		.blkRd,
 		.outputValid(bs_valid),
 		.newBlock(bs_new),
 		.initialState(bs_state)
 	);
 
+
 	dummy_sha #(.DELAY_C(64)) sha (
 		.clk,
-		.rst,
+		.rst(chip.rst),
 		.validIn(bs_valid),
 		.newBlockIn(bs_new),
 		.initialState(bs_state),
@@ -48,8 +45,9 @@ module bcminer #(parameter COUNTBITS = 6)
 		.difficulty(sha_difficulty),
 		.success(hval_success)
 	);
-	assign success = hval_success;
-	assign resultValid = sha_valid;
+
+	assign chip.success = (^ sha_hash);//hval_success;
+	assign chip.resultValid = sha_valid;
 	assign nonBufWrt.nonce = sha_new;
 	assign nonBufWrt.overflow = 1'b0;
 
