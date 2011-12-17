@@ -39,8 +39,9 @@ class golden_dummy_sha #(parameter COUNTBITS = 6, parameter DELAY_C = 10);
 
 
 		validOut_o = valid_buf[DELAY_C];
-		hash_o = hash_buf[DELAY_C];
 		newBlockOut_o = new_buf[DELAY_C];
+		hash_o = hash_buf[DELAY_C];
+		difficulty_o = 'hf2b9441a; // TODO: calculate difficulty instead of hard-coding it!
 		// $display("[ %b, %b, %b, %b ]",  valid_buf[DELAY_C - 3],  valid_buf[DELAY_C - 2],  valid_buf[DELAY_C - 1], valid_buf[DELAY_C]);
 
 	endtask
