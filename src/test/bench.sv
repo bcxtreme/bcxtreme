@@ -42,37 +42,39 @@ program bench #(parameter COUNTBITS=6)
 	endtask
 
 	task print_inputs();
-		$display("%d: [rst %b] [writeValid %b] [blockData %x] [readReady %b]", ix_cycle, gb.rst_i, gb.writeValid_i, gb.blockData_i, gb.readReady_i);
+		$display("%d: [rst %b] [writeValid %b] [blockData %x] [readReady %b]",
+			ix_cycle, gb.rst_i, gb.writeValid_i, gb.blockData_i, gb.readReady_i);
 	endtask
 
 	task print_outputs();
-		$display("%d:                                                      [writeReady %b] [resultValid %b] [success %b] [nonce %b] [overflow %b]", ix_cycle, gb.writeReady_o, gb.resultValid_o, gb.success_o, gb.nonce_o, gb.overflow_o);
+		$display("%d:                                                      [writeReady %b] [resultValid %b] [success %b] [nonce %b] [overflow %b]",
+			ix_cycle, blkWrt.cb.writeReady, chip.cb.resultValid, chip.cb.success, nonBufRd.cb.nonce, nonBufRd.cb.overflow);
 	endtask
 
 	function int verify_outputs();
 		int err_count;
 		err_count = 0;
 
-		if (gb.writeReady_o != blkWrt.cb.writeReady) begin
-			if (env.verbose) $display("ERROR: DUT writeReady: %b", blkWrt.cb.writeReady);
+		if (gb.writeReady_o !== blkWrt.cb.writeReady) begin
+			if (env.verbose) $display("ERROR: GOLD writeReady: %b", gb.writeReady_o);
 			err_count += 1;
 		end
-		if (gb.resultValid_o != chip.cb.resultValid) begin
-			if (env.verbose) $display("ERROR: DUT resultValid: %b", chip.cb.resultValid);
+		if (gb.resultValid_o !== chip.cb.resultValid) begin
+			if (env.verbose) $display("ERROR: GOLD resultValid: %b", gb.resultValid_o);
 			err_count += 1;
 		end
 		if (gb.resultValid_o) begin
-			if (gb.success_o != chip.cb.success) begin
-				if (env.verbose) $display("ERROR: DUT success: %b", chip.cb.success);
+			if (gb.success_o !== chip.cb.success) begin
+				if (env.verbose) $display("ERROR: GOLD success: %b", gb.success_o);
 				err_count += 1;
 			end
 		end
-		if (gb.nonce_o != nonBufRd.cb.nonce) begin
-			if (env.verbose) $display("ERROR: DUT nonce: %b", nonBufRd.cb.nonce);
+		if (gb.nonce_o !== nonBufRd.cb.nonce) begin
+			if (env.verbose) $display("ERROR: GOLD nonce: %b", gb.nonce_o);
 			err_count += 1;
 		end
-		if (gb.overflow_o != nonBufRd.cb.overflow) begin
-			if (env.verbose) $display("ERROR: DUT overflow: %b", nonBufRd.cb.overflow);
+		if (gb.overflow_o !== nonBufRd.cb.overflow) begin
+			if (env.verbose) $display("ERROR: GOLD overflow: %b", gb.overflow_o);
 			err_count += 1;
 		end
 		return err_count;
