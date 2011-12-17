@@ -5,7 +5,7 @@
 
 // only three words in the 2nd chunk are needed. nonce is the 4th word and the rest are padding - remember the last word of padding is the length - 640 (80 bytes) if newBlock and valid high then nonce is 0, else previous + 1 eh? 
 
-
+/*
 function automatic bit[255:0] little_endian_sha256( bit[31:0] _h[8], bit data[], int round_number );
 
   bit [0:31] _h_be[8];
@@ -38,7 +38,21 @@ function automatic bit[255:0] little_endian_sha256( bit[31:0] _h[8], bit data[],
   return result;
 
 endfunction : little_endian_sha256
+*/
 
+
+function bit [0:31] little_endian_to_big( bit[31:0] in );
+
+  bit[0:31] b0, b1, b2, b3;
+
+  b0 = ( in & 8'hff ) >> 0;
+  b1 = ( in & 16'hff00 ) >> 8;
+  b2 = ( in & 24'hff0000 ) >> 16;
+  b3 = ( in & 32'hff000000 ) >> 24;
+
+  return (( b0 << 24 ) | ( b1 << 16 ) | (b2 << 8 ) | ( b3 << 0 ) );
+
+endfunction
 
 
 // round_number is 1 based!
