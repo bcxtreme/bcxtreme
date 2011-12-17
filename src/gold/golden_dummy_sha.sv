@@ -27,15 +27,16 @@ class golden_dummy_sha #(parameter COUNTBITS = 6, parameter DELAY_C = 10);
 			
 
 	task cycle();
-		valid_buf[0] = validIn_i;
-		hash_buf[0] = initialState_i[255:0] ^ initialState_i[351:256];
-		new_buf[0] = newBlockIn_i;
-
 		for (int i = 0; i < DELAY_C; i++) begin
 			valid_buf[i + 1] = valid_buf[i];
 			hash_buf[i + 1] = hash_buf[i];
 			new_buf[i + 1] = new_buf[i];
 		end
+
+		valid_buf[0] = validIn_i;
+		hash_buf[0] = initialState_i[255:0] ^ initialState_i[351:256];
+		new_buf[0] = newBlockIn_i;
+
 
 		validOut_o = valid_buf[DELAY_C];
 		hash_o = hash_buf[DELAY_C];
