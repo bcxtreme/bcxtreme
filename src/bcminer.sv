@@ -17,6 +17,7 @@ module bcminer #(parameter COUNTBITS = 6)
 	logic [255:0] sha_hash;
 	logic [31:0] sha_difficulty;
 
+	logic hval_success;
 
 	block_storage  #(.LOGNCYCLES(COUNTBITS)) bs(
 		.clk,
@@ -39,7 +40,13 @@ module bcminer #(parameter COUNTBITS = 6)
 		.difficulty(sha_difficulty)
 	);
 
-	assign success = (^ sha_hash);
+	standard_hash_validator (
+		.clk,
+		.hash(sha_hash),
+		.difficulty(sha_difficulty),
+		.success(hval_success)
+	);
+	assign success = hval_success;
 	assign resultValid = sha_valid;
 	assign nonBufWrt.nonce = sha_new;
 	assign nonBufWrt.overflow = 1'b0;
