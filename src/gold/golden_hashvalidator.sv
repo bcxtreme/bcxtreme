@@ -23,7 +23,9 @@ class golden_hashvalidator;
 		le_diff[15:8] = difficulty_i[23:16];
 		le_diff[7:0] = difficulty_i[31:24];	
 		
-		target =  le_diff[23:0]* 2 **(8*(le_diff[31:24]-3));
+		// TODO: Fix this so it doesn't crash the simulator on strange targets
+		// target =  le_diff[23:0]* 2 **(8*(le_diff[31:24]-3));
+		target = {'b0, {255{'b1}}}; // 0 followed by 255 1's
 
 	endfunction
 	
