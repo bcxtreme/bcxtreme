@@ -81,14 +81,14 @@ class golden_blockstorage #(parameter COUNTBITS = 6);
 	
 	task cycle();
 
+
+		try_do_broadcast();
 		advance_buffers();
 
 		writeReady_o = is_write_ready();
 		if (writeValid_i)
 			try_write_chunk(blockData_i);
 
-
-		try_do_broadcast();
 
 		$display("%t Outputting %b",$time, validOut_o);
 	endtask
