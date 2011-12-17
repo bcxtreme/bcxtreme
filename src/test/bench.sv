@@ -133,9 +133,9 @@ program bench #(parameter COUNTBITS=6)
 			verify_outputs();
                  	if (env.verbose) print_outputs();
 
-			if (gb.writeReady_o) begin
+			if (gb.writeReady_o && !is_writing) begin
 				is_writing = 1;
-				$display("Begining block");
+				$display("Beginning block");
 			end
 			if (gb.resultValid_o) begin
 				ix_result++;

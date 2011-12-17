@@ -1,5 +1,5 @@
 
-class golden_dummy_sha #(parameter COUNTBITS = 6, parameter DELAY_C = 10);
+class golden_dummy_sha #(parameter DELAY_C = 10);
 
 	// Inputs
 	bit validIn_i;
@@ -46,6 +46,7 @@ class golden_dummy_sha #(parameter COUNTBITS = 6, parameter DELAY_C = 10);
 		newBlockOut_o = new_buf[DELAY_C];
 		hash_o = hash_buf[DELAY_C];
 
+		//$display("%t Valid_buf[0] %b",$time, valid_buf[0]);
 	endtask
 
 endclass

@@ -28,6 +28,6 @@ module standard_hash_validator(
 	logic[255:0] target;
 	assign target = mantissa_as_number << 8*(exp-3);
 
-	assign succ = hash_as_number <= target;
+	assign succ = (hash_as_number < target);
 
 endmodule
