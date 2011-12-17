@@ -28,7 +28,7 @@ module bcminer #(parameter COUNTBITS = 6)
 		.initialState(bs_state)
 	);
 
-	dummy_sha #(.COUNTBITS(COUNTBITS), .DELAY_C(64)) sha (
+	dummy_sha #(.DELAY_C(64)) sha (
 		.clk,
 		.rst,
 		.validIn(bs_valid),
