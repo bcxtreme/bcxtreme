@@ -17,6 +17,12 @@ class golden_processor_standard;
 	coreInputsIfc.reader corein;
 	golden_SHACORE sha;
 	golden_hashvalidator validator;
+	
+	bit validOut_buff[DELAY_C+1];
+	bit newBlockOut_buff[DELAY_C+1];
+	bit [351:0] initialStateOut_buff[DELAY_C+1];
+	bit victoryOut_buff[DELAY_C+1];
+	bit nonceIndexOut_buff[DELAY_C+1]; //EDIT NUMBER OF BITS (M?)
 
 	function void get_result();
 		sha = new();
@@ -43,7 +49,7 @@ class golden_processor_standard;
 		corein.valid = validIn_i;
 		corein.newblock = newBlockIn_i;
 		
-		sha.set_and_evaluate(corein);
+		sha.cycle(corein);
 
 	/*END DEFINING SHA CORE INPUTS*/
 
@@ -65,4 +71,44 @@ class golden_processor_standard;
 			nonceIndexOut_o = nonceIndexIn_i;
 		end
 	endfunction
+	
+	
+	function new();
+		for (int i = 0; i <= DELAY_C; i++) begin
+			validOut_buff[i] = 1'b0;
+			newBlockOut_buff[i] = 1'b0;
+			initialStateOut_buff[i] = 0;
+			victoryOut_buff[i] = 1'b0;
+			nonceIndexOut_buff[i] = 1'b0; 
+		end
+	endfunction
+	
+	
+	task cycle();
+		for (int i = DELAY_C; i > 0; i--) begin
+			validOut_buff[i] = validOut_buff[i-1];
+			newBlockOut_buff[i] = newBlockOut_buff[i-1]
+			initialStateOut_buff[i] = initialStateOut_buff[i-1] 
+			victoryOut_buff[i] = victoryOut_buff[i-1]
+			nonceIndexOut_buff[i] = nonceIndexOut_buff[i-1]
+		end
+		
+		get_result();
+
+		validOut_buff[0] = validOut_o;
+		newBlockOut_buff[0] = newBlockOut_o;
+		initialStateOut_buff[0] = initialStateOut_o; 
+		victoryOut_buff[0] = newBlockOut_o;
+		nonceIndexOut_buff[0] = nonceIndexOut_o;
+		
+		validOut_o = validOut_buff[DELAY_C];
+		newBlockOut_o = newBlockOut_buff[DELAY_C];
+		initialStateOut_o = initialStateOut_buff[DELAY_C]; 
+		victoryOut_o = newBlockOut_buff[DELAY_C];
+		nonceIndexOut_o = nonceIndexOut_buff[DELAY_C];
+
+		//if(validOut_o)
+			//$display("Sending DoubleHash %x",hash_o);
+		//$display("%t Valid_buf[0] %b",$time, valid_buf[0]);
+	endtask
 endclass
