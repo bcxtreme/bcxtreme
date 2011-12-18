@@ -73,9 +73,10 @@ class golden_hashvalidator;
 	task cycle();
 		newBlockOut_o = newBlock;
 		validOut_o = valid;
+		success_o=success;
+
 		newBlock = newBlockIn_i;
 		valid = validIn_i;
-		success_o=success;
 		success = 'b0;
 		if (validIn_i) begin
 			get_target();

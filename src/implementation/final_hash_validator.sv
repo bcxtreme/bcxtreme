@@ -1,5 +1,6 @@
 module final_hash_validator(
 input logic clk,
+input logic rst,
 input logic valid_i,
 input logic newblock_i,
 input logic[255:0] hash,
@@ -8,11 +9,11 @@ output logic valid_o,
 output logic newblock_o,
 output logic success
 );
-	ff #(.WIDTH(1)) v(.clk,.data_i(valid_i),.data_o(valid_o));
-	ff #(.WIDTH(1)) newblock(.clk,.data_i(newblock_i),.data_o(newblock_o));
+	rff #(.WIDTH(1)) v(.clk,.rst,.data_i(valid_i),.data_o(valid_o));
+	rff #(.WIDTH(1)) newblock(.clk,.rst,.data_i(newblock_i),.data_o(newblock_o));
 
 	logic succ;
-	ff #(.WIDTH(1)) valid(.clk,.data_i(succ),.data_o(success));
+	rff #(.WIDTH(1)) valid(.clk,.rst,.data_i(succ),.data_o(success));
 
 	logic[255:0] hash_as_number;
 	generate 

@@ -5,7 +5,7 @@ module standard_hash_validator(
 	output logic success
 );
 	logic succ;
-	ff #(.WIDTH(1)) valid(.clk,.data_i(succ),.data_o(success));
+	rff #(.WIDTH(1)) valid(.clk,.rst,.data_i(succ),.data_o(success));
 
 	logic[255:0] hash_as_number;
 	generate 
