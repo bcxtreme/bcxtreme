@@ -1,11 +1,13 @@
 TOP=top.sv
+INTERFACES=interfaces/blockStoreIfc.sv interfaces/nonceBufferIfc.sv interfaces/minerIfc.sv
+GOLD=gold/golden_hashvalidator.sv gold/golden_dummy_sha.sv gold/golden_blockstorage.sv gold/golden_bcminer.sv
 BENCH=test/inputs.sv test/environ.sv test/bench.sv
 
-SHARED=shared/eff.sv shared/rff.sv implementation/shared/*.sv
+SHARED=shared/*.sv
 BLOCKSTORAGE=implementation/shift_register.sv implementation/block_storage.sv
 SHACORE=implementation/dummy_sha.sv
 HASHVAL=implementation/final_hash_validator.sv
-DUT=$(SHARED) $(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) bcminer.sv
+DUT=$(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) bcminer.sv
 
 SHACORE_TOP=shacore_top.sv
 SHACORE_BENCH=test/shacore/*.sv
