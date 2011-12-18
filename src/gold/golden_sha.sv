@@ -100,7 +100,8 @@ class golden_sha;
 
 
   function set_and_evaluate( virtual coreInputsIfc in );
-
+    configure( in );
+    evaluate();
   endfunction
 
 

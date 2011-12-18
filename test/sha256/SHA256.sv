@@ -231,6 +231,8 @@ function automatic bit[0:255] golden_sha256( bit[0:31] _h[8], bit data[] );
  
   result = { _h[0], _h[1], _h[2], _h[3], _h[4], _h[5], _h[6], _h[7] };
   
+  //$display( result );
+
   return result;
 
 
@@ -430,7 +432,7 @@ function automatic bit[0:255] bitcoin_sha256( bit[0:31] _h[8], bit data[], int r
   
   return result;
 
-  //$display( "%h", result );
+  $display( "%h", result );
      
 endfunction
 
