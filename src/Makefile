@@ -6,7 +6,7 @@ BENCH=test/inputs.sv test/environ.sv test/bench.sv
 SHARED=shared/eff.sv implementation/shared/*.sv
 BLOCKSTORAGE=implementation/shift_register.sv implementation/block_storage.sv
 SHACORE=implementation/dummy_sha.sv
-HASHVAL=implementation/standard_hash_validator.sv
+HASHVAL=implementation/final_hash_validator.sv
 DUT=$(SHARED) $(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) bcminer.sv
 
 .PHONY: help clean bench test

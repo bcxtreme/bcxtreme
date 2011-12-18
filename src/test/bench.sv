@@ -42,13 +42,13 @@ program bench #(parameter COUNTBITS=6)
 	endtask
 
 	task print_inputs();
-		$display("%d: [rst %b] [writeValid %b] [blockData %x] [readReady %b]",
-			ix_cycle, gb.rst_i, gb.writeValid_i, gb.blockData_i, gb.readReady_i);
+		$display("%d %t: [rst %b] [writeValid %b] [blockData %x] [readReady %b]",
+			ix_cycle,$time, gb.rst_i, gb.writeValid_i, gb.blockData_i, gb.readReady_i);
 	endtask
 
 	task print_outputs();
-		$display("%d:                                                      [writeReady %b] [resultValid %b] [success %b] [nonce %b] [overflow %b]",
-			ix_cycle, blkWrt.cb.writeReady, chip.cb.resultValid, chip.cb.success, nonBufRd.cb.nonce, nonBufRd.cb.overflow);
+		$display("%d %t:                                                      [writeReady %b] [resultValid %b] [success %b] [nonce %b] [overflow %b]",
+			ix_cycle,$time, blkWrt.cb.writeReady, chip.cb.resultValid, chip.cb.success, nonBufRd.cb.nonce, nonBufRd.cb.overflow);
 	endtask
 
 	function int verify_outputs();
@@ -83,6 +83,7 @@ program bench #(parameter COUNTBITS=6)
 	task do_cycle();
 		@(blkWrt.cb)
 		gb.cycle();
+		inp.write_feedback(blkWrt.cb.writeReady);
 		inp.generate_inputs();
 		ix_cycle++;
 	endtask
@@ -93,18 +94,13 @@ program bench #(parameter COUNTBITS=6)
 		do_cycle();
 		if (env.verbose) print_outputs();
 
-		if (env.verbose) print_inputs();
-		do_cycle();
-		if (env.verbose) print_outputs();
-
 		set_rst(0);
 		set_writeValid(0);
 		set_blockData(0);
 		set_readReady(0);
-		if (env.verbose) print_inputs();
-		do_cycle();
-		if (env.verbose) print_outputs();
 
+		inp.generate_new_block();
+		inp.generate_inputs();
 	endtask
 
 	task do_block_testing();
@@ -119,9 +115,8 @@ program bench #(parameter COUNTBITS=6)
 			$display("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
 		end
 
-		do_cycle();
 		do_reset();
-		
+
 		while (1) begin
 			if (is_writing && ix_block < $size(env.blocks)) begin
 				set_writeValid(1);
@@ -166,6 +161,7 @@ program bench #(parameter COUNTBITS=6)
 		inp = new(.density_rst(env.density_rst), .density_writeValid(env.density_writeValid));
 
 		gb = new();
+		do_reset();
 
 		if ($size(env.blocks) > 0) do_block_testing();
 
@@ -173,7 +169,6 @@ program bench #(parameter COUNTBITS=6)
 			$display("BEGIN RANDOMIZED TEST");
 			$display("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
 		end
-
 		do_reset();
 
 		for (int i = 0; i < env.max_cycles; i++) begin

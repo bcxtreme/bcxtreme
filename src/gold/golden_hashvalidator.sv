@@ -11,6 +11,8 @@ class golden_hashvalidator;
 	bit newBlockOut_o;
 	bit success_o;
 
+
+
 	local bit [255:0] le_hash;
 	local bit [255:0] target;
 
@@ -23,9 +25,9 @@ class golden_hashvalidator;
 		le_diff[15:8] = difficulty_i[23:16];
 		le_diff[7:0] = difficulty_i[31:24];	
 		
-		// TODO: Fix this so it doesn't crash the simulator on strange targets
-		// target =  le_diff[23:0]* 2 **(8*(le_diff[31:24]-3));
-		target = {32'b0, 16'hffff, 208'b0}; // lowest possible difficulty
+		target =  le_diff[23:0] << (8*(le_diff[31:24]-3));
+		//$display("Difficulty: %x, target: %x",difficulty_i, target);
+		//target = {32'b0, 16'hffff, 208'b0}; // lowest possible difficulty
 
 	endfunction
 	
@@ -65,17 +67,22 @@ class golden_hashvalidator;
 		le_hash[7:0] = hash_i[255:248];
 
 	endfunction
-	
+	bit success;
+	bit valid;
+	bit newBlock;
 	task cycle();
-		newBlockOut_o = newBlockIn_i;
-		validOut_o = validIn_i;
-		success_o = 'b0;
+		newBlockOut_o = newBlock;
+		validOut_o = valid;
+		newBlock = newBlockIn_i;
+		valid = validIn_i;
+		success_o=success;
+		success = 'b0;
 		if (validIn_i) begin
 			get_target();
 			reverse_hash(); //need to byte reverse the hash before comparing
 
 			if(le_hash < target) //check if the output matches difficulty
-				success_o = 'b1;
+				success = 'b1;
 		end
 	endtask
 endclass

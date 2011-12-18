@@ -37,15 +37,16 @@ class golden_dummy_sha #(parameter DELAY_C = 10);
 		end
 
 		valid_buf[0] = validIn_i;
-		dif_buf[0] = initialState_i[351:320];
-		hash_buf[0] = initialState_i[255:0];
+		dif_buf[0] = initialState_i[31:0];
+		hash_buf[0] = initialState_i[351:96];
 		new_buf[0] = newBlockIn_i;
 
 		validOut_o = valid_buf[DELAY_C];
 		difficulty_o = dif_buf[DELAY_C];
 		newBlockOut_o = new_buf[DELAY_C];
 		hash_o = hash_buf[DELAY_C];
-
+		//if(validOut_o)
+			//$display("Sending DoubleHash %x",hash_o);
 		//$display("%t Valid_buf[0] %b",$time, valid_buf[0]);
 	endtask
 

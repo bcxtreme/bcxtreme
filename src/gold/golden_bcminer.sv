@@ -60,7 +60,7 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 		sha.initialState_i = gblock.initialState_o;
 
 		sha.cycle();
-
+		//$display("Input to hashvalidator %x",sha.hash_o);
 		// Hash Validator
 		hval.validIn_i = sha.validOut_o;
 		hval.newBlockIn_i = sha.newBlockOut_o;
@@ -71,8 +71,8 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 
 		writeReady_o = gblock.writeReady_o;
 		resultValid_o = hval.validOut_o;
-		// success_o = hval.success_o;
-		success_o = (^ sha.hash_o);
+		success_o = hval.success_o;
+		//success_o = (^ sha.hash_o);
 		nonce_o = hval.newBlockOut_o;
 
 	endtask

@@ -29,15 +29,16 @@ class golden_blockstorage #(parameter COUNTBITS = 6);
 		// Initialize by saying bufB has already been broadcast, so we don't send out junk
 		bufB_broadcast_cnt = bufB_broadcast_max;
 		force_write_ready = 1;
+		bufA_next=43;
 	endfunction
 
 	task advance_buffers();
-		if ((bufB_broadcast_cnt == bufB_broadcast_max) && (bufA_next == 44)) begin
+		if ((bufB_broadcast_cnt == bufB_broadcast_max) && (bufA_next == -1)) begin
 			bufB = bufA;
 			bufB_broadcast_cnt = 0;
 
 			bufA = 0;
-			bufA_next = 0;
+			bufA_next = 43;
 
 			// Force writeReady to be high on this cycle
 			force_write_ready = 1;
@@ -45,9 +46,10 @@ class golden_blockstorage #(parameter COUNTBITS = 6);
 	endtask
 
 	task try_write_chunk(bit[7:0] chunk);
-		if (bufA_next < 44) begin
+		if (bufA_next >=0) begin
 			bufA[bufA_next] = chunk;
-			bufA_next++;
+			//$display("Wrote chunk %x to %d now we have %x",chunk, bufA_next,bufA);
+			bufA_next--;
 		end
 	endtask
 
@@ -58,7 +60,7 @@ class golden_blockstorage #(parameter COUNTBITS = 6);
 			validOut_o = 1;
 			newBlock_o = (bufB_broadcast_cnt == 0);
 			initialState_o = bufB;
-
+			//$display("Broadcasting: %x",initialState_o);
 			bufB_broadcast_cnt++;
 		end else begin
 			// No broadcast
@@ -72,7 +74,7 @@ class golden_blockstorage #(parameter COUNTBITS = 6);
 		// WriteReady should be on whenever we are ready to accept data
 		// and go off on the cycle that we accept the first chunk.
 		// However, it must be on for at least one cycle.
-		if (force_write_ready || (bufA_next == 0)) begin
+		if (force_write_ready || (bufA_next == 43)) begin
 			force_write_ready = 0;
 			return 1;
 		end

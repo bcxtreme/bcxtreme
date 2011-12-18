@@ -39,14 +39,14 @@ module bcminer #(parameter COUNTBITS = 6)
 		.difficulty(sha_difficulty)
 	);
 
-	standard_hash_validator hval (
+	final_hash_validator hval (
 		.clk,
 		.hash(sha_hash),
 		.difficulty(sha_difficulty),
 		.success(hval_success)
 	);
 
-	assign chip.success = (^ sha_hash);//hval_success;
+	assign chip.success = hval_success;
 	assign chip.resultValid = sha_valid;
 	assign nonBufWrt.nonce = sha_new;
 	assign nonBufWrt.overflow = 1'b0;
