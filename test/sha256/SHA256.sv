@@ -115,7 +115,9 @@ function automatic bit[0:255] golden_sha256( bit[0:31] _h[8], bit data[] );
     _data[_data.size() - 64 + append] = _original_data_size[append];
   end
 
-  $display( "golden_sha256 : Original data size = %d", _original_data_size );
+  //$display( _data );
+
+  $display( "golden_sha256 : Original data size = %d", _original_data_size );  
 
   //$display( binary_array_to_string( binary_message ) );
   //$display( binary_message.size() );
@@ -147,7 +149,7 @@ function automatic bit[0:255] golden_sha256( bit[0:31] _h[8], bit data[] );
     for ( int word = 0; word < 16; word++ ) begin
       for ( int _bit = 0; _bit < 32; _bit++ ) begin
         w[word][_bit] = _data[chunk*512 + word*32 + _bit]; 
-        //$display( "chunk=%d,word=%d,bit=%d ->%d", chunk, word, _bit, binary_message[chunk*512 + word*32 + _bit] ); 
+        //$display( "chunk=%d,word=%d,bit=%d ->%d", chunk, word, _bit, _data[chunk*512 + word*32 + _bit] ); 
       end
     end
 
@@ -161,6 +163,8 @@ function automatic bit[0:255] golden_sha256( bit[0:31] _h[8], bit data[] );
       int s1 = rightrotate( w[extend-2], 17 ) ^ rightrotate( w[extend-2], 19 ) ^ ( w[extend-2] >> 10 );
       w[extend] = w[extend-16] + s0 + w[extend-7] + s1;
     end 
+
+    //$display( "...actually processing chunk" );
 
     //Initialize hash value for this chunk:
     //a := h0

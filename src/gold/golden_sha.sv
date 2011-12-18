@@ -122,16 +122,24 @@ class golden_sha;
     else
       _nonce += 1;
 
-    
     $display( "nonce=%d", _nonce );
 
     message_1_bits = { _firstChunk, _w1, _w2, _w3, _nonce };
+
+    // ** JEREMY : to verify the second calc use :
+    //message_1_bits = { _firstChunk, _w1, _w2, _w3, 32'h42a14695 };
+
     
+    //$display( "%h", message_1_bits );
+
     message_1 = new[640];
 
     // converting from arrays to dynamic arrays is "very sophisticated" in SystemVerilog
     for ( int i = 0; i < 640; i++ )
-      message_1[i] = message_1_bits[i];
+      message_1[i] = message_1_bits[639 - i];
+
+    //$display( message_1 );
+    //$display ( binary_array_to_string( message_1 ) );
 
     result1 = golden_sha256( _h, message_1 );
 
@@ -141,7 +149,7 @@ class golden_sha;
 
     // converting from arrays to dynamic arrays is "very sophisticated" in SystemVerilog
     for ( int i = 0; i < 256; i++ )
-      message_2[i] = result1[i];
+      message_2[i] = result1[255 - i];
 
     // perform a full SHA256 the second time
     _h = {
