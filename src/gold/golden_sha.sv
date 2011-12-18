@@ -115,10 +115,15 @@ class golden_sha;
     bit [255:0] result1;
     bit [255:0] result2;
 
+    $display( "w1=%h, w2=%h, w3=%h", _w1, _w2, _w3 );    
+
     if ( _valid && _newBlock )
       _nonce = 0;
     else
       _nonce += 1;
+
+    
+    $display( "nonce=%d", _nonce );
 
     message_1_bits = { _firstChunk, _w1, _w2, _w3, _nonce };
     
@@ -130,6 +135,10 @@ class golden_sha;
 
     result1 = golden_sha256( _h, message_1 );
 
+    $display( "First SHA256=%h", result1 );
+
+    message_2 = new[256];
+
     // converting from arrays to dynamic arrays is "very sophisticated" in SystemVerilog
     for ( int i = 0; i < 256; i++ )
       message_2[i] = result1[i];
@@ -140,6 +149,8 @@ class golden_sha;
     };
 
     result2 = golden_sha256( _h, message_2 );
+
+    $display( "Second SHA256=%h", result2 );
     
     _result = result2; 
 
