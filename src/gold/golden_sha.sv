@@ -116,6 +116,11 @@ class golden_sha;
     for ( int i = 0; i < 256; i++ )
       message_2[i] = result1[i];
 
+    // perform a full SHA256 the second time
+    _h = {
+      32'h6a09e667, 32'hbb67ae85, 32'h3c6ef372, 32'ha54ff53a, 32'h510e527f, 32'h9b05688c, 32'h1f83d9ab, 32'h5be0cd19
+    };
+
     result2 = golden_sha256( _h, message_2 );
     
     _result = result2; 
