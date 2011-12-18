@@ -145,7 +145,7 @@ class golden_sha;
 
   endfunction
 
-  function getResult();
+  function bit[255:0] getResult();
     // should only make result available after a particular time
     return _result;
   endfunction
