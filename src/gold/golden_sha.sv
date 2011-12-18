@@ -1,53 +1,93 @@
 
+
+
+
 class golden_sha;
 
+  
   bit[31:0] _h[8] = {
     32'h6a09e667, 32'hbb67ae85, 32'h3c6ef372, 32'ha54ff53a, 32'h510e527f, 32'h9b05688c, 32'h1f83d9ab, 32'h5be0cd19
   };
+  
+  //coreInputsIfc.reader in
 
   bit _valid;
   bit _newBlock;
-  bit [544:0] _initialState;
+  bit [511:0] _firstChunk;
 
-  bit [31:0] _timestamp;
-  bit [31:0] _target;
+  bit [31:0] _w1;
+  bit [31:0] _w2;
+  bit [31:0] _w3;
   bit [31:0] _nonce;
 
 
   bit [255:0] _result;
 
   
-  function set_h( bit [31:0] h[8] );
-    _h = h;
+  function new( virtual coreInputsIfc in );
+    _valid = in.valid;
+    _newBlock = in.newblock;
+    
+    _h[0] = in.hashstate.a;
+    _h[1] = in.hashstate.b;
+    _h[2] = in.hashstate.c;
+    _h[3] = in.hashstate.d;
+    _h[4] = in.hashstate.e;
+    _h[5] = in.hashstate.f;
+    _h[6] = in.hashstate.g;
+    _h[7] = in.hashstate.h;
+    
+    _w1 = in.w1;
+    _w2 = in.w2;
+    _w3 = in.w3;
   endfunction
 
 
-  function setValid( bit valid );
-    _valid = valid;
+  function reset();
+    // what else should be emulated here
+
+    _h = {
+      32'h6a09e667, 32'hbb67ae85, 32'h3c6ef372, 32'ha54ff53a, 32'h510e527f, 32'h9b05688c, 32'h1f83d9ab, 32'h5be0cd19
+    };
+  endfunction   
+
+  //function set_h( bit [31:0] h[8] );
+    //_h = h;
+  //endfunction
+
+
+  function HashState get_hashstate();
+    HashState result;
+    
+    result.a = _h[0];
+    result.b = _h[1];
+    result.c = _h[2];
+    result.d = _h[3];
+    result.e = _h[4];
+    result.f = _h[5];
+    result.g = _h[6];
+    result.h = _h[7]; 
+
+    return result;
   endfunction
 
 
-  function setNewBlock( bit newBlock );
-    _newBlock = newBlock;
-  endfunction  
+  //function setValid( bit valid );
+    //_valid = valid;
+  //endfunction
 
 
-  function setInitialState( bit[544:0] initialState );
-    _initialState = initialState;
-  endfunction
+  //function setNewBlock( bit newBlock );
+    //_newBlock = newBlock;
+  //endfunction  
 
 
-  function setTimestamp( bit[31:0] timestamp );
-    _timestamp = timestamp;
-  endfunction
+  //function setInitialState( bit[544:0] initialState );
+    //_initialState = initialState;
+  //endfunction
 
 
-  function setTarget( bit[31:0] target );
-    _target = target;
-  endfunction
-
-
-  function evaluate( int round_number = 1 );
+  function evaluate();
 
     bit message_1[];
     bit[639:0] message_1_bits;
@@ -62,7 +102,7 @@ class golden_sha;
     else
       _nonce += 1;
 
-    message_1_bits = { _initialState, _timestamp, _target, _nonce };
+    message_1_bits = { _firstChunk, _w1, _w2, _w3, _nonce };
     
     message_1 = new[640];
 
@@ -70,15 +110,13 @@ class golden_sha;
     for ( int i = 0; i < 640; i++ )
       message_1[i] = message_1_bits[i];
 
-
-    // if you want to skip a round _h will need to contain the results of the first round
-    result1 = bitcoin_sha256( _h, message_1, round_number );
+    result1 = golden_sha256( _h, message_1 );
 
     // converting from arrays to dynamic arrays is "very sophisticated" in SystemVerilog
     for ( int i = 0; i < 256; i++ )
       message_2[i] = result1[i];
 
-    result2 = bitcoin_sha256( _h, message_2, round_number );
+    result2 = golden_sha256( _h, message_2 );
     
     _result = result2; 
 
