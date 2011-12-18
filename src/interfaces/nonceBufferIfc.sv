@@ -1,13 +1,13 @@
 
-interface nonceBufferIfc();
+interface nonceBufferIfc(input logic clk);
 	logic readReady;
 	logic nonce;
 	logic overflow;
 
-	clocking cb @(posedge clk)
+	clocking cb @(posedge clk);
 		output readReady;
-		output nonce;
-		output overflow;
+		input nonce;
+		input overflow;
 	endclocking
 
 	modport writer(
@@ -17,9 +17,7 @@ interface nonceBufferIfc();
 	);
 
 	modport reader(
-		output readReady,
-		input nonce,
-		input overflow
+		clocking cb
 	);
 
 endinterface

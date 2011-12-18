@@ -29,7 +29,7 @@ logic[7:0] ffout[43:0];
 generate
   for(genvar i=0; i<44; i++) begin
     ff #(.WIDTH(8)) f(.clk,.data_i(ffin[i]),.data_o(ffout[i]));
-    assign out[352-i*8-1:352-(i+1)*8]=ffout[i];
+    assign out[(i+1)*8-1 -:8]=ffout[i];
   end
   
   assign ffin[0]=shift?block_data:ffout[0];

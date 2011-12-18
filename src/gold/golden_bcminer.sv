@@ -20,6 +20,8 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 
 	// Golden units
 	local golden_blockstorage #(.COUNTBITS(COUNTBITS)) gblock;
+	local golden_dummy_sha #(.DELAY_C(64)) sha;
+	local golden_hashvalidator hval;
 
 	// Reset the output pins and the internal state
 	task reset();
@@ -30,6 +32,8 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 		overflow_o = 0;
 
 		gblock = new();
+		sha = new();
+		hval = new();
 	endtask
 
 	// Simulate a cycle
@@ -43,20 +47,33 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 			return;
 		end
 
+		// Block Storage
 		gblock.writeValid_i = writeValid_i;
 		gblock.blockData_i = blockData_i;
 
 		gblock.cycle();
 
+
+		// Sha Core
+		sha.validIn_i = gblock.validOut_o;
+		sha.newBlockIn_i = gblock.newBlock_o;
+		sha.initialState_i = gblock.initialState_o;
+
+		sha.cycle();
+		//$display("Input to hashvalidator %x",sha.hash_o);
+		// Hash Validator
+		hval.validIn_i = sha.validOut_o;
+		hval.newBlockIn_i = sha.newBlockOut_o;
+		hval.hash_i = sha.hash_o;
+		hval.difficulty_i = sha.difficulty_o;
+	
+		hval.cycle();
+
 		writeReady_o = gblock.writeReady_o;
-
-		validOut = gblock.validOut_o;
-		newBlock = gblock.newBlock_o;
-		state = gblock.initialState_o;
-
-		resultValid_o = validOut;
-		//$display("%x",state);
-		success_o = (^ state);
+		resultValid_o = hval.validOut_o;
+		success_o = hval.success_o;
+		//success_o = (^ sha.hash_o);
+		nonce_o = hval.newBlockOut_o;
 
 	endtask
 

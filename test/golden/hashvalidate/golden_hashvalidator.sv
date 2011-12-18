@@ -88,5 +88,4 @@ class golden_hashvalidator;
 			success = 0;
 		end
 	endfunction
-
 endclass

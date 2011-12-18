@@ -3,12 +3,12 @@
 program bench #(parameter COUNTBITS=6) 
 (
 	input clk,
-	output logic rst,
+	minerIfc.bench chip,
 	blockStoreIfc.writer blkWrt,
-	input resultValid,
-	input success,
 	nonceBufferIfc.reader nonBufRd
 );
+
+	int ix_cycle = 0;
 
 	environ env;
 	inputs inp;
@@ -16,7 +16,7 @@ program bench #(parameter COUNTBITS=6)
 
 	task set_rst(bit val);
 		gb.rst_i = val;
-		rst = val;
+		chip.cb.rst <= val;
 	endtask
 
 	task set_writeValid(bit val);
@@ -31,7 +31,7 @@ program bench #(parameter COUNTBITS=6)
 
 	task set_readReady(bit val);
 		gb.readReady_i = val;
-		nonBufRd.readReady <= val;
+		nonBufRd.cb.readReady <= val;
 	endtask
 
 	task set_inputs();
@@ -42,35 +42,39 @@ program bench #(parameter COUNTBITS=6)
 	endtask
 
 	task print_inputs();
-		$display("%t: [rst %b] [writeValid %b] [blockData %x] [readReady %b]", $time, gb.rst_i, gb.writeValid_i, gb.blockData_i, gb.readReady_i);
+		$display("%d %t: [rst %b] [writeValid %b] [blockData %x] [readReady %b]",
+			ix_cycle,$time, gb.rst_i, gb.writeValid_i, gb.blockData_i, gb.readReady_i);
 	endtask
 
 	task print_outputs();
-		$display("%t:                                                      [writeReady %b] [resultValid %b] [success %b] [nonce %b] [overflow %b]", $time, gb.writeReady_o, gb.resultValid_o, gb.success_o, gb.nonce_o, gb.overflow_o);
+		$display("%d %t:                                                      [writeReady %b] [resultValid %b] [success %b] [nonce %b] [overflow %b]",
+			ix_cycle,$time, blkWrt.cb.writeReady, chip.cb.resultValid, chip.cb.success, nonBufRd.cb.nonce, nonBufRd.cb.overflow);
 	endtask
 
 	function int verify_outputs();
 		int err_count;
 		err_count = 0;
 
-		if (gb.writeReady_o != blkWrt.cb.writeReady) begin
-			if (env.verbose) $display("ERROR: DUT writeReady: %b", blkWrt.cb.writeReady);
+		if (gb.writeReady_o !== blkWrt.cb.writeReady) begin
+			if (env.verbose) $display("ERROR: GOLD writeReady: %b", gb.writeReady_o);
 			err_count += 1;
 		end
-		if (gb.resultValid_o != resultValid) begin
-			if (env.verbose) $display("ERROR: DUT resultValid: %b", resultValid);
+		if (gb.resultValid_o !== chip.cb.resultValid) begin
+			if (env.verbose) $display("ERROR: GOLD resultValid: %b", gb.resultValid_o);
 			err_count += 1;
 		end
-		if (gb.resultValid_o && (gb.success_o != success)) begin
-			if (env.verbose) $display("ERROR: DUT success: %b", success);
+		if (gb.resultValid_o) begin
+			if (gb.success_o !== chip.cb.success) begin
+				if (env.verbose) $display("ERROR: GOLD success: %b", gb.success_o);
+				err_count += 1;
+			end
+		end
+		if (gb.nonce_o !== nonBufRd.cb.nonce) begin
+			if (env.verbose) $display("ERROR: GOLD nonce: %b", gb.nonce_o);
 			err_count += 1;
 		end
-		if (gb.nonce_o != nonBufRd.nonce) begin
-			if (env.verbose) $display("ERROR: DUT nonce: %b", nonBufRd.nonce);
-			err_count += 1;
-		end
-		if (gb.overflow_o != nonBufRd.overflow) begin
-			if (env.verbose) $display("ERROR: DUT overflow: %b", nonBufRd.overflow);
+		if (gb.overflow_o !== nonBufRd.cb.overflow) begin
+			if (env.verbose) $display("ERROR: GOLD overflow: %b", gb.overflow_o);
 			err_count += 1;
 		end
 		return err_count;
@@ -79,7 +83,74 @@ program bench #(parameter COUNTBITS=6)
 	task do_cycle();
 		@(blkWrt.cb)
 		gb.cycle();
+		inp.write_feedback(blkWrt.cb.writeReady);
 		inp.generate_inputs();
+		ix_cycle++;
+	endtask
+
+	task do_reset();
+		set_rst(1);
+		if (env.verbose) print_inputs();
+		do_cycle();
+		if (env.verbose) print_outputs();
+
+		set_rst(0);
+		set_writeValid(0);
+		set_blockData(0);
+		set_readReady(0);
+
+		inp.generate_new_block();
+		inp.generate_inputs();
+	endtask
+
+	task do_block_testing();
+		int ix_block = 0; 		// # block we're currently sending
+		int ix_result = 0;		// # result we're expecting next
+		int ix = 0;			// # byte in the current block
+		byte data;			// Next byte to send
+		bit is_writing = 0;		// True if we're mid-block sending
+		
+		if (env.verbose) begin
+			$display("BEGIN MANUAL BLOCK TEST");
+			$display("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+		end
+
+		do_reset();
+
+		while (1) begin
+			if (is_writing && ix_block < $size(env.blocks)) begin
+				set_writeValid(1);
+				set_blockData(env.blocks[ix_block][ix*8+7 -: 8]);
+				ix++;
+				if (ix == 44) begin
+					ix = 0;
+					ix_block++;
+					is_writing = 0;
+					$display("Ending block");
+				end
+			end else begin
+				set_writeValid(0);
+				set_blockData(0);
+			end
+
+			if (env.verbose) print_inputs();
+			do_cycle();
+			verify_outputs();
+                 	if (env.verbose) print_outputs();
+
+			if (gb.writeReady_o && !is_writing) begin
+				is_writing = 1;
+				$display("Beginning block");
+			end
+			if (gb.resultValid_o) begin
+				ix_result++;
+				$display("* RESULT %d [GOLD]: %b", ix_result, gb.success_o);
+			end
+			if (chip.cb.resultValid)
+				$display("* RESULT [DUT]: %b", chip.cb.success);
+
+			if (ix_result == $size(env.blocks)) return;
+		end
 	endtask
 
 	initial begin
@@ -90,30 +161,28 @@ program bench #(parameter COUNTBITS=6)
 		inp = new(.density_rst(env.density_rst), .density_writeValid(env.density_writeValid));
 
 		gb = new();
+		do_reset();
+
+		if ($size(env.blocks) > 0) do_block_testing();
+
 		if (env.verbose) begin
-			$display("BEGIN TEST");
+			$display("BEGIN RANDOMIZED TEST");
 			$display("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
 		end
-
-		set_rst(1);
-		if (env.verbose) print_inputs();
-		do_cycle();
-		if (env.verbose) print_outputs();
-
-		set_rst(0);
-		set_inputs();
-		if (env.verbose) print_inputs();
-		do_cycle();
-		if (env.verbose) print_outputs();
+		do_reset();
 
 		for (int i = 0; i < env.max_cycles; i++) begin
+                        bit is_resetting;
+                        is_resetting = inp.rst;
+ 
+
 			set_inputs();
 			if (env.verbose) print_inputs();
 
 			do_cycle();
-                  	 if (env.verbose) print_outputs();
+                 	if (env.verbose) print_outputs();
 		
-			err_count += verify_outputs();
+			if (!is_resetting) err_count += verify_outputs();
 		end
 
 		if (env.verbose) begin
