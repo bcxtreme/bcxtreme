@@ -24,7 +24,7 @@ class golden_sha;
   bit [255:0] _result;
 
   
-  function new( virtual coreInputsIfc in );
+  function configure( virtual coreInputsIfc in );
     _valid = in.valid;
     _newBlock = in.newblock;
     
@@ -41,6 +41,23 @@ class golden_sha;
     _w2 = in.w2;
     _w3 = in.w3;
   endfunction
+
+
+  function new( virtual coreInputsIfc in );
+    configure( in );
+  endfunction
+
+  
+  function set_hashstate( HashState in );
+    _h[0] = in.a;
+    _h[1] = in.b;
+    _h[2] = in.c;
+    _h[3] = in.d;
+    _h[4] = in.e;
+    _h[5] = in.f;
+    _h[6] = in.g;
+    _h[7] = in.h;
+  endfunction 
 
 
   function reset();
@@ -72,19 +89,19 @@ class golden_sha;
   endfunction
 
 
-  //function setValid( bit valid );
-    //_valid = valid;
-  //endfunction
+  function setValid( bit valid );
+    _valid = valid;
+  endfunction
 
 
-  //function setNewBlock( bit newBlock );
-    //_newBlock = newBlock;
-  //endfunction  
+  function setNewBlock( bit newBlock );
+    _newBlock = newBlock;
+  endfunction  
 
 
-  //function setInitialState( bit[544:0] initialState );
-    //_initialState = initialState;
-  //endfunction
+  function set_and_evaluate( virtual coreInputsIfc in );
+
+  endfunction
 
 
   function evaluate();
