@@ -9,7 +9,7 @@ output logic[31:0] difficulty
 );
 
 HashState round1delayed; //The round 1 state, but delayed 64 cycles.
-hash_state_delay_buffer #(.DELAY(64)) hsdb(.clk,.newblock(in.newblock),.in(round1),.out(round1delayed));
+hash_state_delay_buffer #(.DELAY(64)) hsdb(.clk,.newblock(in.newblock),.in(in.hashstate),.out(round1delayed));
 
 logic valid_pipeline[64:15];
 logic newblock_pipeline[64:15];

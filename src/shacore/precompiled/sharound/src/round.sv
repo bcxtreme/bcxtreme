@@ -30,23 +30,23 @@ sha_eADDER ead(.d(in.d),.h(in.h),.sum1(sum1_tmp),.ch(ch_tmp),.K,.W,.e);
 
 HashState resbuff[PIPELINE_DEPTH:0];
 
-assing resbuff[0].h=in.g;
-assing resbuff[0].g=in.f;
-assing resbuff[0].f=in.e;
-assing resbuff[0].e=e;
-assing resbuff[0].d=in.c;
-assing resbuff[0].c=in.b;
-assing resbuff[0].b=in.a;
-assing resbuff[0].a=a;
+assign resbuff[0].h=in.g;
+assign resbuff[0].g=in.f;
+assign resbuff[0].f=in.e;
+assign resbuff[0].e=e;
+assign resbuff[0].d=in.c;
+assign resbuff[0].c=in.b;
+assign resbuff[0].b=in.a;
+assign resbuff[0].a=a;
 
 
 generate
 	for(genvar i=0; i<PIPELINE_DEPTH; i++) begin
-		HashStateFF(.clk,.in(resbuff[i]),.out(resbuff[i+1]);
+		HashStateFF hsf(.clk,.in(resbuff[i]),.out(resbuff[i+1]));
 	end
 endgenerate
 
-assign out=resbuf[PIPELINE_DEPTH];
+assign out=resbuff[PIPELINE_DEPTH];
 
 
 //assign T1=in.h+sum1_tmp+ch_tmp+K+W;

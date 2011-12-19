@@ -7,7 +7,7 @@ output logic[15:0][31:0] W_o
 logic[15:0][31:0] Wbuff[PIPELINE_DEPTH:0];
 
 //shift the "history" back one...
-for(i=1; i<16; i++) begin
+for(genvar i=1; i<16; i++) begin
   assign Wbuff[0][i]=W_i[i-1];
 end
 

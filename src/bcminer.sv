@@ -7,6 +7,7 @@ module bcminer #(parameter COUNTBITS = 6)
 	blockStoreIfc.reader blkRd,
 	nonceBufferIfc.writer nonBufWrt
 );
+	coreInputsIfc core_inputs;
 
 	logic bs_valid, bs_new;
 	logic [351:0] bs_state;
@@ -17,6 +18,8 @@ module bcminer #(parameter COUNTBITS = 6)
 
 	logic hval_success;
 
+
+
 	block_storage  #(.LOGNCYCLES(COUNTBITS)) bs(
 		.clk,
 		.rst(chip.rst),
@@ -25,17 +28,16 @@ module bcminer #(parameter COUNTBITS = 6)
 		.newBlock(bs_new),
 		.initialState(bs_state)
 	);
+	
 
 
-	dummy_sha #(.DELAY_C(64)) sha (
+	sha_last_pipelined_core #(.ROUND_PIPELINE_DEPTH(1)) sha (
 		.clk,
 		.rst(chip.rst),
-		.validIn(bs_valid),
-		.newBlockIn(bs_new),
-		.initialState(bs_state),
+		.in(core_inputs),
 		.validOut(sha_valid),
 		.newBlockOut(sha_new),
-		.hash(sha_hash),
+		.doublehash(sha_hash),
 		.difficulty(sha_difficulty)
 	);
 

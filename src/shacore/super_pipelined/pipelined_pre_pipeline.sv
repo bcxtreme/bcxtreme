@@ -17,7 +17,7 @@ assign newblock_pipeline[0]=in.newblock;
 assign newblock_o=newblock_pipeline[15];
 
 HashState hashstate_pipeline[15:0];
-assign hashstate_pipeline[0]=state_in;
+assign hashstate_pipeline[0]=in.hashstate;
 assign state_out=hashstate_pipeline[15];
 
 logic[31:0] M[14:0];

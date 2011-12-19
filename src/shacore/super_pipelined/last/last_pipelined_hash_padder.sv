@@ -18,8 +18,9 @@ for(genvar i=2; i<8; i++) begin
    assign padded[i]=32'd0;
 end
 
-HashStateFF hsff(.clk,.in(instate),.out(ffed));
 HashState ffed;
+HashStateFF hsff(.clk,.in(instate),.out(ffed));
+
 
 assign padded[8]=32'h80000000;
 assign padded[9]=ffed.h;
