@@ -4,7 +4,8 @@ input logic rst,
 coreInputsIfc.reader in,
 output logic output_valid,
 output logic newblock_o,
-output HashState doublehash
+output HashState doublehash,
+output logic[31:0] difficulty
 );
 
 HashState round1delayed; //The round 1 state, but delayed 64 cycles.
@@ -55,5 +56,11 @@ end
 sha_add_hash_state ahs2(.in1(hash2_hashstate_pipeline[64]),.in2(init),.out(doublehash));
 assign output_valid=hash2_valid_pipeline[64];
 assign newblock_o=hash2_newblock_pipeline[64];
+
+//And output the difficulty, delayed to be synchronous with the output of the hashstate
+logic[31:0] nextdifficultyout;
+ff #(.WIDTH(32)) difficultyff(.clk,.data_i(nextdifficultyout),.data_o(difficulty));
+//If next round is a (valid) newblock, then we sample the difficulty word being input.  Otherwise we use the same difficulty we used last cycle.
+assign nextdifficultyout=(hash2_valid_pipeline[63] && hash2_newblock_pipeline[64])?in.w3:difficulty;
 
 endmodule:sha_last_pipelined_core
