@@ -10,14 +10,14 @@ module golden_sha_stim();
     bit[31:0] w1, w2, w3;
     bit[31:0] hs[8];
 
-    hs[0] = 32'h9524c593; 
-    hs[1] = 32'h05c56713; 
-    hs[2] = 32'h16e669ba; 
-    hs[3] = 32'h2d2810a0; 
-    hs[4] = 32'h07e86e37; 
-    hs[5] = 32'h2f56a9da; 
-    hs[6] = 32'hcd5bce69; 
-    hs[7] = 32'h7a78da2d;
+    hs[0] = 32'h0; 
+    hs[1] = 32'h0; 
+    hs[2] = 32'h0; 
+    hs[3] = 32'h0; 
+    hs[4] = 32'h0; 
+    hs[5] = 32'h0; 
+    hs[6] = 32'h0; 
+    hs[7] = 32'h0;
     
     
     /*
@@ -26,9 +26,9 @@ module golden_sha_stim();
     inputs.w3 = little_endian_to_big( 32'hf2b9441a );
     */
 
-    w1 = 32'hf1fc122b;
-    w2 = 32'hc7f5d74d;
-    w3 = 32'hf2b9441a;
+    w1 = 32'h0;
+    w2 = 32'h0;
+    w3 = 32'h0009441a;
     //inputs.w3 = 1;
      
     // etc...
@@ -44,9 +44,12 @@ module golden_sha_stim();
     test.validIn_i = 1;
     test.newBlockIn_i = 0;
 
-    for (int i = 1; i < 255; i++)
+    for (int i = 1; i < 1500; i++) begin
         test.cycle();
-
+	$display("%d Hash: %x, Valid: %b; New: %b", i, test.hash_o, test.validOut_o, test.newBlockOut_o);
+    end
+    test.cycle();
+/*
     $display("Hash: %x, Valid: %b; New: %b", test.hash_o, test.validOut_o, test.newBlockOut_o);
     test.cycle();
     $display("Hash: %x, Valid: %b; New: %b", test.hash_o, test.validOut_o, test.newBlockOut_o);
@@ -56,8 +59,7 @@ module golden_sha_stim();
     $display("Hash: %x, Valid: %b; New: %b", test.hash_o, test.validOut_o, test.newBlockOut_o);
     test.cycle();
     $display("Hash: %x, Valid: %b; New: %b", test.hash_o, test.validOut_o, test.newBlockOut_o);
-    test.cycle();
-    $display("Hash: %x, Valid: %b; New: %b", test.hash_o, test.validOut_o, test.newBlockOut_o);
+*/
     /* 
     // modify inputs for next evaluation
     inputs.valid = 1;

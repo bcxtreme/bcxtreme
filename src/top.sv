@@ -1,7 +1,7 @@
 
 `timescale 1ns/1ns
 
-module top #(parameter COUNTBITS=10,parameter ROUND_PIPELINE_DEPTH=2);
+module top #(parameter COUNTBITS=10,parameter ROUND_PIPELINE_DEPTH=3);
 	bit clk = 0;
 	always #5 clk = ~clk;
 
