@@ -19,6 +19,12 @@ class golden_noncebuffer;
 	bit storing = 1'b0;
 	bit clockingout = 1'b0;
 
+	int index_of_out_bit;	
+	
+	//function void clockout_nonce();
+		
+//	endfunction
+
 	function void noncebuffer_result();
 		validOut_o = validIn_i;
 		successOut_o = successIn_i;
@@ -40,6 +46,7 @@ class golden_noncebuffer;
 		if(readReady_i) begin
 			clockingout = 1'b1;
 			if(clockingout) begin	
+				clockout_nonce();
 				for (int i = 0; i < 32; i++) begin		
 					nonceOut_o = buffer[i];//clock out most recent nonce
 				end		
