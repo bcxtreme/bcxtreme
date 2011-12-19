@@ -18,7 +18,7 @@ module top #(parameter COUNTBITS=6);
 		.nonBufWrt(nonBuf.writer)
 	);
 
-	bench #(.DELAY_C(129), .COUNTBITS(COUNTBITS), .NUM_CORES(2)) tb (
+	bench #(.DELAY_C(129), .COUNTBITS(COUNTBITS), .NUM_CORES(3)) tb (
 		.clk,
 		.chip(miner.bench),
 		.blkWrt(blkStore.writer),

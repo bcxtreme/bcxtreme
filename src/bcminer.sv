@@ -28,22 +28,33 @@ module bcminer #(parameter COUNTBITS = 1, parameter DELAY_C = 0)
 	);
 
 
-	coreInputsIfc inputGlue(clk);
-	processorResultsIfc #(.PARTITIONBITS(COUNTBITS)) outputGlue(clk);
+	coreInputsIfc inGlue_0(clk);
+	processorResultsIfc #(.PARTITIONBITS(COUNTBITS)) outGlue_0(clk);
+	coreInputsIfc inGlue_1(clk);
+	processorResultsIfc #(.PARTITIONBITS(COUNTBITS)) outGlue_1(clk);
 
-	lattice_block_first #(.LOG2_NUM_CORES(COUNTBITS), .DELAY_C(DELAY_C), .INDEX(0)) core_first (
+	lattice_block_first #(.LOG2_NUM_CORES(COUNTBITS), .DELAY_C(DELAY_C), .INDEX(0)) lblock_first (
 		.clk,
 		.rst(chip.rst),
 		.inputs_i(blockData.reader),
-		.inputs_o(inputGlue.writer),
-		.outputs_o(outputGlue.writer)
+		.inputs_o(inGlue_0.writer),
+		.outputs_o(outGlue_0.writer)
 	);
-		
-	lattice_block_last #(.LOG2_NUM_CORES(COUNTBITS), .DELAY_C(DELAY_C), .INDEX(1)) core_last (
+
+	lattice_block #(.LOG2_NUM_CORES(COUNTBITS), .DELAY_C(DELAY_C), .INDEX(1)) lblock (
 		.clk,
 		.rst(chip.rst),
-		.inputs_i(inputGlue.reader),
-		.outputs_i(outputGlue.reader),
+		.inputs_i(inGlue_0),
+		.inputs_o(inGlue_1),
+		.outputs_i(outGlue_0),
+		.outputs_o(outGlue_1)
+	);
+		
+	lattice_block_last #(.LOG2_NUM_CORES(COUNTBITS), .DELAY_C(DELAY_C), .INDEX(2)) lblock_last (
+		.clk,
+		.rst(chip.rst),
+		.inputs_i(inGlue_1.reader),
+		.outputs_i(outGlue_1.reader),
 		.outputs_o(outData.writer),
 		.validOut(chip.resultValid),
 		.newBlockOut(nonBufWrt.nonce)

@@ -10,7 +10,7 @@ SHACORE=implementation/dummy_sha.sv implementation/dummy_sha_last.sv
 HASHVAL=implementation/standard_hash_validator.sv implementation/final_hash_validator.sv
 LATTICE=implementation/lattice_ff_input.sv implementation/lattice_ff_output.sv \
         implementation/lattice_core.sv implementation/lattice_core_last.sv \
-        implementation/lattice_block_first.sv implementation/lattice_block_last.sv
+        implementation/lattice_block.sv implementation/lattice_block_first.sv implementation/lattice_block_last.sv
 DUT=$(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) $(LATTICE) bcminer.sv
 
 SHACORE_TOP=shacore_top.sv

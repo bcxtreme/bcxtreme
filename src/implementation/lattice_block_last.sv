@@ -25,7 +25,7 @@ module lattice_block_last #(parameter LOG2_NUM_CORES = 1, parameter INDEX = 0, p
 		.newBlockOut
 	);
 
-	lattice_ff_output f1 (
+	lattice_ff_output ffo (
 		.clk,
 		.outputs_i,
 		.this_stage(tmp.reader),
