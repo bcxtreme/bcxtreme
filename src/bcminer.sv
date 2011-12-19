@@ -15,7 +15,7 @@ module bcminer #(parameter COUNTBITS = 6)
 	logic [255:0] sha_hash;
 	logic [31:0] sha_difficulty;
 
-	logic hval_success;
+	logic hval_valid, hval_success, hval_new;
 
 	block_storage  #(.LOGNCYCLES(COUNTBITS)) bs(
 		.clk,
@@ -43,18 +43,32 @@ module bcminer #(parameter COUNTBITS = 6)
 		.clk,
 		.rst(chip.rst),
 		.valid_i(sha_valid),
-		.valid_o(chip.resultValid),
+		.valid_o(hval_valid),
 		.newblock_i(sha_new),
-		.newblock_o(nonBufWrt.nonce),
+		.newblock_o(hval_new),
 		.hash(sha_hash),
 		.difficulty(sha_difficulty),
 		.success(hval_success)
 	);
 
+	// XXX: Nonce input is hard coded in!
+	// XXX: That means we had better clock the same value out!
+	// XXX: What is the newnonce pin!?
+	nonce_buffer nbuf (
+		.clk,
+		.valid(hval_valid),
+		.success(hval_success),
+		.nonce_i(32'b1011001110001111),
+		.read(nonBufWrt.readReady),
+//		.newnonce(),
+		.nonce_o(nonBufWrt.nonce),
+		.overflow(nonBufWrt.overflow)
+	);
+		
+
 	assign chip.success = hval_success;
 	//assign chip.resultValid = sha_valid;
 	//assign nonBufWrt.nonce = sha_new;
-	assign nonBufWrt.overflow = 1'b0;
 
 endmodule
 	

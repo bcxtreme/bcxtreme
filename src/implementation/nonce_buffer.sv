@@ -1,12 +1,13 @@
 module nonce_buffer (
-input logic clk,
-input logic valid,
-input logic success,
-input logic[31:0] nonce_i,
-input logic read,
-output logic newnonce,
-output logic nonce_o,
-output logic overflow);
+	input clk,
+	input valid,
+	input success,
+	input [31:0] nonce_i,
+	input read,
+	output logic newnonce,
+	output logic nonce_o,
+	output logic overflow
+);
 
 logic[31:0] stored_nonce;
 logic[31:0] nonce_to_store;

@@ -7,7 +7,8 @@ SHARED=shared/*.sv
 BLOCKSTORAGE=implementation/shift_register.sv implementation/block_storage.sv
 SHACORE=implementation/dummy_sha.sv
 HASHVAL=implementation/final_hash_validator.sv
-DUT=$(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) bcminer.sv
+NONCEBUFFER=implementation/nonce_buffer.sv
+DUT=$(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) $(NONCEBUFFER) bcminer.sv
 
 SHACORE_TOP=shacore_top.sv
 SHACORE_BENCH=test/shacore/*.sv
