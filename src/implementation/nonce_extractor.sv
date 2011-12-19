@@ -15,7 +15,7 @@ logic[31:0] numextra;
 always_comb begin
   numextra=(processor_index>LEFTOVER)?LEFTOVER:processor_index;
   base_nonce= NONCESPERPROCESSOR*processor_index+numextra;
-end 
+end
  
 logic[31:0] count_old;
 logic[31:0] count_new;

@@ -3,35 +3,22 @@ module golden_sha_stim();
 
   bit clk;
 
-  coreInputsIfc inputs(.clk);
-  golden_sha test;
-  HashState hashstate;
+  golden_sha #(.DELAY_C(256)) test;
 
   initial begin
-    inputs.valid = 1;
-    inputs.newblock = 1;
     
-    /*hashstate.a = little_endian_to_big( 32'h9524c593 ); 
-    hashstate.b = little_endian_to_big( 32'h05c56713 ); 
-    hashstate.c = little_endian_to_big( 32'h16e669ba ); 
-    hashstate.d = little_endian_to_big( 32'h2d2810a0 ); 
-    hashstate.e = little_endian_to_big( 32'h07e86e37 ); 
-    hashstate.f = little_endian_to_big( 32'h2f56a9da ); 
-    hashstate.g = little_endian_to_big( 32'hcd5bce69 ); 
-    hashstate.h = little_endian_to_big( 32'h7a78da2d );
-    */
+    bit[31:0] w1, w2, w3;
+    bit[31:0] hs[8];
+
+    hs[0] = 32'h0; 
+    hs[1] = 32'h0; 
+    hs[2] = 32'h0; 
+    hs[3] = 32'h0; 
+    hs[4] = 32'h0; 
+    hs[5] = 32'h0; 
+    hs[6] = 32'h0; 
+    hs[7] = 32'h0;
     
-    hashstate.a = 32'h9524c593; 
-    hashstate.b = 32'h05c56713; 
-    hashstate.c = 32'h16e669ba; 
-    hashstate.d = 32'h2d2810a0; 
-    hashstate.e = 32'h07e86e37; 
-    hashstate.f = 32'h2f56a9da; 
-    hashstate.g = 32'hcd5bce69; 
-    hashstate.h = 32'h7a78da2d;
-    
-    
-    inputs.hashstate = hashstate;
     
     /*
     inputs.w1 = little_endian_to_big( 32'hf1fc122b );
@@ -39,17 +26,40 @@ module golden_sha_stim();
     inputs.w3 = little_endian_to_big( 32'hf2b9441a );
     */
 
-    inputs.w1 = 32'hf1fc122b;
-    inputs.w2 = 32'hc7f5d74d;
-    inputs.w3 = 32'hf2b9441a;
+    w1 = 32'h0;
+    w2 = 32'h0;
+    w3 = 32'h0009441a;
     //inputs.w3 = 1;
      
     // etc...
-    test = new ( inputs );
-    
-    test.evaluate();
-    $display( "%h", test.getResult() );
 
+    test = new ();
+    
+    test.validIn_i = 1;
+    test.newBlockIn_i = 1;
+    test.initialState_i = { hs[0], hs[1], hs[2], hs[3], hs[4], hs[5], hs[6], hs[7], w1, w2, w3 };
+
+    test.cycle();
+
+    test.validIn_i = 1;
+    test.newBlockIn_i = 0;
+
+    for (int i = 1; i < 1500; i++) begin
+        test.cycle();
+	$display("%d Hash: %x, Valid: %b; New: %b", i, test.hash_o, test.validOut_o, test.newBlockOut_o);
+    end
+    test.cycle();
+/*
+    $display("Hash: %x, Valid: %b; New: %b", test.hash_o, test.validOut_o, test.newBlockOut_o);
+    test.cycle();
+    $display("Hash: %x, Valid: %b; New: %b", test.hash_o, test.validOut_o, test.newBlockOut_o);
+    test.cycle();
+    $display("Hash: %x, Valid: %b; New: %b", test.hash_o, test.validOut_o, test.newBlockOut_o);
+    test.cycle();
+    $display("Hash: %x, Valid: %b; New: %b", test.hash_o, test.validOut_o, test.newBlockOut_o);
+    test.cycle();
+    $display("Hash: %x, Valid: %b; New: %b", test.hash_o, test.validOut_o, test.newBlockOut_o);
+*/
     /* 
     // modify inputs for next evaluation
     inputs.valid = 1;

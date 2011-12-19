@@ -1,53 +1,27 @@
 
-class golden_sha #(parameter DELAY_C = 10);
 
-	// Inputs
-	bit validIn_i;
-	bit newBlockIn_i;
-	bit[351:0] initialState_i;
 
-	// Outputs
-	bit validOut_o;
-	bit newBlockOut_o;
-	bit[255:0] hash_o;
-	bit[31:0] difficulty_o;
 
-	// Internal State
-	local bit[255:0] hash_buf[DELAY_C + 1];
-	local bit[32:0] dif_buf[DELAY_C + 1];
-	local bit valid_buf[DELAY_C + 1];
-	local bit new_buf[DELAY_C + 1];
+class golden_sha;
 
-/*SHA CORE*/
-	bit[31:0] _h[8] = {
-   	 32'h6a09e667, 32'hbb67ae85, 32'h3c6ef372, 32'ha54ff53a, 32'h510e527f, 32'h9b05688c, 32'h1f83d9ab, 32'h5be0cd19
- 	 };
   
- 	 //coreInputsIfc.reader in
+  bit[31:0] _h[8] = {
+    32'h6a09e667, 32'hbb67ae85, 32'h3c6ef372, 32'ha54ff53a, 32'h510e527f, 32'h9b05688c, 32'h1f83d9ab, 32'h5be0cd19
+  };
+  
+  //coreInputsIfc.reader in
 
-	bit _valid;
-	bit _newBlock;
- 	bit [511:0] _firstChunk;
+  bit _valid;
+  bit _newBlock;
+  bit [511:0] _firstChunk;
 
- 	bit [31:0] _w1;
- 	bit [31:0] _w2;
-	bit [31:0] _w3;
- 	bit [31:0] _nonce;
+  bit [31:0] _w1;
+  bit [31:0] _w2;
+  bit [31:0] _w3;
+  bit [31:0] _nonce;
 
 
-  	bit [255:0] _result;
-/*SHA CORE*/
-
-	function new();
-		for (int i = 0; i <= DELAY_C; i++) begin
-			hash_buf[i] = 0;
-			dif_buf[i] = 0;
-			valid_buf[i] = 1'b0;
-			new_buf[i] = 1'b0;
-		end
-	endfunction
-/*GOLDEN SHA CORE HERE********************************************************************************************************/
- 
+  bit [255:0] _result;
 
   
   function configure( virtual coreInputsIfc in );
@@ -194,34 +168,6 @@ class golden_sha #(parameter DELAY_C = 10);
     // should only make result available after a particular time
     return _result;
   endfunction
-
-/*END GOLDEN SHA CORE********************************************************************/	
-	task cycle();
-		for (int i = DELAY_C; i > 0; i--) begin
-			valid_buf[i] = valid_buf[i - 1];
-			dif_buf[i] = dif_buf[i - 1];
-			hash_buf[i] = hash_buf[i - 1];
-			new_buf[i] = new_buf[i - 1];
-		end
-		
-		validIn_i = _valid;
-		newBlockIn_i = _newblock;
-		
-		set_and_evaluate(in);
-
-		valid_buf[0] = validIn_i;
-		dif_buf[0] = initialState_i[31:0];
-		hash_buf[0] = getResult(); //doublehashthing( initialState_i[351:96],w1,w2,w3);
-		new_buf[0] = newBlockIn_i;
-
-		validOut_o = valid_buf[DELAY_C];
-		difficulty_o = dif_buf[DELAY_C];
-		newBlockOut_o = new_buf[DELAY_C];
-		hash_o = hash_buf[DELAY_C];
-		//if(validOut_o)
-			//$display("Sending DoubleHash %x",hash_o);
-		//$display("%t Valid_buf[0] %b",$time, valid_buf[0]);
-	endtask
 
 endclass
 

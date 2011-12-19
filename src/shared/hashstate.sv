@@ -1,3 +1,5 @@
+// 256-bit hash state
+
 typedef struct {
   logic[31:0] a;
   logic[31:0] b;

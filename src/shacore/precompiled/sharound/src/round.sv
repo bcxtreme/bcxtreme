@@ -1,4 +1,4 @@
-module sha_round(
+module sha_round #(parameter PIPELINE_DEPTH=1) (
 input logic clk,
 input HashState in,
 output HashState out,
@@ -10,17 +10,6 @@ logic[31:0] sum0_tmp;
 logic[31:0] sum1_tmp;
 logic[31:0] ch_tmp;
 logic[31:0] maj_tmp;
-
-//logic[31:0] sum0_out;
-//logic[31:0] sum1_out;
-//logic[31:0] ch_out;
-//logic[31:0] maj_out;
-
-//ff #(.WIDTH(32)) fs0(.clk,.data_i(sum0_tmp),.data_o(sum0_out));
-//ff #(.WIDTH(32)) fs1(.clk,.data_i(sum1_tmp),.data_o(sum1_out));
-//ff #(.WIDTH(32)) fch(.clk,.data_i(ch_tmp),.data_o(ch_out));
-//ff #(.WIDTH(32)) fmaj(.clk,.data_i(maj_tmp),.data_o(maj_out));
-
 
 sha_sum0 s0(.x(in.a),.out(sum0_tmp));
 sha_sum1 s1(.x(in.e),.out(sum1_tmp));
@@ -38,17 +27,30 @@ sha_aADDER aad(.h(in.h),.sum1(sum1_tmp),.ch(ch_tmp),.K,.W,.sum0(sum0_tmp),.maj(m
 
 sha_eADDER ead(.d(in.d),.h(in.h),.sum1(sum1_tmp),.ch(ch_tmp),.K,.W,.e);
 
+
+HashState resbuff[PIPELINE_DEPTH:0];
+
+assign resbuff[0].h=in.g;
+assign resbuff[0].g=in.f;
+assign resbuff[0].f=in.e;
+assign resbuff[0].e=e;
+assign resbuff[0].d=in.c;
+assign resbuff[0].c=in.b;
+assign resbuff[0].b=in.a;
+assign resbuff[0].a=a;
+
+
+generate
+	for(genvar i=0; i<PIPELINE_DEPTH; i++) begin
+		HashStateFF hsf(.clk,.in(resbuff[i]),.out(resbuff[i+1]));
+	end
+endgenerate
+
+assign out=resbuff[PIPELINE_DEPTH];
+
+
 //assign T1=in.h+sum1_tmp+ch_tmp+K+W;
 //assign T2=sum0_tmp+maj_tmp;
-
-ff #(.WIDTH(32)) h(.clk,.data_i(in.g),.data_o(out.h));
-ff #(.WIDTH(32)) g(.clk,.data_i(in.f),.data_o(out.g));
-ff #(.WIDTH(32)) f(.clk,.data_i(in.e),.data_o(out.f));
-ff #(.WIDTH(32)) e1(.clk,.data_i(e),.data_o(out.e));
-ff #(.WIDTH(32)) d(.clk,.data_i(in.c),.data_o(out.d));
-ff #(.WIDTH(32)) c(.clk,.data_i(in.b),.data_o(out.c));
-ff #(.WIDTH(32)) b(.clk,.data_i(in.a),.data_o(out.b));
-ff #(.WIDTH(32)) a1(.clk,.data_i(a),.data_o(out.a));
 //assign out.h=in.g;
 //assign out.g=in.f;
 //assign out.f=in.e;
