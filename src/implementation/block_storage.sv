@@ -1,12 +1,12 @@
 module secondary_ff_array #(parameter LOGNCYCLES=6) (
-input logic clk,
-input logic rst,
-input logic write,
-input logic[351:0] inputState,
-output logic writeReady,
-output logic[351:0] initialState,
-output logic newBlock,
-output logic outputValid
+	input logic clk,
+	input logic rst,
+	input logic write,
+	input logic[351:0] inputState,
+	output logic writeReady,
+	output logic [351:0] initialState,
+	output logic newBlock,
+	output logic outputValid
 );
 logic reading;
 assign reading=write & writeReady;
@@ -39,23 +39,46 @@ endmodule
 
 
 module block_storage #(parameter LOGNCYCLES=6) (
-input logic clk,
-input logic rst,
-blockStoreIfc.reader blkRd,
-output logic outputValid,
-output logic newBlock,
-output logic[351:0] initialState);
+	input logic clk,
+	input logic rst,
+	blockStoreIfc.reader blkRd,
+	coreInputsIfc.writer broadcast
+);
 
-logic rFull;
-logic[351:0] rOut;
+	logic rFull;
+	logic[351:0] rOut;
+
+	wire [351:0] initialState;
+	
+	assign {broadcast.hashstate.a, broadcast.hashstate.b, broadcast.hashstate.c, broadcast.hashstate.d, 
+	        broadcast.hashstate.e, broadcast.hashstate.f, broadcast.hashstate.g, broadcast.hashstate.h,
+	        broadcast.w1,          broadcast.w2,          broadcast.w3} = initialState;
 
 
-logic secondaryReady;
-logic transfer;
-assign transfer=secondaryReady & rFull;
-secondary_ff_array #(.LOGNCYCLES(LOGNCYCLES)) sff(.clk,.rst,.write(rFull),.inputState(rOut),.writeReady(secondaryReady),.initialState,.newBlock,.outputValid);
+	logic secondaryReady;
+	logic transfer;
+	assign transfer=secondaryReady & rFull;
+	secondary_ff_array #(.LOGNCYCLES(LOGNCYCLES)) sff (
+		.clk,
+		.rst,
+		.write(rFull),
+		.inputState(rOut),
+		.writeReady(secondaryReady),
+		.initialState,
+		.newBlock(broadcast.newblock),
+		.outputValid(broadcast.valid)
+	);
 
-shift_register r(.clk,.rst,.write_valid(blkRd.writeValid), .write_ready(blkRd.writeReady),.read(secondaryReady),.block_data(blkRd.blockData),.full(rFull),.out(rOut));
+	shift_register r (
+		.clk,
+		.rst,
+		.write_valid(blkRd.writeValid),
+		.write_ready(blkRd.writeReady),
+		.read(secondaryReady),
+		.block_data(blkRd.blockData),
+		.full(rFull),
+		.out(rOut)
+	);
 
 endmodule
 

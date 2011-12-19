@@ -8,6 +8,8 @@ module bcminer #(parameter COUNTBITS = 6)
 	nonceBufferIfc.writer nonBufWrt
 );
 
+	coreInputsIfc blockData(clk);
+
 	logic bs_valid, bs_new;
 	logic [351:0] bs_state;
 
@@ -16,28 +18,25 @@ module bcminer #(parameter COUNTBITS = 6)
 	logic [31:0] sha_difficulty;
 
 	logic hval_success;
+	
 
 	block_storage  #(.LOGNCYCLES(COUNTBITS)) bs(
 		.clk,
 		.rst(chip.rst),
 		.blkRd,
-		.outputValid(bs_valid),
-		.newBlock(bs_new),
-		.initialState(bs_state)
+		.broadcast(blockData.writer)
 	);
-
 
 	dummy_sha #(.DELAY_C(64)) sha (
 		.clk,
 		.rst(chip.rst),
-		.validIn(bs_valid),
-		.newBlockIn(bs_new),
-		.initialState(bs_state),
+		.block(blockData.reader),
 		.validOut(sha_valid),
 		.newBlockOut(sha_new),
 		.hash(sha_hash),
 		.difficulty(sha_difficulty)
 	);
+	initial $monitor("Hash: %x; validOut: %b; newBlock: %b", sha_hash, sha_valid, sha_new);
 
 	final_hash_validator hval (
 		.clk,

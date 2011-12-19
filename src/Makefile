@@ -1,5 +1,5 @@
 TOP=top.sv
-INTERFACES=interfaces/blockStoreIfc.sv interfaces/nonceBufferIfc.sv interfaces/minerIfc.sv
+INTERFACES=interfaces/blockStoreIfc.sv interfaces/nonceBufferIfc.sv interfaces/minerIfc.sv interfaces/coreInputsIfc.sv
 GOLD=gold/golden_hashvalidator.sv gold/golden_dummy_sha.sv gold/golden_blockstorage.sv gold/golden_bcminer.sv
 BENCH=test/inputs.sv test/environ.sv test/bench.sv
 

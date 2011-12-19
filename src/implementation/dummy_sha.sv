@@ -2,9 +2,7 @@
 module dummy_sha #(parameter COUNTBITS=6, parameter DELAY_C = 0) (
 	input clk,
 	input rst,
-	input validIn,
-	input newBlockIn,
-	input[351:0] initialState,
+	coreInputsIfc.reader block,
 	output validOut,
 	output newBlockOut,
 	output[255:0] hash,
@@ -15,8 +13,9 @@ module dummy_sha #(parameter COUNTBITS=6, parameter DELAY_C = 0) (
 	wire [31:0]difficulty_in;
 
 	// The "hash" is the higher 256 bits of the input. The difficulty is the final 32 bits
-	assign hash_in = initialState[351:96];
-	assign difficulty_in = initialState[31:0];
+	assign hash_in = {block.hashstate.a, block.hashstate.b, block.hashstate.c, block.hashstate.d,
+	                  block.hashstate.e, block.hashstate.f, block.hashstate.g, block.hashstate.h};
+	assign difficulty_in = block.w3;
 
 	// Store the value for DELAY_C cycles
 	wire [255:0] trans[DELAY_C + 1];
@@ -25,8 +24,8 @@ module dummy_sha #(parameter COUNTBITS=6, parameter DELAY_C = 0) (
 	wire trans_new[DELAY_C + 1];
 	assign trans[0] = hash_in;
 	assign trans_difficulty[0] = difficulty_in;
-	assign trans_valid[0] = validIn;
-	assign trans_new[0] = newBlockIn;
+	assign trans_valid[0] = block.valid;
+	assign trans_new[0] = block.newblock;
 	for (genvar n = 0; n < DELAY_C; n++) begin
 		eff #(.WIDTH(256)) bhash  (
 			.clk,
