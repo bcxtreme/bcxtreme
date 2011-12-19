@@ -12,32 +12,15 @@ class golden_sha #(parameter DELAY_C = 10, parameter PROCESSORINDEX=0, parameter
 	bit[255:0] hash_o;
 	bit[31:0] difficulty_o;
 
+	bit[31:0] nonce_o;
+
 	// Internal State
 	local bit[255:0] hash_buf[DELAY_C + 1];
 	local bit[31:0] dif_buf[DELAY_C + 1];
 	local bit valid_buf[DELAY_C + 1];
 	local bit new_buf[DELAY_C + 1];
+	local bit nonce_buf[DELAY_C + 1];
 	local bit[31:0] nonce;
-
-/*
-	bit[31:0] _h[8] = {
-   	 32'h6a09e667, 32'hbb67ae85, 32'h3c6ef372, 32'ha54ff53a, 32'h510e527f, 32'h9b05688c, 32'h1f83d9ab, 32'h5be0cd19
- 	 };
-  
- 	 //coreInputsIfc.reader in
-
-	bit _valid;
-	bit _newBlock;
- 	bit [511:0] _firstChunk;
-
- 	bit [31:0] _w1;
- 	bit [31:0] _w2;
-	bit [31:0] _w3;
- 	bit [31:0] _nonce;
-
-
-  	bit [255:0] _result;
-*/
 
 	function new();
 		// Initialize buffers
@@ -46,89 +29,12 @@ class golden_sha #(parameter DELAY_C = 10, parameter PROCESSORINDEX=0, parameter
 			dif_buf[i] = 0;
 			valid_buf[i] = 1'b0;
 			new_buf[i] = 1'b0;
+			nonce_buf[i] = 0;
 		end
 		nonce = PROCESSORINDEX;
 	endfunction
 
-  
-/*
-  function configure( virtual coreInputsIfc in );
-    _valid = in.valid;
-    _newBlock = in.newblock;
-    
-    _h[0] = in.hashstate.a;
-    _h[1] = in.hashstate.b;
-    _h[2] = in.hashstate.c;
-    _h[3] = in.hashstate.d;
-    _h[4] = in.hashstate.e;
-    _h[5] = in.hashstate.f;
-    _h[6] = in.hashstate.g;
-    _h[7] = in.hashstate.h;
-    
-    _w1 = in.w1;
-    _w2 = in.w2;
-    _w3 = in.w3;
-  endfunction
-*/
-
-
-
-/*
-  function new( virtual coreInputsIfc in );
-    configure( in );
-  endfunction
-*/
-
-  
-/*
-  function set_hashstate( HashState in );
-    _h[0] = in.a;
-    _h[1] = in.b;
-    _h[2] = in.c;
-    _h[3] = in.d;
-    _h[4] = in.e;
-    _h[5] = in.f;
-    _h[6] = in.g;
-    _h[7] = in.h;
-  endfunction 
-
-
-  function HashState get_hashstate();
-    HashState result;
-    
-    result.a = _h[0];
-    result.b = _h[1];
-    result.c = _h[2];
-    result.d = _h[3];
-    result.e = _h[4];
-    result.f = _h[5];
-    result.g = _h[6];
-    result.h = _h[7]; 
-
-    return result;
-  endfunction
-*/
-
-/*
-  function setValid( bit valid );
-    _valid = valid;
-  endfunction
-
-
-  function setNewBlock( bit newBlock );
-    _newBlock = newBlock;
-  endfunction  
-
-
-  function set_and_evaluate( virtual coreInputsIfc in );
-    configure( in );
-    evaluate();
-  endfunction
-*/
-
-	
-
-	local function bit[255:0] evaluate(bit[31:0] hs[8], bit[31:0] w1, bit[31:0] w2, bit[31:0] w3);
+ 	local function bit[255:0] evaluate(bit[31:0] hs[8], bit[31:0] w1, bit[31:0] w2, bit[31:0] w3);
 		bit[639:0] msg1;
 		bit[255:0] middleHash;
 		bit[31:0] _h[8];
@@ -156,13 +62,6 @@ class golden_sha #(parameter DELAY_C = 10, parameter PROCESSORINDEX=0, parameter
 		return golden_sha256( _h, arr);
 	endfunction
 
-/*
-  function bit[255:0] getResult();
-    // should only make result available after a particular time
-    return _result;
-  endfunction
-*/
-
 	task cycle();
 		bit[31:0] hs[8];
 		bit[31:0] w1, w2, w3;
@@ -185,17 +84,17 @@ class golden_sha #(parameter DELAY_C = 10, parameter PROCESSORINDEX=0, parameter
 		end
 
 		// Format input
-		w3 = initialState_i[31:0];
+		w3 = initialState_i[31: 0];
 		w2 = initialState_i[63:32];
 		w1 = initialState_i[95:64];
 
-		hs[7] = initialState_i[127:96];
+		hs[7] = initialState_i[127: 96];
 		hs[6] = initialState_i[159:128];
 		hs[5] = initialState_i[191:160];
-		hs[4]= initialState_i[223:192];
-		hs[3]= initialState_i[255:224];
-		hs[2]= initialState_i[287:256];
-		hs[1]= initialState_i[319:288];
+		hs[4] = initialState_i[223:192];
+		hs[3] = initialState_i[255:224];
+		hs[2] = initialState_i[287:256];
+		hs[1] = initialState_i[319:288];
 		hs[0] = initialState_i[351:320];
 
 		// Do SHA Logic
@@ -206,12 +105,14 @@ class golden_sha #(parameter DELAY_C = 10, parameter PROCESSORINDEX=0, parameter
 		dif_buf[0] = w3;
 		new_buf[0] = newBlockIn_i;
 		hash_buf[0] = out;
+		nonce_buf[0] = nonce;
 
 		// Pull outputs from the other side of buffers
 		validOut_o = valid_buf[DELAY_C];
 		difficulty_o = dif_buf[DELAY_C];
 		newBlockOut_o = new_buf[DELAY_C];
 		hash_o = hash_buf[DELAY_C];
+		nonce_o = nonce_buf[DELAY_C];
 	endtask
 
 endclass
