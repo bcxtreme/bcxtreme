@@ -41,7 +41,7 @@ module bcminer #(parameter COUNTBITS = 6,parameter ROUND_PIPELINE_DEPTH=1)
 	assign core_inputs.w2=bs_state[63:32];
 	assign core_inputs.w3=bs_state[31:0];
 
-	sha_last_pipelined_core #(.ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) sha (
+	sha_last_pipelined_core #(.ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH),.PROCESSORINDEX(32'h42a14600)) sha (
 		.clk,
 		.rst(chip.rst),
 		.in(core_inputs),
@@ -62,10 +62,10 @@ module bcminer #(parameter COUNTBITS = 6,parameter ROUND_PIPELINE_DEPTH=1)
 		.difficulty(sha_difficulty),
 		.success(hval_success)
 	);
-	//assign chip.success = hval_success;
-	assign chip.success= ^ (sha_hash);
-	assign chip.resultValid = sha_valid;
-	assign nonBufWrt.nonce = sha_new;
+	assign chip.success = hval_success;
+	//assign chip.success= ^ (sha_hash);
+	assign chip.resultValid = hval_valid;
+	assign nonBufWrt.nonce = hval_new;
 	assign nonBufWrt.overflow = 1'b0;
 
 endmodule
