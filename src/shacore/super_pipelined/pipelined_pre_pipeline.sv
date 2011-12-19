@@ -82,8 +82,11 @@ assign history[15-15]=32'd640; //The size of the message in bits... appended as 
 /* Generate the first 15 stages of the pipeline */
 for(genvar i=0; i<15; i++) begin
   sha_pipelined_pre_stage #(.K(Kfunction(i)),.ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) s(
-	.clk,.state_i(hashstate_pipeline[i]),
-	.W(M[i]),.valid_i(valid_pipeline[i]),
+	.clk,
+	.rst,
+	.state_i(hashstate_pipeline[i]),
+	.W(M[i]),
+	.valid_i(valid_pipeline[i]),
 	.newblock_i(newblock_pipeline[i]),
 	.state_o(hashstate_pipeline[i+1]),
 	.valid_o(valid_pipeline[i+1]),

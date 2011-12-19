@@ -20,7 +20,7 @@ assign newblockbuff[0]=newblock_i;
 
 generate
 	for(genvar i=0; i<ROUND_PIPELINE_DEPTH; i++) begin
-		rff #(.WIDTH(1)) vff(.clk,.data_i(validbuff[i]),.data_o(validbuff[i+1]));
+		rff #(.WIDTH(1)) vff(.clk,.rst,.data_i(validbuff[i]),.data_o(validbuff[i+1]));
 		ff #(.WIDTH(1)) nff(.clk,.data_i(newblockbuff[i]),.data_o(newblockbuff[i+1]));
 	end
 endgenerate

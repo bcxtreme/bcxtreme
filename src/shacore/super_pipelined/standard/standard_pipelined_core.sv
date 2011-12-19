@@ -1,7 +1,7 @@
 module sha_standard_pipelined_core  #(parameter PROCESSORINDEX=0,parameter NUMPROCESSORS=1,parameter ROUND_PIPELINE_DEPTH=1,parameter TOTAL_DELAY=ROUND_PIPELINE_DEPTH*3+1) (
 input logic clk,
 coreInputsIfc.reader in,
-output HashState doublehash,
+output logic[255:0] doublehash,
 output logic[31:0] difficulty
 );
 
@@ -71,8 +71,12 @@ for(i=15; i<64; i++) begin
 		.state_o(hash2_hashstate_pipeline[i+1]));
 end
 
+HashState doublehash_hs;
+
 //Finally add the output state to the inital state to calculate the final state.
-sha_add_hash_state ahs2(.in1(hash2_hashstate_pipeline[64]),.in2(init),.out(doublehash));
+sha_add_hash_state ahs2(.in1(hash2_hashstate_pipeline[64]),.in2(init),.out(doublehash_hs));
+
+assign doublehash={doublehash_hs.a,doublehash_hs.b,doublehash_hs.c,doublehash_hs.d,doublehash_hs.e,doublehash_hs.f,doublehash_hs.g,doublehash_hs.h};
 
 `ifdef DIFFICULTY_IS_PIPELINED
 	logic[$clog2(TOTAL_DELAY)-1:0] difficulty_count;

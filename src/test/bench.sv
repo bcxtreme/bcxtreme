@@ -1,6 +1,6 @@
 
 
-program bench #(parameter COUNTBITS=6) 
+program bench #(parameter COUNTBITS=6,parameter DELAY_C=129) 
 (
 	input clk,
 	minerIfc.bench chip,
@@ -12,7 +12,7 @@ program bench #(parameter COUNTBITS=6)
 
 	environ env;
 	inputs inp;
-	golden_bcminer #(.COUNTBITS(COUNTBITS)) gb;
+	golden_bcminer #(.COUNTBITS(COUNTBITS),.DELAY_C(DELAY_C)) gb;
 
 	task set_rst(bit val);
 		gb.rst_i = val;
@@ -68,15 +68,17 @@ program bench #(parameter COUNTBITS=6)
 				if (env.verbose) $display("ERROR: GOLD success: %b", gb.success_o);
 				err_count += 1;
 			end
+			//TODO FOR NORMAL OPERATION THESE SHOULD NOT BE INSIDE THIS IF BLOCK BUT SHOULD BE CHECKED REGARDLESS
+			if (gb.nonce_o !== nonBufRd.cb.nonce) begin
+				if (env.verbose) $display("ERROR: GOLD nonce: %b", gb.nonce_o);
+				err_count += 1;
+			end
+			if (gb.overflow_o !== nonBufRd.cb.overflow) begin
+				if (env.verbose) $display("ERROR: GOLD overflow: %b", gb.overflow_o);
+				err_count += 1;
+			end
 		end
-		if (gb.nonce_o !== nonBufRd.cb.nonce) begin
-			if (env.verbose) $display("ERROR: GOLD nonce: %b", gb.nonce_o);
-			err_count += 1;
-		end
-		if (gb.overflow_o !== nonBufRd.cb.overflow) begin
-			if (env.verbose) $display("ERROR: GOLD overflow: %b", gb.overflow_o);
-			err_count += 1;
-		end
+
 		return err_count;
 	endfunction
 
@@ -120,7 +122,7 @@ program bench #(parameter COUNTBITS=6)
 		while (1) begin
 			if (is_writing && ix_block < $size(env.blocks)) begin
 				set_writeValid(1);
-				set_blockData(env.blocks[ix_block][ix*8+7 -: 8]);
+				set_blockData(env.blocks[ix_block][351-ix*8 -: 8]);
 				ix++;
 				if (ix == 44) begin
 					ix = 0;

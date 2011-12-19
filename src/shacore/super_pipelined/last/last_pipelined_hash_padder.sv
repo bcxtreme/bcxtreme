@@ -12,7 +12,7 @@ rff #(.WIDTH(1)) valid(.clk,.rst,.data_i(valid_i),.data_o(valid_o));
 ff #(.WIDTH(1)) newblock(.clk,.data_i(newblock_i),.data_o(newblock_o));
 
 //Essentially the message wrapped around, so the bottom is queued up with the next words.
-assign padded[0]=instate.a;
+assign padded[0]=ffed.a;
 assign padded[1]=32'd256;
 for(genvar i=2; i<8; i++) begin
    assign padded[i]=32'd0;

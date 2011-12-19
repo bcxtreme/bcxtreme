@@ -4,7 +4,7 @@ input logic rst,
 coreInputsIfc.reader in,
 output logic output_valid,
 output logic newblock_o,
-output HashState doublehash,
+output logic[255:0] doublehash,
 output logic[31:0] difficulty
 );
 
@@ -52,8 +52,13 @@ for(i=15; i<64; i++) begin
   sha_last_pipelined_stage #(.K(Kfunction(i)),.ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) s(.clk,.rst,.state_i(hash2_hashstate_pipeline[i]),.valid_i(hash2_valid_pipeline[i]),.newblock_i(hash2_newblock_pipeline[i]),.W_i(hash2_W_pipeline[i]),.W_o(hash2_W_pipeline[i+1]),.valid_o(hash2_valid_pipeline[i+1]),.newblock_o(hash2_newblock_pipeline[i+1]),.state_o(hash2_hashstate_pipeline[i+1]));
 end
 
+HashState doublehash_hs;
+
 //Finally add the output state to the inital state to calculate the final state.
-sha_add_hash_state ahs2(.in1(hash2_hashstate_pipeline[64]),.in2(init),.out(doublehash));
+sha_add_hash_state ahs2(.in1(hash2_hashstate_pipeline[64]),.in2(init),.out(doublehash_hs));
+
+assign doublehash={doublehash_hs.a,doublehash_hs.b,doublehash_hs.c,doublehash_hs.d,doublehash_hs.e,doublehash_hs.f,doublehash_hs.g,doublehash_hs.h};
+
 assign output_valid=hash2_valid_pipeline[64];
 assign newblock_o=hash2_newblock_pipeline[64];
 

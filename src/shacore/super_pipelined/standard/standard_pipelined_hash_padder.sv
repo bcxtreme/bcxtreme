@@ -5,7 +5,7 @@ input HashState instate,
 output logic[15:0][31:0] padded);
 
 //Essentially the message wrapped around, so the bottom is queued up with the next words.
-assign padded[0]=instate.a;
+assign padded[0]=ffed.a;
 assign padded[1]=32'd256;
 for(genvar i=2; i<8; i++) begin
    assign padded[i]=32'd0;

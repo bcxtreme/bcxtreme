@@ -117,7 +117,7 @@ function automatic bit[0:255] golden_sha256( bit[0:31] _h[8], bit data[] );
 
   //$display( _data );
 
-  $display( "golden_sha256 : Original data size = %d", _original_data_size );  
+  //$display( "golden_sha256 : Original data size = %d", _original_data_size );  
 
   //$display( binary_array_to_string( binary_message ) );
   //$display( binary_message.size() );
@@ -125,7 +125,7 @@ function automatic bit[0:255] golden_sha256( bit[0:31] _h[8], bit data[] );
   // if we were passed some intermediate _h assume that we are started on the second chunk
   if ( _h[0] != 32'h6a09e667 ) begin 
     start_chunk = 1;
-    $display( "golden_sha256 : Skipping 1st CHUNK" );
+    //$display( "golden_sha256 : Skipping 1st CHUNK" );
   end
   else
     start_chunk = 0;

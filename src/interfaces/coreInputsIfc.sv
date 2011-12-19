@@ -17,7 +17,7 @@ interface coreInputsIfc(input logic clk);
 	endclocking
 
 	modport bench(clocking cb);
-	modport writer(output newblock, output hashstate, output w1, output w2, output w3);
-	modport reader(input newblock, input hashstate, input w1, input w2, input w3);
+	modport writer(output valid, output newblock, output hashstate, output w1, output w2, output w3);
+	modport reader(input valid, input newblock, input hashstate, input w1, input w2, input w3);
 
 endinterface
