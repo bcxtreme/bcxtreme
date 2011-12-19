@@ -1,5 +1,5 @@
-//reset signal resets the counter to zero for the *next* cycle.
-module counter #(parameter WIDTH=32) (
+//reset signal resets the counter to INDEX for the *next* cycle.
+module counter #(parameter WIDTH=32,parameter INITIALCOUNT=0, parameter INCREMENT=1) (
 input logic clk,
 input logic rst,
 input logic inc,
@@ -13,8 +13,8 @@ ff #(.WIDTH(WIDTH)) f(.clk,.data_i(n),.data_o(prev));
 assign count=prev;
 
 always_comb begin
-  if(rst) n=0;
-  else if (inc) n=prev+1;
+  if(rst) n=INITIALCOUNT;
+  else if (inc) n=prev+INCREMENT;
   else n=prev;
 end
 
