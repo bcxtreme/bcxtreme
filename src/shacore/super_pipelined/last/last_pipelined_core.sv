@@ -57,10 +57,17 @@ sha_add_hash_state ahs2(.in1(hash2_hashstate_pipeline[64]),.in2(init),.out(doubl
 assign output_valid=hash2_valid_pipeline[64];
 assign newblock_o=hash2_newblock_pipeline[64];
 
+
+`ifdef DIFFICULTY_IS_PIPELINED
 //And output the difficulty, delayed to be synchronous with the output of the hashstate
 logic[31:0] nextdifficultyout;
 ff #(.WIDTH(32)) difficultyff(.clk,.data_i(nextdifficultyout),.data_o(difficulty));
 //If next round is a (valid) newblock, then we sample the difficulty word being input.  Otherwise we use the same difficulty we used last cycle.
 assign nextdifficultyout=(hash2_valid_pipeline[63] && hash2_newblock_pipeline[64])?in.w3:difficulty;
+`endif
+
+`ifndef DIFFICULTY_IS_PIPELINED
+assign difficulty=in.w3;
+`endif
 
 endmodule:sha_last_pipelined_core
