@@ -5,7 +5,7 @@ module standard_hash_validator(
 	output logic success
 );
 	logic succ;
-	rff #(.WIDTH(1)) valid(.clk,.rst,.data_i(succ),.data_o(success));
+	ff #(.WIDTH(1)) valid(.clk,.rst,.data_i(succ),.data_o(success));
 
 	logic[255:0] hash_as_number;
 	generate 
@@ -25,7 +25,7 @@ module standard_hash_validator(
 	assign exp=difficulty[7:0];
 
 	logic[255:0] target;
-	assign target = mantissa_as_number << 8*(exp-3);
+	assign target = mantissa_as_number << ((exp-3)<<3); //target=mantissa*2^(8*(exp-3))
 
 	assign succ = (hash_as_number < target);
 

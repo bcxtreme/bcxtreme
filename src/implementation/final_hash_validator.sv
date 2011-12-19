@@ -33,7 +33,7 @@ output logic success
 	assign exp=difficulty[7:0];
 
 	logic[255:0] target;
-	assign target = mantissa_as_number << 8*(exp-3);
+	assign target = mantissa_as_number << ((exp-3)<<3); //target=mantissa*2^(8*(exp-3))
 
 	assign succ = (hash_as_number < target);
 
