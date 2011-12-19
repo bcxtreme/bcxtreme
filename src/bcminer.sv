@@ -1,6 +1,6 @@
 
 
-module bcminer #(parameter COUNTBITS = 6)
+module bcminer #(parameter COUNTBITS = 1, parameter DELAY_C = 0)
 (
 	input clk,
 	minerIfc.dut chip,
@@ -28,15 +28,22 @@ module bcminer #(parameter COUNTBITS = 6)
 	);
 
 
-	processorResultsIfc #(.PARTITIONBITS(COUNTBITS)) outDataTmp(clk);
-	assign outDataTmp.success = 0;
-	assign outDataTmp.nonce_prefix = 0;
+	coreInputsIfc inputGlue(clk);
+	processorResultsIfc #(.PARTITIONBITS(COUNTBITS)) outputGlue(clk);
 
-	lattice_block_last #(.LOG2_NUM_CORES(COUNTBITS), .DELAY_C(64), .INDEX(0)) core_last (
+	lattice_block_first #(.LOG2_NUM_CORES(COUNTBITS), .DELAY_C(DELAY_C), .INDEX(0)) core_first (
 		.clk,
 		.rst(chip.rst),
 		.inputs_i(blockData.reader),
-		.outputs_i(outDataTmp.reader),
+		.inputs_o(inputGlue.writer),
+		.outputs_o(outputGlue.writer)
+	);
+		
+	lattice_block_last #(.LOG2_NUM_CORES(COUNTBITS), .DELAY_C(DELAY_C), .INDEX(1)) core_last (
+		.clk,
+		.rst(chip.rst),
+		.inputs_i(inputGlue.reader),
+		.outputs_i(outputGlue.reader),
 		.outputs_o(outData.writer),
 		.validOut(chip.resultValid),
 		.newBlockOut(nonBufWrt.nonce)

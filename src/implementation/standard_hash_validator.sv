@@ -1,5 +1,6 @@
 module standard_hash_validator(
 	input logic clk,
+	input logic rst,
 	input logic[255:0] hash,
 	input logic[31:0] difficulty,
 	output logic success
