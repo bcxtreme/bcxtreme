@@ -12,7 +12,7 @@ output logic valid_o,
 output logic newblock_o
 );
 
-ff #(.WIDTH(1)) valid(.clk,.data_i(valid_i),.data_o(valid_o));
+rff #(.WIDTH(1)) valid(.clk,.rst,.data_i(valid_i),.data_o(valid_o));
 ff #(.WIDTH(1)) newblock(.clk,.data_i(newblock_i),.data_o(newblock_o));
 
 
