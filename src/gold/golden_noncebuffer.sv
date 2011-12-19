@@ -1,16 +1,20 @@
 class golden_noncebuffer;
 	
+	//INPUTS
 	bit validIn_i;
 	bit successIn_i;
 	bit [31:0] nonceIn_i;
 	
 	bit readReady_i;
 
+	//OUTPUTS
 	bit overflow_o;
 	bit nonceOut_o;
 	bit validOut_i;
 	bit successOut_o;
 	
+
+	//BUFFERS
 	bit [31:0] buffer;
 	bit storing = 1'b0;
 	bit clockingout = 1'b0;
