@@ -181,7 +181,7 @@ class golden_sha #(parameter DELAY_C = 10, parameter PROCESSORINDEX=0, parameter
 			if (newBlockIn_i)
 				nonce = PROCESSORINDEX;
 			else
-				nonce++;
+				nonce += NUMPROCESSORS;
 		end
 
 		// Format input
