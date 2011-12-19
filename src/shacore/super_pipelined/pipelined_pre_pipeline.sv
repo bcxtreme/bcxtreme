@@ -29,7 +29,7 @@ logic[31:0] M[14:0];
 assign M[0]=in.w1; //Zero delay for m0.
 
 logic[31:0] m2next;
-ff #(.WIDTH(32)) m2ff(.clk,.data_i(in.w2),.data_o(M[1]));  //1 delay for m2.
+ff #(.WIDTH(32)) m2ff(.clk,.data_i(m2next),.data_o(M[1]));  //1 delay for m2.
 assign m2next=(next_is_newblock[0]&next_is_valid[0])?in.w2:M[1];
 
 logic[31:0] m3next;
