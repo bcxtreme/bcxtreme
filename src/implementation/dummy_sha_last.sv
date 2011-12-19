@@ -1,0 +1,68 @@
+
+module dummy_sha_last #(parameter COUNTBITS=6, parameter DELAY_C = 0) (
+	input clk,
+	input rst,
+	coreInputsIfc.reader block,
+	output validOut,
+	output newBlockOut,
+	output[255:0] hash,
+	output[31:0] difficulty
+);
+
+	wire [255:0]hash_in;
+	wire [31:0]difficulty_in;
+
+	initial $monitor("Hash in: %x; A: %x", hash_in, block.hashstate.a);
+
+	// The "hash" is the higher 256 bits of the input. The difficulty is the final 32 bits
+	assign hash_in = {block.hashstate.a, block.hashstate.b, block.hashstate.c, block.hashstate.d,
+	                  block.hashstate.e, block.hashstate.f, block.hashstate.g, block.hashstate.h};
+	assign difficulty_in = block.w3;
+
+	// Store the value for DELAY_C cycles
+	wire [255:0] trans[DELAY_C + 1];
+	wire [31:0] trans_difficulty[DELAY_C + 1];
+	wire trans_valid[DELAY_C + 1];
+	wire trans_new[DELAY_C + 1];
+	assign trans[0] = hash_in;
+	assign trans_difficulty[0] = difficulty_in;
+	assign trans_valid[0] = block.valid;
+	assign trans_new[0] = block.newblock;
+	for (genvar n = 0; n < DELAY_C; n++) begin
+		eff #(.WIDTH(256)) bhash  (
+			.clk,
+			.rst,
+			.enable(1'b1),
+			.data_i(trans[n]),
+			.data_o(trans[n + 1])
+		);
+		eff #(.WIDTH(32)) dif (
+			.clk,
+			.rst,
+			.enable(1'b1),
+			.data_i(trans_difficulty[n]),
+			.data_o(trans_difficulty[n + 1])
+		);
+		eff bnew (
+			.clk,
+			.rst,
+			.enable(1'b1),
+			.data_i(trans_new[n]),
+			.data_o(trans_new[n + 1])
+		);
+		eff bvalid (
+			.clk,
+			.rst,
+			.enable(1'b1),
+			.data_i(trans_valid[n]),
+			.data_o(trans_valid[n + 1])
+		);
+	end
+	assign hash = trans[DELAY_C];
+	assign difficulty = trans_difficulty[DELAY_C];
+	assign validOut = trans_valid[DELAY_C];
+	assign newBlockOut = trans_new[DELAY_C];
+
+endmodule
+
+	
