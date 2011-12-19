@@ -13,6 +13,9 @@ module lattice_block_first #(parameter LOG2_NUM_CORES = 1, parameter INDEX = 0, 
 	processorResultsIfc.writer outputs_o
 );
 
+	wire success;
+	wire [LOG2_NUM_CORES - 1 : 0] prefix;
+
 	lattice_core #(.COUNTBITS(LOG2_NUM_CORES), .INDEX(INDEX), .DELAY_C(DELAY_C)) core (
 		.clk,
 		.rst,
@@ -21,6 +24,8 @@ module lattice_block_first #(parameter LOG2_NUM_CORES = 1, parameter INDEX = 0, 
 	);
 
 	lattice_ff_input ffi (
+		.clk,
+		.rst,
 		.inputs_i,
 		.inputs_o
 	);

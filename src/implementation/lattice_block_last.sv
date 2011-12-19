@@ -11,8 +11,8 @@ module lattice_block_last #(parameter LOG2_NUM_CORES = 1, parameter INDEX = 0, p
 	processorResultsIfc.reader outputs_i,
 	// Pipeline outputs leave 1 cycle later (plus any output we add)
 	processorResultsIfc.writer outputs_o,
-	output logic validOut,
-	output logic newBlockOut
+	output validOut,
+	output newBlockOut
 );
 	processorResultsIfc #(.PARTITIONBITS(LOG2_NUM_CORES)) tmp(clk);
 	
@@ -25,12 +25,24 @@ module lattice_block_last #(parameter LOG2_NUM_CORES = 1, parameter INDEX = 0, p
 		.newBlockOut
 	);
 
-	lattice_ff_output (
+	lattice_ff_output f1 (
+		.clk,
 		.outputs_i,
 		.this_stage(tmp.reader),
 		.outputs_o
 	);
+
 	
+/*
+	// Note: Previously, we delayed the outputs for one cycle, but we no longer need to.
+	wire [1:0] x; // store validOut and newBlockOut in the flip-flop
+	rff #(.WIDTH(2)) f2 (
+		.clk,
+		.rst,
+		.data_i(x),
+		.data_o({validOut, newBlockOut})
+	);
+*/
 
 endmodule
 

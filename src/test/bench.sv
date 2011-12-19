@@ -1,6 +1,6 @@
 
 
-program bench #(parameter COUNTBITS=6) 
+program bench #(parameter COUNTBITS=6, parameter DELAY_C = 129, parameter NUM_CORES = 1)
 (
 	input clk,
 	minerIfc.bench chip,

@@ -1,5 +1,5 @@
 
-class golden_bcminer  #(parameter COUNTBITS = 6);
+class golden_bcminer  #(parameter COUNTBITS = 6, parameter DELAY_C = 129, parameter NUM_CORES = 1);
 
 
 	bit rst_i;
@@ -20,7 +20,7 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 
 	// Golden units
 	local golden_blockstorage #(.COUNTBITS(COUNTBITS)) gblock;
-	local golden_dummy_sha #(.DELAY_C(129)) sha;
+	local golden_dummy_sha #(.DELAY_C(DELAY_C + NUM_CORES)) sha; // Delay for ShaCore + delay for pipelining through each stage
 	local golden_hashvalidator hval;
 
 	// Reset the output pins and the internal state
