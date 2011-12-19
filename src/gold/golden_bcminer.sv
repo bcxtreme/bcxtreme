@@ -20,7 +20,7 @@ class golden_bcminer  #(parameter COUNTBITS = 6);
 
 	// Golden units
 	local golden_blockstorage #(.COUNTBITS(COUNTBITS)) gblock;
-	local golden_dummy_sha #(.DELAY_C(64)) sha;
+	local golden_dummy_sha #(.DELAY_C(129)) sha;
 	local golden_hashvalidator hval;
 
 	// Reset the output pins and the internal state

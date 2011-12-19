@@ -11,7 +11,7 @@ module top #(parameter COUNTBITS=8);
 	blockStoreIfc blkStore(clk);
 	nonceBufferIfc nonBuf(clk);
 
-	bcminer #(.COUNTBITS(COUNTBITS)) dut (
+	bcminer #(.DELAY_C(129), .COUNTBITS(COUNTBITS)) dut (
 		.clk,
 		.chip(miner.dut),
 		.blkRd(blkStore.reader),

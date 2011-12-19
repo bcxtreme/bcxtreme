@@ -6,6 +6,7 @@ module lattice_ff_input (
 	// TODO: Add flipflops here!!!!
 
 	always_comb begin
+		
 		inputs_o.valid = inputs_i.valid;
 		inputs_o.newblock = inputs_i.newblock;
 		inputs_o.hashstate = inputs_i.hashstate;
