@@ -3,14 +3,18 @@ class golden_noncebuffer;
 	// Nonce Input interface
 	bit rst_i;
 	bit writeValid_i;
-	bit success_i
+	bit success_i;
+	bit newblock_i;
 	bit[31:0] nonce_i;
 
 	// Output Interface
-	bit new_nonce_o;
+	bit resultValid_o;
+	bit successOut_o;
+
+	bit readReady_i;
 	bit nonce_o;
 	bit overflow_o;
-	bit readReady_i;
+
 	
 	// Buffers for storing nonce
 	local bit[31:0] nonce;
@@ -19,6 +23,7 @@ class golden_noncebuffer;
 	local int next_bit;	// the next bit of the noncebuffer to write out
 	local bit is_new;
 	local bit overflow;
+	local int inputs_since_newblock;  //Includes the input sent *with* the newblock
 
 	function new();
 
@@ -32,7 +37,10 @@ class golden_noncebuffer;
 	endtask
 
 	task cycle();
+		//Reset interface
 		if(rst_i) begin do_reset(); return; end
+
+		//Read interface
 		nonce_o=nonce[next_bit];
 		if(readReady_i) begin 
 			is_new=0;
@@ -40,15 +48,19 @@ class golden_noncebuffer;
 			if(next_bit>=32) 
 				next_bit=0; 
 		end
-		if(writeValid_i & success_i) begin
-			if((is_new | next_bit!=0)) begin
-				overflow=1;
-			end else begin
-				is_new=1;
-				nonce=nonce_i;
+
+		//Write interface
+		if(writeValid_i) begin
+			if(success_i) begin
+				if((is_new | next_bit!=0)) begin
+					overflow=1;
+				end else begin
+					is_new=1;
+					nonce=nonce_i;
+				end 
 			end
 		end
-		new_nonce_o=is_new;
+		//Drive outputs with internal state
 		overflow_o=overflow;
 	endtask
 endclass
