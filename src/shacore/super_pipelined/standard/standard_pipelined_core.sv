@@ -1,4 +1,4 @@
-module sha_standard_pipelined_core(
+module sha_standard_pipelined_core  #(parameter PROCESSORINDEX=0,parameter NUMPROCESSORS=1) (
 input logic clk,
 input logic rst,
 coreInputsIfc.reader in,
@@ -14,7 +14,7 @@ logic[15:0][31:0] W_pipeline[64:15];
 logic newblock_discard; //Discard the output
 logic valid_discard;
 //For the first 16 rounds, feed in the data directly.
-sha_pipelined_pre_pipeline pre(.clk,.rst,.in,.output_valid(valid_discard),.newblock_o(newblock_discard),.history(W_pipeline[15]),.state_out(hashstate_pipeline[15]));
+sha_pipelined_pre_pipeline  #(.PROCESSORINDEX(PROCESSORINDEX),.NUMPROCESSORS(NUMPROCESSORS)) pre(.clk,.rst,.in,.output_valid(valid_discard),.newblock_o(newblock_discard),.history(W_pipeline[15]),.state_out(hashstate_pipeline[15]));
 
 //Standard sha rounds with attached message expander for the rest.
 for(genvar i=15; i<64; i++) begin

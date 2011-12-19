@@ -1,4 +1,4 @@
-module sha_pipelined_pre_pipeline(
+module sha_pipelined_pre_pipeline #(parameter PROCESSORINDEX=0,parameter NUMPROCESSORS=1) (
 input logic clk,
 input logic rst,
 coreInputsIfc.reader in,
@@ -27,7 +27,12 @@ assign M[0]=in.w1;
 assign M[1]=in.w2;
 assign M[2]=in.w3;
 //Note that as the reset signal is on a one cycle delay, we source it from the previous step in the pipeline.
-counter c1(.clk,.rst(valid_pipeline[2]& newblock_pipeline[2]),.inc(valid_pipeline[2]),.count(M[3]));
+counter #(.INITIALCOUNT(PROCESSORINDEX),.INCREMENT(NUMPROCESSORS)) c1(
+	.clk,
+	.rst(valid_pipeline[2]& newblock_pipeline[2]),
+	.inc(valid_pipeline[2]),
+	.count(M[3]));
+
 assign M[4]=32'h80000000; //The one bit of padding
 
 generate 
@@ -44,7 +49,11 @@ end
 endgenerate
 
 //Note that as the reset signal is on a one cycle delay, we source it from the previous step in the pipeline.
-counter c2(.clk,.rst(valid_pipeline[14] & newblock_pipeline[14]),.inc(valid_pipeline[14]),.count(history[15-3]));
+counter #(.INITIALCOUNT(PROCESSORINDEX),.INCREMENT(NUMPROCESSORS)) c2(
+	.clk,
+	.rst(valid_pipeline[14] & newblock_pipeline[14]),
+	.inc(valid_pipeline[14]),
+	.count(history[15-3]));
 
 generate
 for(n=4; n<15; n++) begin
