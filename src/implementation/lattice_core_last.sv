@@ -7,8 +7,7 @@ module lattice_core_last #(parameter COUNTBITS = 6, parameter DELAY_C = 0, param
 	coreInputsIfc.reader data_i,
 	processorResultsIfc.writer data_o,
 	output validOut,
-	output newBlock,
-	output success
+	output newBlockOut
 );
 	wire [31:0] difficulty;
 	wire [255:0] hash;
@@ -30,13 +29,13 @@ module lattice_core_last #(parameter COUNTBITS = 6, parameter DELAY_C = 0, param
 		.valid_i(hash_valid),
 		.valid_o(validOut),
 		.newblock_i(hash_new),
-		.newblock_o(newBlock),
+		.newblock_o(newBlockOut),
 		.hash,
 		.difficulty,
-		.success
+		.success(data_o.success)
 	);
 
-	assign data_o.nonce_start = INDEX;
+	assign data_o.nonce_prefix = INDEX;
 
 endmodule
 		
