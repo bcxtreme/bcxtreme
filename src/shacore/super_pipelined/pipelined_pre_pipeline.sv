@@ -48,7 +48,6 @@ endgenerate
 /* assign the history values appropriately */
 
 /*Whether the next cycle will be a newblock output to the history.  If this is the case, then we want to load in the *new* values of w1 through w3 to the flip-flops, so next cycle, the *new* values of w1-w3 will be output to the history.*/
-
 logic next_is_newblock; 
 assign next_is_newblock=newblock_pipeline[14]&valid_pipeline[14];
 
