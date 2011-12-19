@@ -8,7 +8,9 @@ input logic valid_i,
 input logic newblock_i,
 output HashState state_o,
 output logic valid_o,
-output logic newblock_o
+output logic newblock_o,
+output logic next_is_newblock,  //This is an output to indicate that the next output will be newblock&valid.
+output logic next_is_valid
 );
 
 logic validbuff[ROUND_PIPELINE_DEPTH:0];
@@ -26,6 +28,8 @@ endgenerate
 
 assign valid_o=validbuff[ROUND_PIPELINE_DEPTH];
 assign newblock_o=newblockbuff[ROUND_PIPELINE_DEPTH];
+assign next_is_newblock=newblockbuff[ROUND_PIPELINE_DEPTH-1];
+assign next_is_valid=validbuff[ROUND_PIPELINE_DEPTH-1];
 
 sha_round #(.PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) r(
 	.clk,

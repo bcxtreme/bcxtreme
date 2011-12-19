@@ -151,7 +151,7 @@ program bench #(parameter COUNTBITS=6,parameter DELAY_C=129)
 			if (chip.cb.resultValid)
 				$display("* RESULT [DUT]: %b", chip.cb.success);
 
-			if (ix_result == $size(env.blocks)) return;
+			if (ix_result == (1<<COUNTBITS)*$size(env.blocks)) return;
 		end
 	endtask
 

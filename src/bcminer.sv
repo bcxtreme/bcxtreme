@@ -1,6 +1,6 @@
 
 
-module bcminer #(parameter COUNTBITS = 6)
+module bcminer #(parameter COUNTBITS = 6,parameter ROUND_PIPELINE_DEPTH=1)
 (
 	input clk,
 	minerIfc.dut chip,
@@ -41,7 +41,7 @@ module bcminer #(parameter COUNTBITS = 6)
 	assign core_inputs.w2=bs_state[63:32];
 	assign core_inputs.w3=bs_state[31:0];
 
-	sha_last_pipelined_core #(.ROUND_PIPELINE_DEPTH(1)) sha (
+	sha_last_pipelined_core #(.ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) sha (
 		.clk,
 		.rst(chip.rst),
 		.in(core_inputs),
