@@ -13,7 +13,6 @@ module lattice_core #(parameter COUNTBITS = 6, parameter INDEX = 0, parameter RO
 	
 	sha_standard_pipelined_core #(.ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH), .PROCESSORINDEX(INDEX)) sha (
 		.clk,
-		.rst,
 		.in(data_i),
 		.doublehash(hash),
 		.difficulty
