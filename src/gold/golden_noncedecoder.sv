@@ -1,11 +1,11 @@
-class golden_noncedecoder #(parameter NUMPROCESSORS=10)//,parameter INDEXBITS=$clog2(NUMPROCESSORS),parameter NONCESPACE=(1<<6));
+class golden_noncedecoder #(parameter NUMPROCESSORS=10),parameter INDEXBITS=$clog2(NUMPROCESSORS))//,parameter NONCESPACE=(1<<6));
 
 	// Nonce Input interface
 
 	bit valid_i;
 	bit newblock_i;
 	bit success_i
-	bit[INDEXBITS-1:0] index_i;
+	bit[INDEXBITS-1:0] processor_index_i;
 
 	// Output Interface
 	bit valid_o
@@ -36,7 +36,7 @@ class golden_noncedecoder #(parameter NUMPROCESSORS=10)//,parameter INDEXBITS=$c
 			end
 		
 			if (success_i) begin 
-				nonce_o = cycles_since_newblock * index_i;
+				nonce_o = cycles_since_newblock + processor_index_i;
 				valid_o = 1'b1;
 			end
 			else begin

@@ -1,11 +1,11 @@
-module nonce_extractor #(parameter NUMPROCESSORS=10, parameter NONCESPACE=(1<<6),parameter PARTITIONBITS=$clog(NUMPROCESSORS),parameter NONCESPERPROCESSOR=NONCESPACE/NUMPROCESSORS, parameter LEFTOVER=NONCESPACE-NONCESPERPROCESSOR*NUMPROCESSORS)
+module nonce_extractor #(parameter NUMPROCESSORS=10, parameter NONCESPACE=(1<<6),parameter PARTITIONBITS=$clog(NUMPROCESSORS))//,parameter NONCESPERPROCESSOR=NONCESPACE/NUMPROCESSORS, parameter LEFTOVER=NONCESPACE-NONCESPERPROCESSOR*NUMPROCESSORS)
 (
 	input logic clk,
 	input logic rst,
 	input logic valid_i,
 	input logic newblock_i,
 	input logic success_i,
-	input logic[PARTITIONBITS-1:0] processor_index,
+	input logic[PARTITIONBITS-1:0] processor_index_i,
 	
 	output logic valid_o,
 	output logic success_o,
@@ -27,11 +27,18 @@ module nonce_extractor #(parameter NUMPROCESSORS=10, parameter NONCESPACE=(1<<6)
 			cycles_since_newblock <= cylces_since_newblock + NUMPROCESSORS;
 	end
 
-
 	always_comb begin
+		if(rst)
+			cycles_since_new_block = 0;
+	end
+	
+	/*always_comb begin
 	  numextra=(processor_index>LEFTOVER)?LEFTOVER:processor_index;
 	  base_nonce= NONCESPERPROCESSOR*processor_index+numextra;
-	end
+	end*/
+
+
+	assign nonce_o = cycles_since_newblock +  processor_index_i;
 	 
 /*	logic[31:0] count_old;
 	logic[31:0] count_new;
