@@ -18,7 +18,7 @@ module nonce_extractor #(parameter NUMPROCESSORS=10, parameter NONCESPACE=10,par
 	ff #(.WIDTH(32)) f(.clk,.data_i(count_new),.data_o(count_old));
 
 	logic[31:0] calculated_count;
-	assign count_new=valid_i?count_old:(newblock_i?0:(count_old+NUMPROCESSORS));
+	assign count_new = valid_i ? (newblock_i?0:(count_old+NUMPROCESSORS)) : count_old;
 
 	logic[31:0] nonce_tmp;
 	assign nonce_tmp=count_new+ processor_index_i;
