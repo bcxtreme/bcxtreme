@@ -8,21 +8,11 @@ module bcminer #(parameter LOG2_BROADCAST_CNT = 4, parameter ROUND_PIPELINE_DEPT
 	nonceBufferIfc.writer nonBufWrt
 );
 	parameter LOG2_NUM_CORES = $clog2(NUM_CORES);
-
-	initial $display("N: %d; Log2 N: %d", NUM_CORES, LOG2_NUM_CORES);
+	bit validOut, newBlockOut, resultValidd, success;
+	bit[31:0] nonce;
 
 	coreInputsIfc blockData(clk);
 	processorResultsIfc outData(clk);
-
-	logic bs_valid, bs_new;
-	logic [351:0] bs_state;
-
-	logic sha_valid, sha_new;
-	HashState sha_hashout;
-	logic [255:0] sha_hash;
-	logic [31:0] sha_difficulty;
-
-	logic hval_success;
 
 	block_storage  #(.LOGNCYCLES(LOG2_BROADCAST_CNT)) bs(
 		.clk,
@@ -30,19 +20,6 @@ module bcminer #(parameter LOG2_BROADCAST_CNT = 4, parameter ROUND_PIPELINE_DEPT
 		.blkRd,
 		.broadcast(blockData.writer)
 	);
-	/*
-	assign core_inputs.hashstate.a=bs_state[351:320];
-	assign core_inputs.hashstate.b=bs_state[319:288];
-	assign core_inputs.hashstate.c=bs_state[287:256];
-	assign core_inputs.hashstate.d=bs_state[255:224];
-	assign core_inputs.hashstate.e=bs_state[223:192];
-	assign core_inputs.hashstate.f=bs_state[191:160];
-	assign core_inputs.hashstate.g=bs_state[159:128];
-	assign core_inputs.hashstate.h=bs_state[127:96];
-	assign core_inputs.w1=bs_state[95:64];
-	assign core_inputs.w2=bs_state[63:32];
-	assign core_inputs.w3=bs_state[31:0];
-	*/
 
 	coreInputsIfc inGlue[NUM_CORES - 2:0](clk);
 	processorResultsIfc #(.PARTITIONBITS(LOG2_NUM_CORES)) outGlue[NUM_CORES - 2:0](clk);
@@ -74,19 +51,25 @@ module bcminer #(parameter LOG2_BROADCAST_CNT = 4, parameter ROUND_PIPELINE_DEPT
 		.inputs_i(inGlue[NUM_CORES - 2].reader),
 		.outputs_i(outGlue[NUM_CORES - 2].reader),
 		.outputs_o(outData.writer),
-		.validOut(chip.resultValid),
-		.newBlockOut(nonBufWrt.nonce)
+		.validOut,
+		.newBlockOut
 	);
 
-	/*
-	 // NOTE: This is how the pins were connected to the Hash-Validator to verify the Sha Core
-	assign chip.success = hval_success;
-	assign chip.resultValid = hval_valid;
-	assign nonBufWrt.nonce = hval_new;
-	*/
+	nonce_decoder #(.NUM_CORES(NUM_CORES)) ndecode (
+		.clk,
+		.rst(chip.rst),
+		.valid_i(validOut),
+		.newblock_i(newBlockOut),
+		.rawinput_i(outData.reader),
+		.valid_o(resultValid),
+		.success_o(success),
+		.nonce
+	);
 
 
-	assign chip.success = outData.success;
+	assign chip.resultValid = resultValid;
+	assign chip.success = success;
+	assign nonBufWrt.nonce = validOut;
 	assign nonBufWrt.overflow = 1'b0;
 
 endmodule

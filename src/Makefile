@@ -10,11 +10,11 @@ SHACORE=shacore/*.sv shacore/precompiled/messageschedule/src/*.sv\
 	shacore/precompiled/sharound/src/*.sv shacore/super_pipelined/*.sv\
 	shacore/super_pipelined/last/*.sv shacore/super_pipelined/standard/*.sv
 HASHVAL=implementation/standard_hash_validator.sv implementation/final_hash_validator.sv
-DUT=$(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) bcminer.sv
 LATTICE=implementation/lattice_ff_input.sv implementation/lattice_ff_output.sv \
         implementation/lattice_core.sv implementation/lattice_core_last.sv \
         implementation/lattice_block.sv implementation/lattice_block_first.sv implementation/lattice_block_last.sv
-DUT=$(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) $(LATTICE) bcminer.sv
+NONCEDECODER=implementation/nonce_decoder.sv
+DUT=$(NONCEDECODER) $(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) $(LATTICE) bcminer.sv
 
 SHACORE_TOP=shacore_top.sv
 SHACORE_BENCH=test/shacore/*.sv
