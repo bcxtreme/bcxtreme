@@ -1,6 +1,5 @@
 module sha_standard_pipelined_pad_hash(
 	input logic clk,
-	input logic rst,
 	input HashState instate,
 	output logic[15:0][31:0] padded
 );
