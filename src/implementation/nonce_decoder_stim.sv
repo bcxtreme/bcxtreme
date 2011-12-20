@@ -41,14 +41,13 @@ initial begin
   valid_i = 0;
   newblock_i = 0;
   rawinput.success = 0;
-  rawinput.nonce_prefix = 1;
 
   #6;
   
   valid_i = 1;
   newblock_i = 1;
 
-  #2
+  #1
 
   newblock_i = 0;
 
