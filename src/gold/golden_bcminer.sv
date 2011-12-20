@@ -1,5 +1,5 @@
 
-class golden_bcminer  #(parameter COUNTBITS = 6, parameter DELAY_C = 129, parameter NUM_CORES = 1);
+class golden_bcminer  #(parameter LOG2_BROADCAST_CNT = 6, parameter DELAY_C = 129, parameter NUM_CORES = 1);
 
 	bit rst_i;
 	
@@ -18,7 +18,7 @@ class golden_bcminer  #(parameter COUNTBITS = 6, parameter DELAY_C = 129, parame
 	bit overflow_o;
 
 	// Golden units
-	local golden_blockstorage #(.COUNTBITS(COUNTBITS)) gblock;
+	local golden_blockstorage #(.LOG2_BROADCAST_CNT(LOG2_BROADCAST_CNT)) gblock;
 	// NOTE: Delay for DELAY_C cycles to account for the ShaCore, then NUM_CORES to account for the pipelining of the outputs
 	// NOTE: Previously, the index was hard-coded to 32'h42a14600
 	local golden_sha #(.DELAY_C(DELAY_C + NUM_CORES - 1), .NUM_CORES(NUM_CORES)) sha[NUM_CORES];

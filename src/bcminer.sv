@@ -1,12 +1,15 @@
 
 
-module bcminer #(parameter COUNTBITS = 4, parameter ROUND_PIPELINE_DEPTH=1, parameter NUM_CORES=10)
+module bcminer #(parameter LOG2_BROADCAST_CNT = 4, parameter ROUND_PIPELINE_DEPTH=1, parameter NUM_CORES=10)
 (
 	input clk,
 	minerIfc.dut chip,
 	blockStoreIfc.reader blkRd,
 	nonceBufferIfc.writer nonBufWrt
 );
+	parameter LOG2_NUM_CORES = $clog2(NUM_CORES);
+
+	initial $display("N: %d; Log2 N: %d", NUM_CORES, LOG2_NUM_CORES);
 
 	coreInputsIfc blockData(clk);
 	processorResultsIfc outData(clk);
@@ -21,7 +24,7 @@ module bcminer #(parameter COUNTBITS = 4, parameter ROUND_PIPELINE_DEPTH=1, para
 
 	logic hval_success;
 
-	block_storage  #(.LOGNCYCLES(COUNTBITS)) bs(
+	block_storage  #(.LOGNCYCLES(LOG2_BROADCAST_CNT)) bs(
 		.clk,
 		.rst(chip.rst),
 		.blkRd,
@@ -42,9 +45,9 @@ module bcminer #(parameter COUNTBITS = 4, parameter ROUND_PIPELINE_DEPTH=1, para
 	*/
 
 	coreInputsIfc inGlue[NUM_CORES - 2:0](clk);
-	processorResultsIfc #(.PARTITIONBITS(COUNTBITS)) outGlue[NUM_CORES - 2:0](clk);
+	processorResultsIfc #(.PARTITIONBITS(LOG2_NUM_CORES)) outGlue[NUM_CORES - 2:0](clk);
 
-	lattice_block_first #(.LOG2_NUM_CORES(COUNTBITS), .INDEX(0), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) lblock_first (
+	lattice_block_first #(.LOG2_NUM_CORES(LOG2_NUM_CORES), .INDEX(0), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) lblock_first (
 		.clk,
 		.rst(chip.rst),
 		.inputs_i(blockData.reader),
@@ -54,7 +57,7 @@ module bcminer #(parameter COUNTBITS = 4, parameter ROUND_PIPELINE_DEPTH=1, para
 
 	generate
 	for (genvar i = 1; i < NUM_CORES - 1; i++) begin
-		lattice_block #(.LOG2_NUM_CORES(COUNTBITS), .INDEX(i), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) lblock (
+		lattice_block #(.LOG2_NUM_CORES(LOG2_NUM_CORES), .INDEX(i), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) lblock (
 			.clk,
 			.rst(chip.rst),
 			.inputs_i(inGlue[i - 1].reader),
@@ -65,7 +68,7 @@ module bcminer #(parameter COUNTBITS = 4, parameter ROUND_PIPELINE_DEPTH=1, para
 	end
 	endgenerate
 		
-	lattice_block_last #(.LOG2_NUM_CORES(COUNTBITS), .INDEX(NUM_CORES - 1), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) lblock_last (
+	lattice_block_last #(.LOG2_NUM_CORES(LOG2_NUM_CORES), .INDEX(NUM_CORES - 1), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) lblock_last (
 		.clk,
 		.rst(chip.rst),
 		.inputs_i(inGlue[NUM_CORES - 2].reader),

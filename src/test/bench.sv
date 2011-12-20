@@ -1,6 +1,6 @@
 
 
-program bench #(parameter COUNTBITS=6, parameter DELAY_C = 129, parameter NUM_CORES = 1)
+program bench #(parameter LOG2_BROADCAST_CNT=6, parameter DELAY_C = 129, parameter NUM_CORES = 1)
 (
 	input clk,
 	minerIfc.bench chip,
@@ -12,7 +12,7 @@ program bench #(parameter COUNTBITS=6, parameter DELAY_C = 129, parameter NUM_CO
 
 	environ env;
 	inputs inp;
-	golden_bcminer #(.COUNTBITS(COUNTBITS), .DELAY_C(DELAY_C), .NUM_CORES(NUM_CORES)) gb;
+	golden_bcminer #(.LOG2_BROADCAST_CNT(LOG2_BROADCAST_CNT), .DELAY_C(DELAY_C), .NUM_CORES(NUM_CORES)) gb;
 
 	task set_rst(bit val);
 		gb.rst_i = val;
@@ -151,7 +151,7 @@ program bench #(parameter COUNTBITS=6, parameter DELAY_C = 129, parameter NUM_CO
 			if (chip.cb.resultValid)
 				$display("* RESULT [DUT]: %b", chip.cb.success);
 
-			if (ix_result == (1<<COUNTBITS)*$size(env.blocks)) return;
+			if (ix_result == (1<<LOG2_BROADCAST_CNT)*$size(env.blocks)) return;
 		end
 	endtask
 

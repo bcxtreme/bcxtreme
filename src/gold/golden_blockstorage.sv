@@ -1,5 +1,5 @@
 
-class golden_blockstorage #(parameter COUNTBITS = 6);
+class golden_blockstorage #(parameter LOG2_BROADCAST_CNT = 6);
 
 	// Block Storage Interface
 	bit writeValid_i;
@@ -21,8 +21,8 @@ class golden_blockstorage #(parameter COUNTBITS = 6);
 	local bit force_write_ready;
 
 	// Constants
-	local int bufB_broadcast_max = 2 ** COUNTBITS;
-	local int bufB_broadcast_last = 2 ** COUNTBITS - 1;
+	local int bufB_broadcast_max = 2 ** LOG2_BROADCAST_CNT;
+	local int bufB_broadcast_last = 2 ** LOG2_BROADCAST_CNT - 1;
 	
 	
 	function new();
