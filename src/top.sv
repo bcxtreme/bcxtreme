@@ -1,7 +1,7 @@
 
 `timescale 1ns/1ns
 
-module top #(parameter COUNTBITS=6);
+module top #(parameter COUNTBITS=4);
 	bit clk = 0;
 	always #5 clk = ~clk;
 
@@ -18,7 +18,7 @@ module top #(parameter COUNTBITS=6);
 		.nonBufWrt(nonBuf.writer)
 	);
 
-	bench #(.DELAY_C(129), .COUNTBITS(COUNTBITS), .NUM_CORES(3)) tb (
+	bench #(.DELAY_C(129), .COUNTBITS(COUNTBITS), .NUM_CORES(10)) tb (
 		.clk,
 		.chip(miner.bench),
 		.blkWrt(blkStore.writer),

@@ -1,5 +1,5 @@
 
-module lattice_ff_output #(parameter COUNTBITS = 6) (
+module lattice_ff_output #(parameter COUNTBITS = 4) (
 	input clk,
 	processorResultsIfc.reader outputs_i,
 	processorResultsIfc.reader this_stage,

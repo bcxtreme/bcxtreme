@@ -29,7 +29,7 @@ module lattice_block #(parameter LOG2_NUM_CORES = 1, parameter INDEX = 0, parame
 		.inputs_o
 	);
 
-	lattice_ff_output ffo (
+	lattice_ff_output #(.COUNTBITS(LOG2_NUM_CORES)) ffo (
 		.clk,
 		.outputs_i,
 		.this_stage(tmp.reader),
