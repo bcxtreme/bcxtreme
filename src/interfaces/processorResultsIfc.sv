@@ -1,4 +1,4 @@
-interface processorResultsIfc #(parameter PARTITIONBITS=6) (input logic clk);
+interface processorResultsIfc #(parameter NUM_CORES=10,PARTITIONBITS=$clog2(NUMPROCESSORS)) (input logic clk);
 logic success;
 logic[PARTITIONBITS-1:0] nonce_prefix;
 
