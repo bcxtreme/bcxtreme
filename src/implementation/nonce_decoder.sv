@@ -27,28 +27,28 @@ module nonce_decoder #(parameter NUM_CORES=10, parameter BROADCAST_CNT=100)
 
 	// is_last_reading: 1 when we are reading in the last valid input
 	rff #(.WIDTH(1)) last_reading_ff(.clk, .rst, .data_i(is_last_reading_new), .data_o(is_last_reading_old));
-	assign is_last_reading_new = is_reading_old & (count_old == (BROADCAST_CNT - 1));
+	assign is_last_reading_new = is_reading_old ? (count_old == (BROADCAST_CNT - 1)) : 0;
 
 	// is_reading: 1 when we receive a newBlock, 0 when we output our result from it
 	rff #(.WIDTH(1)) reading_ff(.clk, .rst, .data_i(is_reading_new), .data_o(is_reading_old));
 	always_comb begin
 		if (newblock_i)
-			is_reading_new <= 1;
+			is_reading_new = 1;
 		else if (found_new_nonce)
-			is_reading_new <= 0;
+			is_reading_new = 0;
 		else if (is_reading_old)
-			is_reading_new <= is_reading_old ? count_new < BROADCAST_CNT : 0;
+			is_reading_new = is_reading_old ? count_new < BROADCAST_CNT : 0;
 	end
 	 
 	// count: starts at 0, increments by NUM_CORES for each valid block we receive, resets on newblock
-	ff #(.WIDTH(32)) f(.clk,.data_i(count_new),.data_o(count_old));
+	rff #(.WIDTH(32)) f(.clk,.rst,.data_i(count_new),.data_o(count_old));
 	always_comb begin
 		if (!valid_i)
-			count_new <= count_old;
+			count_new = count_old;
 		else if (newblock_i)
-			count_new <= 0;
+			count_new = 0;
 		else
-			count_new <= count_old + NUM_CORES;
+			count_new = count_old + NUM_CORES;
 	end
 
 	// nonce_tmp: the nonce of the current inputs, possibly
