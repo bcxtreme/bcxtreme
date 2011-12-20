@@ -1,6 +1,6 @@
 
 
-program bench #(parameter COUNTBITS=6,parameter DELAY_C=129) 
+program bench #(parameter COUNTBITS=6, parameter DELAY_C = 129, parameter NUM_CORES = 1)
 (
 	input clk,
 	minerIfc.bench chip,
@@ -12,7 +12,7 @@ program bench #(parameter COUNTBITS=6,parameter DELAY_C=129)
 
 	environ env;
 	inputs inp;
-	golden_bcminer #(.COUNTBITS(COUNTBITS),.DELAY_C(DELAY_C)) gb;
+	golden_bcminer #(.COUNTBITS(COUNTBITS), .DELAY_C(DELAY_C), .NUM_CORES(NUM_CORES)) gb;
 
 	task set_rst(bit val);
 		gb.rst_i = val;

@@ -1,5 +1,5 @@
 
-module dummy_sha #(parameter COUNTBITS=6, parameter DELAY_C = 0) (
+module dummy_sha_last #(parameter COUNTBITS=6, parameter DELAY_C = 0) (
 	input clk,
 	input rst,
 	coreInputsIfc.reader block,
@@ -11,6 +11,8 @@ module dummy_sha #(parameter COUNTBITS=6, parameter DELAY_C = 0) (
 
 	wire [255:0]hash_in;
 	wire [31:0]difficulty_in;
+
+	initial $monitor("Hash in: %x; A: %x", hash_in, block.hashstate.a);
 
 	// The "hash" is the higher 256 bits of the input. The difficulty is the final 32 bits
 	assign hash_in = {block.hashstate.a, block.hashstate.b, block.hashstate.c, block.hashstate.d,
@@ -60,7 +62,6 @@ module dummy_sha #(parameter COUNTBITS=6, parameter DELAY_C = 0) (
 	assign difficulty = trans_difficulty[DELAY_C];
 	assign validOut = trans_valid[DELAY_C];
 	assign newBlockOut = trans_new[DELAY_C];
-//	initial $monitor("valid: %b %b %b %b", trans_valid[0], trans_valid[1], trans_valid[2], trans_valid[3]);
 
 endmodule
 

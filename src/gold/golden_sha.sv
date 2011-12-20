@@ -1,5 +1,5 @@
 
-class golden_sha #(parameter DELAY_C = 10, parameter PROCESSORINDEX=0, parameter NUMPROCESSORS=1);
+class golden_sha #(parameter DELAY_C = 10, parameter INDEX=0, parameter NUM_CORES=1);
 
 	// Inputs
 	bit validIn_i;
@@ -31,7 +31,7 @@ class golden_sha #(parameter DELAY_C = 10, parameter PROCESSORINDEX=0, parameter
 			new_buf[i] = 1'b0;
 			nonce_buf[i] = 0;
 		end
-		nonce = PROCESSORINDEX;
+		nonce = INDEX;
 	endfunction
 
  	local function bit[255:0] evaluate(bit[31:0] hs[8], bit[31:0] w1, bit[31:0] w2, bit[31:0] w3);
@@ -78,9 +78,9 @@ class golden_sha #(parameter DELAY_C = 10, parameter PROCESSORINDEX=0, parameter
 		// Advance nonce
 		if (validIn_i) begin
 			if (newBlockIn_i)
-				nonce = PROCESSORINDEX;
+				nonce = INDEX;
 			else
-				nonce += NUMPROCESSORS;
+				nonce += NUM_CORES;
 		end
 
 		// Format input

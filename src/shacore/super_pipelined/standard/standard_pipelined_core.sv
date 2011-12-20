@@ -1,6 +1,7 @@
 
 module sha_standard_pipelined_core  #(parameter PROCESSORINDEX=0,parameter NUMPROCESSORS=1,parameter ROUND_PIPELINE_DEPTH=1,parameter TOTAL_DELAY=ROUND_PIPELINE_DEPTH*3+1) (
 input logic clk,
+input rst,
 coreInputsIfc.reader in,
 output logic[255:0] doublehash,
 output logic[31:0] difficulty
@@ -42,7 +43,7 @@ logic[15:0][31:0] hash2_W_pipeline[64:0];
 
 //An additional pipeline stage to do the final add of the first SHA round and output the
 // padded message words into hash2_W_pipeline[0]
-sha_standard_pipelined_pad_hash hp(.clk,.instate(firsthash),.padded(hash2_W_pipeline[0]));
+sha_standard_pipelined_pad_hash hp(.clk, .rst, .instate(firsthash),.padded(hash2_W_pipeline[0]));
 
 HashState init;
 sha_initial_hashstate is(.state(init));

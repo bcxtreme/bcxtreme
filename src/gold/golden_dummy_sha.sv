@@ -45,9 +45,6 @@ class golden_dummy_sha #(parameter DELAY_C = 10);
 		difficulty_o = dif_buf[DELAY_C];
 		newBlockOut_o = new_buf[DELAY_C];
 		hash_o = hash_buf[DELAY_C];
-		//if(validOut_o)
-			//$display("Sending DoubleHash %x",hash_o);
-		//$display("%t Valid_buf[0] %b",$time, valid_buf[0]);
 	endtask
 
 endclass

@@ -1,5 +1,6 @@
 
 interface coreInputsIfc(input logic clk);
+
 	logic valid;
 	logic newblock;
 	HashState hashstate;
