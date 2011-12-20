@@ -1,6 +1,6 @@
 
 
-module bcminer #(parameter BROADCAST_CNT = 100, parameter ROUND_PIPELINE_DEPTH=1, parameter NUM_CORES=10)
+module bcminer #(parameter BROADCAST_CNT = 1024, parameter ROUND_PIPELINE_DEPTH=1, parameter NUM_CORES=10)
 (
 	input clk,
 	minerIfc.dut chip,
@@ -8,7 +8,6 @@ module bcminer #(parameter BROADCAST_CNT = 100, parameter ROUND_PIPELINE_DEPTH=1
 	nonceBufferIfc.writer nonBufWrt
 );
 	parameter LOG2_NUM_CORES = $clog2(NUM_CORES);
-	parameter LOG2_BROADCAST_CNT = $clog2(BROADCAST_CNT);
 
 	logic validOut, newBlockOut, resultValid, success;
 	logic[31:0] nonce;
@@ -16,7 +15,7 @@ module bcminer #(parameter BROADCAST_CNT = 100, parameter ROUND_PIPELINE_DEPTH=1
 	coreInputsIfc blockData(clk);
 	processorResultsIfc outData(clk);
 
-	block_storage  #(.LOGNCYCLES(LOG2_BROADCAST_CNT)) bs(
+	block_storage  #(.NCYCLES(BROADCAST_CNT)) bs(
 		.clk,
 		.rst(chip.rst),
 		.blkRd,
