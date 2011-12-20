@@ -1,16 +1,16 @@
-class golden_noncedecoder #(parameter NUMPROCESSORS=10),parameter INDEXBITS=$clog2(NUMPROCESSORS))//,parameter NONCESPACE=(1<<6));
+class golden_noncedecoder #(parameter NUMPROCESSORS=10);//,parameter INDEXBITS=$clog2(NUMPROCESSORS))//,parameter NONCESPACE=(1<<6));
 
 	// Nonce Input interface
 
 	bit valid_i;
 	bit newblock_i;
-	bit success_i
-	bit[INDEXBITS-1:0] processor_index_i;
+	bit success_i;
+	bit[3:0] processor_index_i;
 
 	// Output Interface
-	bit valid_o
+	bit valid_o;
 	bit success_o;
-	bit[31:0] nonce_o
+	bit[31:0] nonce_o;
 	
 	// Buffers for storing nonce
 	local bit valid;
