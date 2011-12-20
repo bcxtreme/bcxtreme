@@ -6,7 +6,7 @@ int ticks = 0;
 logic rst;
 
 logic valid_i, newblock_i, success_o, valid_o;
-processorResultsIfc #(.PARTITIONBITS(4)) rawinput(clk);
+processorResultsIfc #(.PARTITIONBITS(2)) rawinput(clk);
 logic [31:0] nonce_o;
 
 nonce_decoder #(.BROADCAST_CNT(5), .NUM_CORES(4)) test(
