@@ -1,55 +1,40 @@
-module nonce_extractor #(parameter NUMPROCESSORS=10)//, parameter NONCESPACE=(1<<6),parameter PARTITIONBITS=$clog(NUMPROCESSORS))//,parameter NONCESPERPROCESSOR=NONCESPACE/NUMPROCESSORS, parameter LEFTOVER=NONCESPACE-NONCESPERPROCESSOR*NUMPROCESSORS)
+module nonce_extractor #(parameter NUMPROCESSORS=10, parameter NONCESPACE=10,parameter PARTITIONBITS=$clog2(NUMPROCESSORS))
 (
 	input logic clk,
 	input logic rst,
 	input logic valid_i,
 	input logic newblock_i,
 	input logic success_i,
-	input logic[10-1:0] processor_index_i,
+	input logic[PARTITIONBITS-1:0] processor_index_i,
 	
 	output logic valid_o,
 	output logic success_o,
 	output logic[31:0] nonce_o
 );
 
-	//logic[31:0] base_nonce;
-	//logic[31:0] numextra;
-
-	reg[31:0] cycles_since_newblock = 0;
-	reg[31:0] nonceout_buf;
-
-	always_ff @(posedge clk) begin
-	  if (valid_i && newblock_i) 
-		cycles_since_newblock <= 0;
-	end
-
-	always_ff @(posedge clk) begin
-		if(valid_i && ~newblock_i)
-			cycles_since_newblock <= cycles_since_newblock + NUMPROCESSORS;
-			nonceout_buf <= cycles_since_newblock + processor_index_i;
-	end
-
-	
-	/*always_comb begin
-	  numextra=(processor_index>LEFTOVER)?LEFTOVER:processor_index;
-	  base_nonce= NONCESPERPROCESSOR*processor_index+numextra;
-	end*/
-
-
-	assign nonce_o = nonceout_buf;
 	 
-/*	logic[31:0] count_old;
+	logic[31:0] count_old;
 	logic[31:0] count_new;
 	ff #(.WIDTH(32)) f(.clk,.data_i(count_new),.data_o(count_old));
 
 	logic[31:0] calculated_count;
-	assign count_new=(newblock&valid_i)?0:(count_old+valid_i);
+	assign count_new=valid_i?count_old:(newblock_i?0:(count_old+NUMPROCESSORS));
 
 	logic[31:0] nonce_tmp;
-	assign nonce_tmp=new_count+base_nonce;
+	assign nonce_tmp=count_new+ processor_index_i;
+	
+	logic is_valid;
+	assign is_valid=(count_new > (NONCESPACE - NUMPROCESSORS))?1:0;
 
-	rff #(.WIDTH(1)) vff(.clk,.rst,.data_i(valid_i),.data_o(valid_o));
-	rff #(.WIDTH(1)) nbff(.clk,.rst,.data_i(newblock_i),.data_o(newblock_o));
-	rff #(.WIDTH(1)) sff(.clk,.rst,.data_i(success_i),.data_o(success_o));
-	rff #(.WIDTH(32)) nff(.clk,.rst,.data_i(nonce_tmp),.data_o(nonce));*/
+	logic is_success;
+	assign is_success = (success_i)?(is_valid?1:0):0;
+	
+	logic [31:0] nonce_tmp2;
+	assign nonce_tmp2 = (success_i)?nonce_tmp:0;
+
+	rff #(.WIDTH(1)) vff(.clk,.rst,.data_i(is_valid),.data_o(valid_o));
+	//rff #(.WIDTH(1)) vff(.clk,.rst,.data_i(valid_i),.data_o(valid_o));
+	//rff #(.WIDTH(1)) nbff(.clk,.rst,.data_i(newblock_i),.data_o(newblock_o));
+	ff #(.WIDTH(1)) sff(.clk,.rst,.data_i(is_success),.data_o(success_o));
+	ff #(.WIDTH(32)) nff(.clk,.rst,.data_i(nonce_tmp2),.data_o(nonce_o));
 endmodule
