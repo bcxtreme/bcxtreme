@@ -10,8 +10,8 @@ module bcminer #(parameter BROADCAST_CNT = 100, parameter ROUND_PIPELINE_DEPTH=1
 	parameter LOG2_NUM_CORES = $clog2(NUM_CORES);
 	parameter LOG2_BROADCAST_CNT = $clog2(BROADCAST_CNT);
 
-	bit validOut, newBlockOut, resultValidd, success;
-	bit[31:0] nonce;
+	logic validOut, newBlockOut, resultValid, success;
+	logic[31:0] nonce;
 
 	coreInputsIfc blockData(clk);
 	processorResultsIfc outData(clk);
@@ -57,7 +57,8 @@ module bcminer #(parameter BROADCAST_CNT = 100, parameter ROUND_PIPELINE_DEPTH=1
 		.newBlockOut
 	);
 
-	nonce_decoder #(.NUM_CORES(NUM_CORES)) ndecode (
+	// XXX: Not sure what nonce space is...
+	nonce_decoder #(.NUM_CORES(NUM_CORES), .BROADCAST_CNT(BROADCAST_CNT) ) ndecode (
 		.clk,
 		.rst(chip.rst),
 		.valid_i(validOut),
@@ -65,14 +66,14 @@ module bcminer #(parameter BROADCAST_CNT = 100, parameter ROUND_PIPELINE_DEPTH=1
 		.rawinput_i(outData.reader),
 		.valid_o(resultValid),
 		.success_o(success),
-		.nonce
+		.nonce_o(nonce)
 	);
 
 
 	assign chip.resultValid = resultValid;
 	assign chip.success = success;
-	assign nonBufWrt.nonce = validOut;
-	assign nonBufWrt.overflow = 1'b0;
+	assign nonBufWrt.nonce = (& nonce);
+	assign nonBufWrt.overflow = newBlockOut;
 
 endmodule
 	

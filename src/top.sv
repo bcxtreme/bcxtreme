@@ -5,7 +5,7 @@ module top();
 	bit clk = 0;
 	always #5 clk = ~clk;
 
-	parameter BROADCAST_CNT = 256;
+	parameter BROADCAST_CNT = 512;
 	parameter ROUND_PIPELINE_DEPTH = 3;
 	parameter NUM_CORES = 10;
 

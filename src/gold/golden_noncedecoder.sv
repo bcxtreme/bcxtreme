@@ -4,13 +4,13 @@ class golden_noncedecoder #(parameter NUMPROCESSORS=10,parameter INDEXBITS=$clog
 
 	bit valid_i;
 	bit newblock_i;
-	bit success_i
+	bit success_i;
 	bit[INDEXBITS-1:0] index_i;
 
 	// Output Interface
-	bit valid_o
+	bit valid_o;
 	bit success_o;
-	bit[31:0] nonce_o
+	bit[31:0] nonce_o;
 	
 	// Buffers for storing nonce
 	local bit valid;
@@ -43,7 +43,7 @@ class golden_noncedecoder #(parameter NUMPROCESSORS=10,parameter INDEXBITS=$clog
 				valid_o = 1'b0;
 			end
 			
-			if(valid_0) begin
+			if(valid_o) begin
 				success_o = 1'b1;
 			end			
 			else begin
