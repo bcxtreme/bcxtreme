@@ -13,8 +13,6 @@ module nonce_decoder #(parameter NUM_CORES=10, parameter BROADCAST_CNT=100)
 	parameter PARTITIONBITS = $clog2(NUM_CORES);
 	parameter TARGET = BROADCAST_CNT * NUM_CORES;
 
-	wire success_i = rawinput_i.success;
-	wire [PARTITIONBITS - 1 : 0] processor_index_i = rawinput_i.nonce_prefix;
 
 	logic is_last_reading_new, is_last_reading_old;
 	logic is_reading_old, is_reading_new;
@@ -24,7 +22,7 @@ module nonce_decoder #(parameter NUM_CORES=10, parameter BROADCAST_CNT=100)
 	logic success_new, success_old;
 
 	// found_new_nonce: true if we found a valid nonce this cycle
-	logic found_new_nonce = success_i & is_reading_old;
+	logic found_new_nonce = rawinput_i.success & is_reading_old;
 
 	// is_last_reading: 1 when we are reading in the last valid input
 	rff #(.WIDTH(1)) last_reading_ff(.clk, .rst, .data_i(is_last_reading_new), .data_o(is_last_reading_old));
@@ -53,7 +51,7 @@ module nonce_decoder #(parameter NUM_CORES=10, parameter BROADCAST_CNT=100)
 	end
 
 	// nonce_tmp: the nonce of the current inputs, possibly
-	assign nonce_tmp=count_new + processor_index_i;
+	assign nonce_tmp=count_new + rawinput_i.nonce_prefix;
 
 	// validNonce: hold the last correct nonce
 	rff #(.WIDTH(32)) validNonce_ff(.clk, .rst, .data_i(validNonce_new), .data_o(validNonce_old));
@@ -61,7 +59,7 @@ module nonce_decoder #(parameter NUM_CORES=10, parameter BROADCAST_CNT=100)
 
 	// success: True when we found a bitcoin during this session
 	rff #(.WIDTH(1)) success_ff(.clk, .rst, .data_i(success_new), .data_o(success_old));
-	assign success_new = is_reading_old & (success_i);
+	assign success_new = is_reading_old & (rawinput_i.success);
 
 	assign valid_o = is_last_reading_old;
 	assign success_o = is_last_reading_old & success_old;
