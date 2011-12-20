@@ -1,6 +1,6 @@
 
 
-module bcminer #(parameter LOG2_BROADCAST_CNT = 4, parameter ROUND_PIPELINE_DEPTH=1, parameter NUM_CORES=10)
+module bcminer #(parameter BROADCAST_CNT = 100, parameter ROUND_PIPELINE_DEPTH=1, parameter NUM_CORES=10)
 (
 	input clk,
 	minerIfc.dut chip,
@@ -8,6 +8,8 @@ module bcminer #(parameter LOG2_BROADCAST_CNT = 4, parameter ROUND_PIPELINE_DEPT
 	nonceBufferIfc.writer nonBufWrt
 );
 	parameter LOG2_NUM_CORES = $clog2(NUM_CORES);
+	parameter LOG2_BROADCAST_CNT = $clog2(BROADCAST_CNT);
+
 	bit validOut, newBlockOut, resultValidd, success;
 	bit[31:0] nonce;
 

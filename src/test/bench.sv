@@ -1,6 +1,6 @@
 
 
-program bench #(parameter LOG2_BROADCAST_CNT=6, parameter DELAY_C = 129, parameter NUM_CORES = 1)
+program bench #(parameter BROADCAST_CNT=100, parameter DELAY_C = 129, parameter NUM_CORES = 1)
 (
 	input clk,
 	minerIfc.bench chip,
@@ -12,7 +12,7 @@ program bench #(parameter LOG2_BROADCAST_CNT=6, parameter DELAY_C = 129, paramet
 
 	environ env;
 	inputs inp;
-	golden_bcminer #(.LOG2_BROADCAST_CNT(LOG2_BROADCAST_CNT), .DELAY_C(DELAY_C), .NUM_CORES(NUM_CORES)) gb;
+	golden_bcminer #(.BROADCAST_CNT(BROADCAST_CNT), .DELAY_C(DELAY_C), .NUM_CORES(NUM_CORES)) gb;
 
 	task set_rst(bit val);
 		gb.rst_i = val;
@@ -151,7 +151,7 @@ program bench #(parameter LOG2_BROADCAST_CNT=6, parameter DELAY_C = 129, paramet
 			if (chip.cb.resultValid)
 				$display("* RESULT [DUT]: %b", chip.cb.success);
 
-			if (ix_result == (1<<LOG2_BROADCAST_CNT)*$size(env.blocks)) return;
+			if (ix_result == (BROADCAST_CNT)*$size(env.blocks)) return;
 		end
 	endtask
 
