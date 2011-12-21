@@ -1,0 +1,27 @@
+
+The layout of files follows the following scheme:
+---
+
+/test 
+Contains early versions of golden models and interfaces that were used to 
+refine and test the functional specification as it was developed
+
+/src
+Contains the actual implementation, golden models, testbenches and stim files
+for the bitcoin project
+
+/doc 
+Contains the documentation that covers the various aspects of design, 
+testing and use
+
+/reference
+Contains a C implementation of customized reference implementation of a bitcoin miner that 
+calculates intermediate values for the processes for initial verification of the golden models
+and bitcoin implementation
+
+CALCULATIONS
+Desribes some of the decisions that guided design in terms of stages, pipeline depth, area and 
+ultimately performance
+
+
+ 
