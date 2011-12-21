@@ -21,8 +21,10 @@ DUT=$(NONCEDECODER) $(NONCEBUFFER) $(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) $(LATTI
 SHACORE_TOP=shacore_top.sv
 SHACORE_BENCH=test/shacore/*.sv
 
-CODECOVERFLAGS=-lca -cm line+cond+fsm+tgl+path
-VCS=vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all $(CODECOVERFLAGS)
+COVERF=line
+CODECOVERFLAGS=-cm $(COVERF)
+VCS=vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all $(CODECOVERFLAGS) -lca
+URG=urg -dir simulator.exe.cm -grade -format text -lca
 
 .PHONY: help clean bench shacore_bench test
 
@@ -35,6 +37,8 @@ shacore_bench:
 
 test: bench
 	./simulator.exe
+cover: bench
+	$(URG)
 
 help:
 	@echo "The following make targets are supported:"; \
