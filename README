@@ -54,4 +54,8 @@ Desribes some of the decisions that guided design in terms of stages, pipeline d
 ultimately performance
 
 
- 
+/reports
+   Contains the synthesis reports from the SHA Core.  The design compiler failed to compile 
+our full design no matter how lightly we set the optimization and contraint settings.  Thus 
+since the SHA core is the bottleneck of our design, more specifically the sha round, we have 
+included reports from synthesis of both.
