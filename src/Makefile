@@ -19,7 +19,8 @@ DUT=$(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) $(LATTICE) bcminer.sv
 SHACORE_TOP=shacore_top.sv
 SHACORE_BENCH=test/shacore/*.sv
 
-VCS=vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all
+CODECOVERFLAGS=-lca -cm line+cond+fsm+tgl+path
+VCS=vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all $(CODECOVERFLAGS)
 
 .PHONY: help clean bench shacore_bench test
 
