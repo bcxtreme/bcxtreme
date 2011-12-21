@@ -1,5 +1,5 @@
 
-module lattice_core #(parameter COUNTBITS = 6, parameter INDEX = 0, parameter ROUND_PIPELINE_DEPTH = 1)
+module lattice_core #(parameter INDEX = 0, parameter ROUND_PIPELINE_DEPTH = 3)
 (
 	input clk,
 	input rst,
@@ -25,7 +25,7 @@ module lattice_core #(parameter COUNTBITS = 6, parameter INDEX = 0, parameter RO
 		.success(data_o.success)
 	);
 
-	assign data_o.nonce_prefix = INDEX;
+	assign data_o.processor_index = INDEX;
 
 endmodule
 		

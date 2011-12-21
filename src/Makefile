@@ -1,7 +1,8 @@
 TOP=top.sv
 INTERFACES=interfaces/blockStoreIfc.sv interfaces/nonceBufferIfc.sv interfaces/minerIfc.sv \
            interfaces/coreInputsIfc.sv interfaces/processorResultsIfc.sv
-GOLD=gold/golden_noncedecoder.sv gold/SHA256.sv gold/golden_hashvalidator.sv gold/golden_sha.sv gold/golden_blockstorage.sv gold/golden_bcminer.sv
+GOLD=gold/golden_noncebuffer.sv gold/golden_noncedecoder.sv gold/SHA256.sv \
+     gold/golden_hashvalidator.sv gold/golden_sha.sv gold/golden_blockstorage.sv gold/golden_bcminer.sv
 BENCH=test/inputs.sv test/environ.sv test/bench.sv
 
 SHARED=shared/*.sv
@@ -14,14 +15,15 @@ LATTICE=implementation/lattice_ff_input.sv implementation/lattice_ff_output.sv \
         implementation/lattice_core.sv implementation/lattice_core_last.sv \
         implementation/lattice_block.sv implementation/lattice_block_first.sv implementation/lattice_block_last.sv
 NONCEDECODER=implementation/nonce_decoder.sv
-DUT=$(NONCEDECODER) $(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) $(LATTICE) bcminer.sv
+NONCEBUFFER=implementation/nonce_buffer.sv
+DUT=$(NONCEDECODER) $(NONCEBUFFER) $(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) $(LATTICE) bcminer.sv
 
 SHACORE_TOP=shacore_top.sv
 SHACORE_BENCH=test/shacore/*.sv
 
 VCS=vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all
 
-.PHONY: help clean bench shacore_bench test
+.PHONY: help clean bench shacore_bench test sharound_syn messageround_syn synthesis
 
 
 bench:
@@ -32,6 +34,19 @@ shacore_bench:
 
 test: bench
 	./simulator.exe
+
+synthesis: sharound_syn messageround_syn
+	dc_shell -f dsyn.tcl
+
+sharound_syn:
+	cd shacore/precompiled/sharound;\
+	dc_shell -f dsyn.tcl;\
+	cd ../../..;
+
+messageround_syn:
+	cd shacore/precompiled/messageschedule;\
+	dc_shell -f dsyn.tcl;\
+	cd ../../..;
 
 help:
 	@echo "The following make targets are supported:"; \

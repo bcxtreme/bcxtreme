@@ -1,15 +1,17 @@
 module nonce_decoder_stim;
 
-bit clk = 0;
+logic clk = 0;
 int ticks = 0;
 
 logic rst;
 
 logic valid_i, newblock_i, success_o, valid_o;
-processorResultsIfc #(.PARTITIONBITS(4)) rawinput(clk);
+processorResultsIfc #(.NUM_CORES(4)) rawinput(clk);
 logic [31:0] nonce_o;
 
-nonce_decoder test(
+default clocking cb @(posedge clk);
+endclocking
+nonce_decoder #(.BROADCAST_CNT(10), .NUM_CORES(4)) test(
 	.clk,
 	.rst,
 	.valid_i,
@@ -19,44 +21,46 @@ nonce_decoder test(
 	.success_o,
 	.nonce_o
 );
-
-string header;
-
 initial begin
   $vcdpluson;
-  rawinput.nonce_prefix = 5;
+  rawinput.processor_index = 2;
   rawinput.success = 0;
 
   $display( "Direct stim initialized" );  
-  header = "[rst] [valid_i] [newblock_i]  [success_i] [nonce_prefix_i]      [valid_o] [success_o]  [nonce_o]       ticks|clock";
-  $display( header );
+  $display("[rst] [valid_i] [newblock_i]  [success_i] [nonce_prefix_i]      [valid_o] [success_o]  [nonce_o]       ticks|clock");
   $monitor( "    %d       %d         %d            %d           %d              %d          %d   %d|%d",
-            rst, valid_i, newblock_i, rawinput.success, rawinput.nonce_prefix, valid_o, success_o, nonce_o, ticks, clk );
+            rst, valid_i, newblock_i, rawinput.success, rawinput.processor_index, valid_o, success_o, nonce_o, ticks, clk );
   
   clk = 0;
   ticks = 0;
   rst = 1;
-  #2
+  ##1
   rst = 0;
   valid_i = 0;
   newblock_i = 0;
   rawinput.success = 0;
-  rawinput.nonce_prefix = 1;
 
-  #6;
+  ##6;
   
   valid_i = 1;
   newblock_i = 1;
 
-  #2
+  ##1
 
   newblock_i = 0;
 
-  #30
-
+  ##10
+  newblock_i=1;
+  ##1
+  newblock_i=0;
+  ##5
+  rawinput.success=1;
+  ##1
+  rawinput.success=0;
+  ##5
   valid_i = 0;
 
-  #4
+  ##4
 
   $finish; 
 

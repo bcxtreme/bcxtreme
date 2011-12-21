@@ -1,5 +1,5 @@
 
-module lattice_block_last #(parameter LOG2_NUM_CORES = 1, parameter INDEX = 0, parameter DELAY_C = 0, parameter ROUND_PIPELINE_DEPTH=1)
+module lattice_block_last #(parameter NUM_CORES = 10, parameter INDEX = 0, parameter DELAY_C = 0, parameter ROUND_PIPELINE_DEPTH=1)
 (
 	input clk,
 	input rst,
@@ -13,9 +13,9 @@ module lattice_block_last #(parameter LOG2_NUM_CORES = 1, parameter INDEX = 0, p
 	output validOut,
 	output newBlockOut
 );
-	processorResultsIfc #(.PARTITIONBITS(LOG2_NUM_CORES)) tmp(clk);
+	processorResultsIfc #(.NUM_CORES(NUM_CORES)) tmp(clk);
 	
-	lattice_core_last #(.COUNTBITS(LOG2_NUM_CORES), .DELAY_C(DELAY_C), .INDEX(INDEX), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) core (
+	lattice_core_last #(.INDEX(INDEX), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) core (
 		.clk,
 		.rst,
 		.data_i(inputs_i),
@@ -24,7 +24,7 @@ module lattice_block_last #(parameter LOG2_NUM_CORES = 1, parameter INDEX = 0, p
 		.newBlockOut
 	);
 
-	lattice_ff_output #(.COUNTBITS(LOG2_NUM_CORES)) ffo (
+	lattice_ff_output #(.COUNTBITS($clog2(NUM_CORES))) ffo (
 		.clk,
 		.outputs_i,
 		.this_stage(tmp.reader),

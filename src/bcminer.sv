@@ -1,6 +1,6 @@
 
 
-module bcminer #(parameter BROADCAST_CNT = 1024, parameter ROUND_PIPELINE_DEPTH=1, parameter NUM_CORES=10)
+module bcminer #(parameter BROADCAST_CNT = 1024, parameter ROUND_PIPELINE_DEPTH=3, parameter NUM_CORES=10)
 (
 	input clk,
 	minerIfc.dut chip,
@@ -23,9 +23,9 @@ module bcminer #(parameter BROADCAST_CNT = 1024, parameter ROUND_PIPELINE_DEPTH=
 	);
 
 	coreInputsIfc inGlue[NUM_CORES - 2:0](clk);
-	processorResultsIfc #(.PARTITIONBITS(LOG2_NUM_CORES)) outGlue[NUM_CORES - 2:0](clk);
+	processorResultsIfc #(.NUM_CORES(NUM_CORES)) outGlue[NUM_CORES - 2:0](clk);
 
-	lattice_block_first #(.LOG2_NUM_CORES(LOG2_NUM_CORES), .INDEX(0), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) lblock_first (
+	lattice_block_first #(.NUM_CORES(NUM_CORES),.INDEX(0), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) lblock_first (
 		.clk,
 		.rst(chip.rst),
 		.inputs_i(blockData.reader),
@@ -35,7 +35,7 @@ module bcminer #(parameter BROADCAST_CNT = 1024, parameter ROUND_PIPELINE_DEPTH=
 
 	generate
 	for (genvar i = 1; i < NUM_CORES - 1; i++) begin
-		lattice_block #(.LOG2_NUM_CORES(LOG2_NUM_CORES), .INDEX(i), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) lblock (
+		lattice_block #(.NUM_CORES(NUM_CORES),.INDEX(i), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) lblock (
 			.clk,
 			.rst(chip.rst),
 			.inputs_i(inGlue[i - 1].reader),
@@ -46,7 +46,7 @@ module bcminer #(parameter BROADCAST_CNT = 1024, parameter ROUND_PIPELINE_DEPTH=
 	end
 	endgenerate
 		
-	lattice_block_last #(.LOG2_NUM_CORES(LOG2_NUM_CORES), .INDEX(NUM_CORES - 1), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) lblock_last (
+	lattice_block_last #(.NUM_CORES(NUM_CORES), .INDEX(NUM_CORES - 1), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) lblock_last (
 		.clk,
 		.rst(chip.rst),
 		.inputs_i(inGlue[NUM_CORES - 2].reader),
@@ -56,23 +56,35 @@ module bcminer #(parameter BROADCAST_CNT = 1024, parameter ROUND_PIPELINE_DEPTH=
 		.newBlockOut
 	);
 
-	// XXX: Not sure what nonce space is...
+	logic decoder_valid;
+	logic decoder_success;
+	logic[31:0] decoder_nonce;
 	nonce_decoder #(.NUM_CORES(NUM_CORES), .BROADCAST_CNT(BROADCAST_CNT) ) ndecode (
 		.clk,
 		.rst(chip.rst),
 		.valid_i(validOut),
 		.newblock_i(newBlockOut),
 		.rawinput_i(outData.reader),
-		.valid_o(resultValid),
-		.success_o(success),
-		.nonce_o(nonce)
+		.valid_o(decoder_valid),
+		.success_o(decoder_success),
+		.nonce_o(decoder_nonce)
 	);
 
+	nonce_buffer nbuffer (
+		.clk,
+		.rst(chip.rst),
+		.valid(decoder_valid),
+		.valid_o(resultValid),
+		.success(decoder_success),
+		.success_o(success),
+		.nonce_i(decoder_nonce),
+		.readready(nonBufWrt.readReady),
+		.nonce_o(nonBufWrt.nonce),
+		.error(nonBufWrt.error)
+	);
 
 	assign chip.resultValid = resultValid;
 	assign chip.success = success;
-	assign nonBufWrt.nonce = (& nonce);
-	assign nonBufWrt.overflow = newBlockOut;
 
 endmodule
 	

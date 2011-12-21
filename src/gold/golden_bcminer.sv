@@ -15,7 +15,7 @@ class golden_bcminer  #(parameter BROADCAST_CNT = 100, parameter DELAY_C = 129, 
 	// Nonce Buffer Interface
 	bit readReady_i;
 	bit nonce_o;
-	bit overflow_o;
+	bit error_o;
 
 	// Golden units
 	local golden_blockstorage #(.BROADCAST_CNT(BROADCAST_CNT)) gblock;
@@ -23,7 +23,8 @@ class golden_bcminer  #(parameter BROADCAST_CNT = 100, parameter DELAY_C = 129, 
 	// NOTE: Previously, the index was hard-coded to 32'h42a14600
 	local golden_sha #(.DELAY_C(DELAY_C + NUM_CORES - 1), .NUM_CORES(NUM_CORES)) sha[NUM_CORES];
 	local golden_hashvalidator hval[NUM_CORES];
-	local golden_noncedecoder #(.NUMPROCESSORS(NUM_CORES), .NONCESPACE($clog2(BROADCAST_CNT))) ndec;
+	local golden_noncedecoder #(.NUMPROCESSORS(NUM_CORES), .NONCESPACE(BROADCAST_CNT*NUM_CORES)) ndec;
+	local golden_noncebuffer nbuf;
 
 	// Reset the output pins and the internal state
 	task reset();
@@ -31,7 +32,7 @@ class golden_bcminer  #(parameter BROADCAST_CNT = 100, parameter DELAY_C = 129, 
 		resultValid_o = 0;
 		success_o = 0;
 		nonce_o = 0;
-		overflow_o = 0;
+		error_o = 0;
 
 		gblock = new();
 		for (int i = 0; i < NUM_CORES; i++) begin
@@ -39,6 +40,7 @@ class golden_bcminer  #(parameter BROADCAST_CNT = 100, parameter DELAY_C = 129, 
 			hval[i] = new();
 		end
 		ndec = new();
+		nbuf = new();
 	endtask
 
 	// Simulate a cycle
@@ -95,11 +97,17 @@ class golden_bcminer  #(parameter BROADCAST_CNT = 100, parameter DELAY_C = 129, 
 
 		ndec.cycle();
 
-		resultValid_o = ndec.valid_o;
-		success_o = ndec.success_o;
-		nonce_o = (& ndec.nonce_o);
-		// DEBUG:
-		overflow_o = newBlock;
+		// Nonce Buffer
+		nbuf.validIn_i = ndec.valid_o;
+		nbuf.successIn_i = ndec.success_o;
+		nbuf.nonceIn_i = ndec.nonce_o;
+
+		nbuf.cycle();
+
+		resultValid_o = nbuf.validOut_o;
+		success_o = nbuf.successOut_o;
+		nonce_o = nbuf.nonceOut_o;
+		error_o = nbuf.error_o;
 	endtask
 
 endclass

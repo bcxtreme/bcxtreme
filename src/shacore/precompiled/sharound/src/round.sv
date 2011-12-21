@@ -1,4 +1,4 @@
-module sha_round #(parameter PIPELINE_DEPTH=1) (
+module sha_round #(parameter PIPELINE_DEPTH=3) (
 input logic clk,
 input HashState in,
 output HashState out,

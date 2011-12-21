@@ -40,13 +40,13 @@ set CLK "clk"                  ;# The name of your clock
 set virtual 0                        ;# 1 if virtual clock, 0 if real clock
 
 # Timing and loading information                
-set clkPeriod_ns 2     ;# desired clock period (in ns) 
+set clkPeriod_ns 1     ;# desired clock period (in ns) 
 
 # Input delay tells DC how long after the clock before an input becomes
 # valid. 
 set inDelay_ns [expr $clkPeriod_ns*.1]  ;# delay from clock to inputs valid
 set outDelay_ns [expr $clkPeriod_ns*.1] ;# delay from clock to output valid
-set inputDrive INVX16_LVT
+set inputDrive INVX16
 set LoadLib $design_db         ;# name of library the cell comes from
 set myLoadPin "ZN"             ;# name of pin that the outputs drive
 set CLK_SKEW 0.10
@@ -152,7 +152,7 @@ check_design
 # and do a second compile with incremental mapping        
 # or use the compile_ultra meta-command        
 if {  $useUltra == 1 } {
-   compile_ultra -retime
+     compile_ultra -retime
 } else {
    if {  $useUngroup == 1 } {
      compile -ungroup_all -map_effort $mapEffort1
@@ -162,6 +162,8 @@ if {  $useUltra == 1 } {
      compile -incremental_mapping -map_effort $mapEffort2
   }
 }
+
+compile -incremental_mapping -map_effort high
 
 report_constraint -all_violators
 
