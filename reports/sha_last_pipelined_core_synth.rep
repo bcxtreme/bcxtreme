@@ -1,0 +1,166 @@
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : sha_last_pipelined_core
+Version: D-2010.03-SP1
+Date   : Wed Dec 21 00:07:11 2011
+****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
+
+Operating Conditions: TYPICAL   Library: saed90nm_typ
+Wire Load Model Mode: enclosed
+
+  Startpoint: in.w1[10] (input port clocked by clk)
+  Endpoint: pre/genblk3[0].s/r/genblk1[0].hsf/out_reg[e][31]
+            (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  sha_last_pipelined_core
+                     8000000               saed90nm_typ
+  sha_eADDER_14_DW01_add_3
+                     8000                  saed90nm_typ
+  sha_eADDER_14      8000                  saed90nm_typ
+  sha_eADDER_14_DW01_add_1
+                     8000                  saed90nm_typ
+  sha_round_PIPELINE_DEPTH1_14
+                     35000                 saed90nm_typ
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock clk (rise edge)                                   0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  input external delay                                    1.50       1.50 r
+  in.w1[10] (in)                                          0.00       1.50 r
+  pre/in.w1[10] (sha_pipelined_pre_pipeline_PROCESSORINDEX0_NUMPROCESSORS1_ROUND_PIPELINE_DEPTH1I_in_coreInputsIfc_reader_)
+                                                          0.00       1.50 r
+  pre/genblk3[0].s/W[10] (sha_pipelined_pre_stage_428a2f98_1)
+                                                          0.00       1.50 r
+  pre/genblk3[0].s/r/W[10] (sha_round_PIPELINE_DEPTH1_14)
+                                                          0.00       1.50 r
+  pre/genblk3[0].s/r/ead/W[10] (sha_eADDER_14)            0.00       1.50 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/B[10] (sha_eADDER_14_DW01_add_3)
+                                                          0.00       1.50 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U1_10/CO (FADDX1)
+                                                          7.82       9.32 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U1_11/CO (FADDX1)
+                                                          0.27       9.59 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U1_12/CO (FADDX1)
+                                                          0.26       9.85 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U4/QN (NAND2X0)
+                                                          0.08       9.93 f
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U6/QN (NAND3X0)
+                                                          0.11      10.04 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U1_14/CO (FADDX1)
+                                                          0.27      10.31 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U20/QN (NAND2X0)
+                                                          0.08      10.39 f
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U22/QN (NAND3X0)
+                                                          0.11      10.50 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U1_16/CO (FADDX1)
+                                                          0.27      10.76 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U25/QN (NAND2X0)
+                                                          0.08      10.84 f
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U27/QN (NAND3X0)
+                                                          0.11      10.95 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U30/QN (NAND2X0)
+                                                          0.08      11.03 f
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U31/QN (NAND3X0)
+                                                          0.11      11.14 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U36/QN (NAND2X0)
+                                                          0.08      11.22 f
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U37/QN (NAND3X0)
+                                                          0.11      11.33 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U1_20/CO (FADDX1)
+                                                          0.27      11.61 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U1_21/CO (FADDX1)
+                                                          0.27      11.87 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U1_22/CO (FADDX1)
+                                                          0.26      12.14 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U9/QN (NAND2X0)
+                                                          0.08      12.22 f
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U11/QN (NAND3X0)
+                                                          0.10      12.32 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U15/QN (NAND2X0)
+                                                          0.08      12.40 f
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U17/QN (NAND3X0)
+                                                          0.11      12.51 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U1_25/CO (FADDX1)
+                                                          0.27      12.78 r
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/U1_26/S (FADDX1)
+                                                          0.28      13.07 f
+  pre/genblk3[0].s/r/ead/add_4_root_add_0_root_add_10_5/SUM[26] (sha_eADDER_14_DW01_add_3)
+                                                          0.00      13.07 f
+  pre/genblk3[0].s/r/ead/add_1_root_add_0_root_add_10_5/B[26] (sha_eADDER_14_DW01_add_1)
+                                                          0.00      13.07 f
+  pre/genblk3[0].s/r/ead/add_1_root_add_0_root_add_10_5/U1_26/CO (FADDX1)
+                                                          0.35      13.41 f
+  pre/genblk3[0].s/r/ead/add_1_root_add_0_root_add_10_5/U1_27/CO (FADDX1)
+                                                          0.27      13.68 f
+  pre/genblk3[0].s/r/ead/add_1_root_add_0_root_add_10_5/U1_28/CO (FADDX1)
+                                                          0.27      13.95 f
+  pre/genblk3[0].s/r/ead/add_1_root_add_0_root_add_10_5/U1_29/CO (FADDX1)
+                                                          0.27      14.22 f
+  pre/genblk3[0].s/r/ead/add_1_root_add_0_root_add_10_5/U1_30/CO (FADDX1)
+                                                          0.26      14.47 f
+  pre/genblk3[0].s/r/ead/add_1_root_add_0_root_add_10_5/U1_31/Q (XOR3X1)
+                                                          0.14      14.62 f
+  pre/genblk3[0].s/r/ead/add_1_root_add_0_root_add_10_5/SUM[31] (sha_eADDER_14_DW01_add_1)
+                                                          0.00      14.62 f
+  pre/genblk3[0].s/r/ead/add_0_root_add_0_root_add_10_5/B[31] (sha_eADDER_14_DW01_add_0)
+                                                          0.00      14.62 f
+  pre/genblk3[0].s/r/ead/add_0_root_add_0_root_add_10_5/U10/Q (XNOR3X1)
+                                                          0.23      14.84 r
+  pre/genblk3[0].s/r/ead/add_0_root_add_0_root_add_10_5/SUM[31] (sha_eADDER_14_DW01_add_0)
+                                                          0.00      14.84 r
+  pre/genblk3[0].s/r/ead/e[31] (sha_eADDER_14)            0.00      14.84 r
+  pre/genblk3[0].s/r/genblk1[0].hsf/in[e][31] (HashStateFF_14)
+                                                          0.00      14.84 r
+  pre/genblk3[0].s/r/genblk1[0].hsf/out_reg[e][31]/D (DFFX1)
+                                                          0.03      14.88 r
+  data arrival time                                                 14.88
+
+  clock clk (rise edge)                                  15.00      15.00
+  clock network delay (ideal)                             0.00      15.00
+  pre/genblk3[0].s/r/genblk1[0].hsf/out_reg[e][31]/CLK (DFFX1)
+                                                          0.00      15.00 r
+  library setup time                                     -0.07      14.93
+  data required time                                                14.93
+  --------------------------------------------------------------------------
+  data required time                                                14.93
+  data arrival time                                                -14.88
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.06
+
+
+1
+ 
+****************************************
+Report : area
+Design : sha_last_pipelined_core
+Version: D-2010.03-SP1
+Date   : Wed Dec 21 00:07:11 2011
+****************************************
+
+Library(s) Used:
+
+    saed90nm_typ (File: /sim/synopsys/SAED_EDK90nm/Digital_Standard_Cell_Library/synopsys/models/saed90nm_typ.db)
+
+Number of ports:              646
+Number of nets:             88661
+Number of cells:              130
+Number of references:         121
+
+Combinational area:       2077916.753273
+Noncombinational area:    2279923.171759
+Net Interconnect area:    880690.125663
+
+Total cell area:          4357839.925032
+Total area:               5238530.050695
+1
