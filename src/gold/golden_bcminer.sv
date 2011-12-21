@@ -15,7 +15,7 @@ class golden_bcminer  #(parameter BROADCAST_CNT = 100, parameter DELAY_C = 129, 
 	// Nonce Buffer Interface
 	bit readReady_i;
 	bit nonce_o;
-	bit overflow_o;
+	bit error_o;
 
 	// Golden units
 	local golden_blockstorage #(.BROADCAST_CNT(BROADCAST_CNT)) gblock;
@@ -32,7 +32,7 @@ class golden_bcminer  #(parameter BROADCAST_CNT = 100, parameter DELAY_C = 129, 
 		resultValid_o = 0;
 		success_o = 0;
 		nonce_o = 0;
-		overflow_o = 0;
+		error_o = 0;
 
 		gblock = new();
 		for (int i = 0; i < NUM_CORES; i++) begin
@@ -107,7 +107,7 @@ class golden_bcminer  #(parameter BROADCAST_CNT = 100, parameter DELAY_C = 129, 
 		resultValid_o = nbuf.validOut_o;
 		success_o = nbuf.successOut_o;
 		nonce_o = nbuf.nonceOut_o;
-		overflow_o = nbuf.overflow_o;
+		error_o = nbuf.error_o;
 	endtask
 
 endclass

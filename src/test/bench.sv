@@ -47,8 +47,8 @@ program bench #(parameter BROADCAST_CNT=100, parameter DELAY_C = 129, parameter 
 	endtask
 
 	task print_outputs();
-		$display("%d %t:                                                      [writeReady %b] [resultValid %b] [success %b] [nonce %b] [overflow %b]",
-			ix_cycle,$time, blkWrt.cb.writeReady, chip.cb.resultValid, chip.cb.success, nonBufRd.cb.nonce, nonBufRd.cb.overflow);
+		$display("%d %t:                                                      [writeReady %b] [resultValid %b] [success %b] [nonce %b] [error %b]",
+			ix_cycle,$time, blkWrt.cb.writeReady, chip.cb.resultValid, chip.cb.success, nonBufRd.cb.nonce, nonBufRd.cb.error);
 	endtask
 
 	function int verify_outputs();
@@ -68,17 +68,15 @@ program bench #(parameter BROADCAST_CNT=100, parameter DELAY_C = 129, parameter 
 				if (env.verbose) $display("ERROR: GOLD success: %b", gb.success_o);
 				err_count += 1;
 			end
-			//TODO FOR NORMAL OPERATION THESE SHOULD NOT BE INSIDE THIS IF BLOCK BUT SHOULD BE CHECKED REGARDLESS
-			if (gb.nonce_o !== nonBufRd.cb.nonce) begin
-				if (env.verbose) $display("ERROR: GOLD nonce: %b", gb.nonce_o);
-				err_count += 1;
-			end
-			if (gb.overflow_o !== nonBufRd.cb.overflow) begin
-				if (env.verbose) $display("ERROR: GOLD overflow: %b", gb.overflow_o);
-				err_count += 1;
-			end
 		end
-
+		if (gb.nonce_o !== nonBufRd.cb.nonce) begin
+			if (env.verbose) $display("ERROR: GOLD nonce: %b", gb.nonce_o);
+			err_count += 1;
+		end
+		if (gb.error_o !== nonBufRd.cb.error) begin
+			if (env.verbose) $display("ERROR: GOLD error: %b", gb.error_o);
+			err_count += 1;
+		end
 		return err_count;
 	endfunction
 

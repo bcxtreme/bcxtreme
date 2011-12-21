@@ -8,7 +8,7 @@ class golden_noncebuffer;
 	bit readReady_i;
 
 	//OUTPUTS
-	bit overflow_o;
+	bit error_o;
 	bit nonceOut_o;
 	bit validOut_o;
 	bit successOut_o;
@@ -31,7 +31,7 @@ class golden_noncebuffer;
 			storing = 1'b1;
 			if(storing) begin
 				if(clockingout) begin //if second nonce is found before first is clocked out
-					overflow_o = 1'b1;
+					error_o = 1'b1;
 				end
 				else begin
 					buffer = nonceIn_i; //store nonceIn
@@ -43,7 +43,7 @@ class golden_noncebuffer;
 		if(readReady_i) begin
 			clockingout = 1'b1;
 			if(clockingout) begin	
-				clockout_nonce();
+				//clockout_nonce();  TODO
 				for (int i = 0; i < 32; i++) begin		
 					nonceOut_o = buffer[i];//clock out most recent nonce
 				end		

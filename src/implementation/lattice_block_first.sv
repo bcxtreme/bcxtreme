@@ -1,5 +1,5 @@
 
-module lattice_block_first #(parameter LOG2_NUM_CORES = 1, parameter INDEX = 0, parameter ROUND_PIPELINE_DEPTH = 0)
+module lattice_block_first #(parameter NUM_CORES = 1, parameter INDEX = 0, parameter ROUND_PIPELINE_DEPTH = 0)
 (
 	input clk,
 	input rst,
@@ -14,9 +14,9 @@ module lattice_block_first #(parameter LOG2_NUM_CORES = 1, parameter INDEX = 0, 
 );
 
 	wire success;
-	wire [LOG2_NUM_CORES - 1 : 0] prefix;
+	wire [$clog2(NUM_CORES) - 1 : 0] prefix;
 
-	lattice_core #(.COUNTBITS(LOG2_NUM_CORES), .INDEX(INDEX), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) core (
+	lattice_core #( .INDEX(INDEX), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) core (
 		.clk,
 		.rst,
 		.data_i(inputs_i),
