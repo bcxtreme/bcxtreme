@@ -8,6 +8,9 @@ output logic[15:0][31:0] padded,
 output logic valid_o,
 output logic newblock_o);
 
+HashState ffed;
+HashStateFF hsff(.clk,.in(instate),.out(ffed));
+
 rff #(.WIDTH(1)) valid(.clk,.rst,.data_i(valid_i),.data_o(valid_o));
 ff #(.WIDTH(1)) newblock(.clk,.data_i(newblock_i),.data_o(newblock_o));
 
@@ -17,9 +20,6 @@ assign padded[1]=32'd256;
 for(genvar i=2; i<8; i++) begin
    assign padded[i]=32'd0;
 end
-
-HashState ffed;
-HashStateFF hsff(.clk,.in(instate),.out(ffed));
 
 
 assign padded[8]=32'h80000000;

@@ -1,46 +1,42 @@
 class golden_noncebuffer;
-	bit rst;
-		
-	bit validIn;
-	bit success;
-	bit [31:0] nonceIn;
+	
+	bit validIn_i;
+	bit successIn_i;
+	bit [31:0] nonceIn_i;
+	
+	bit readReady_i;
+
+	bit overflow_o;
+	bit nonceOut_o;
+	
 	bit [31:0] buffer;
-	
-	bit overflow;
-	bit nonceOut;
-	
-	bit readReady;
+	bit storing = 1'b0;
+	bit clockingout = 1'b0;
 
-	bit storing = 0;
-	bit clockingout = 0;
-
-	function void noncebuffer_test();
-		if(rst) begin
-			buffer = 0;
+	function void noncebuffer_result();
+		if(validIn_i && successIn_i) begin
+			storing = 1'b1;
+			if(storing) begin
+				if(clockingout) begin //if second nonce is found before first is clocked out
+					overflow_o = 1'b1;
+				end
+				else begin
+					buffer = nonceIn_i; //store nonceIn
+				end
+			end
+			storing = 1'b0;
 		end
-		
-		else begin
-			if(validIn && success) begin
-				storing = 1;
-				if(storing) begin
-					if(clockingout) begin //if second nonce is found before first is clocked out
-						overflow = 1;
-					end
-					else begin
-						buffer = nonceIn; //store nonceIn
-					end
-				end
-				storing = 0;
-			end
 
-			if(readReady) begin
-				clockingout = 1;
-				if(clockingout) begin
-				
-					nonceOut = buffer[0];//clock out most recent nonce
-				end
-				clockingout = 0;
+		if(readReady_i) begin
+			clockingout = 1'b1;
+			if(clockingout) begin			
+				nonceOut_o = buffer[0];//clock out most recent nonce
 			end
+			clockingout = 1'b0;
 		end
 	endfunction
+
+	task cycle();
+		noncebuffer_result();
+	endtask
 endclass

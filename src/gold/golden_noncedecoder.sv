@@ -1,16 +1,17 @@
-class golden_noncedecoder #(parameter NUMPROCESSORS=10,parameter INDEXBITS=$clog2(NUMPROCESSORS),parameter NONCESPACE=(1<<6));
+class golden_noncedecoder #(parameter NUMPROCESSORS=10,parameter NONCESPACE=(1<<6),parameter INDEXBITS=$clog2(NUMPROCESSORS));
+
 
 	// Nonce Input interface
 
 	bit valid_i;
 	bit newblock_i;
-	bit success_i
+	bit success_i;
 	bit[INDEXBITS-1:0] index_i;
 
 	// Output Interface
-	bit valid_o
+	bit valid_o;
 	bit success_o;
-	bit[31:0] nonce_o
+	bit[31:0] nonce_o;
 	
 	// Buffers for storing nonce
 	local bit valid;
@@ -19,51 +20,36 @@ class golden_noncedecoder #(parameter NUMPROCESSORS=10,parameter INDEXBITS=$clog
 	local bit[31:0] nonce;
 
 	// Misc internal state
-	local int cycles_since_newblock;
-
-	function new();
-
-	endfunction
+	local int base_nonce;
+	local bit is_accumulating;
 
 	task cycle();
-
 		if(valid_i) begin
+			if (is_accumulating && base_nonce+NUMPROCESSORS>=NONCESPACE) begin
+				valid_o=1'b1;
+				success_o=success;
+				nonce_o=nonce;
+				is_accumulating = 0;
+			end else 
+				valid_o=1'b0;
+
 			if(newblock_i) begin
-				cycles_since_newblock = 0;
+				base_nonce= 0;
+				success=0;
+				nonce=0;
+				is_accumulating = 1;
 			end
-			else begin
-				cycles_since_newblock = cycles_since_newblock + NUMPROCESSORS;
+			else if (is_accumulating) begin
+				base_nonce = base_nonce + NUMPROCESSORS;
+				if (success_i) begin 
+					nonce = base_nonce + index_i;
+					success = 1'b1;
+				end
 			end
 		
-			if (success_i) begin 
-				nonce_o = cycles_since_newblock + index_i;
-				valid_o = 1'b1;
-			end
-			else begin
-				valid_o = 1'b0;
-			end
 			
-			if(valid_0) begin
-				success_o = 1'b1;
-			end			
-			else begin
-				success_o = 1'b0;
-				nonce_o = 0;
-			end
-
-			/*
-			valid_o=valid;
-			success_o=success;
-			nonce_o=nonce;
-			*/
 		end
 
-	/*	valid=valid_i;
-		success=//TODO: HANDLE THE LOGIC FOR SUCCESS (should only be high once at the end of every block)
-		index=index_i;
-		cycles_since_newblock++;
-		if(newblock&valid) cycles_since_newblock=0;
-		nonce=cycles_since_newblock*NONCESPERPROCESSOR+index;*/
 	endtask
 endclass
 

@@ -1,4 +1,4 @@
-module secondary_ff_array #(parameter LOGNCYCLES=6) (
+module secondary_ff_array #(parameter NCYCLES=6, parameter LOGNCYCLES=$clog2(NCYCLES)) (
 	input logic clk,
 	input logic rst,
 	input logic write,
@@ -15,30 +15,30 @@ logic[351:0] current_state;
 ff #(.WIDTH(352)) storage(.clk,.data_i(current_state),.data_o(initialState));
 assign current_state=reading?inputState:initialState;
 
-logic[LOGNCYCLES:0] round_i;
-logic[LOGNCYCLES:0] round_o;
+logic[LOGNCYCLES:0] next_round;
+logic[LOGNCYCLES:0] round;
 logic[LOGNCYCLES:0] next;
-ff #(.WIDTH(LOGNCYCLES+1)) curr_round(.clk,.data_i(round_i),.data_o(round_o));
-assign next=round_o[LOGNCYCLES]?round_o:round_o+1'd1;
+ff #(.WIDTH(LOGNCYCLES+1)) curr_round(.clk,.data_i(next_round),.data_o(round));
+assign next=(round==NCYCLES)?round:round+1'd1;
 
 always_comb begin
    if(rst) begin
-      round_i=0;
-      round_i[LOGNCYCLES]=1;
+      next_round=NCYCLES;
    end else begin
-      round_i=reading?0:next;
+      next_round=reading?0:next;
    end
 end
 
-assign writeReady=next[LOGNCYCLES];
-assign outputValid=~round_o[LOGNCYCLES];
-assign newBlock=(0==round_o);
+assign writeReady=(next==NCYCLES);
+assign outputValid= (round!=NCYCLES);
+assign newBlock=(round==0);
+
 endmodule
 
 
 
 
-module block_storage #(parameter LOGNCYCLES=6) (
+module block_storage #(parameter NCYCLES=64,parameter LOGNCYCLES=$clog2(NCYCLES)) (
 	input logic clk,
 	input logic rst,
 	blockStoreIfc.reader blkRd,
@@ -58,7 +58,7 @@ module block_storage #(parameter LOGNCYCLES=6) (
 	logic secondaryReady;
 	logic transfer;
 	assign transfer=secondaryReady & rFull;
-	secondary_ff_array #(.LOGNCYCLES(LOGNCYCLES)) sff (
+	secondary_ff_array #(.NCYCLES(NCYCLES)) sff (
 		.clk,
 		.rst,
 		.write(rFull),

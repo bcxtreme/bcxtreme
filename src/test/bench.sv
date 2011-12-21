@@ -1,6 +1,6 @@
 
 
-program bench #(parameter COUNTBITS=6, parameter DELAY_C = 129, parameter NUM_CORES = 1)
+program bench #(parameter BROADCAST_CNT=100, parameter DELAY_C = 129, parameter NUM_CORES = 1)
 (
 	input clk,
 	minerIfc.bench chip,
@@ -12,7 +12,7 @@ program bench #(parameter COUNTBITS=6, parameter DELAY_C = 129, parameter NUM_CO
 
 	environ env;
 	inputs inp;
-	golden_bcminer #(.COUNTBITS(COUNTBITS), .DELAY_C(DELAY_C), .NUM_CORES(NUM_CORES)) gb;
+	golden_bcminer #(.BROADCAST_CNT(BROADCAST_CNT), .DELAY_C(DELAY_C), .NUM_CORES(NUM_CORES)) gb;
 
 	task set_rst(bit val);
 		gb.rst_i = val;
@@ -47,8 +47,8 @@ program bench #(parameter COUNTBITS=6, parameter DELAY_C = 129, parameter NUM_CO
 	endtask
 
 	task print_outputs();
-		$display("%d %t:                                                      [writeReady %b] [resultValid %b] [success %b] [nonce %b] [overflow %b]",
-			ix_cycle,$time, blkWrt.cb.writeReady, chip.cb.resultValid, chip.cb.success, nonBufRd.cb.nonce, nonBufRd.cb.overflow);
+		$display("%d %t:                                                      [writeReady %b] [resultValid %b] [success %b] [nonce %b] [error %b]",
+			ix_cycle,$time, blkWrt.cb.writeReady, chip.cb.resultValid, chip.cb.success, nonBufRd.cb.nonce, nonBufRd.cb.error);
 	endtask
 
 	function int verify_outputs();
@@ -68,17 +68,15 @@ program bench #(parameter COUNTBITS=6, parameter DELAY_C = 129, parameter NUM_CO
 				if (env.verbose) $display("ERROR: GOLD success: %b", gb.success_o);
 				err_count += 1;
 			end
-			//TODO FOR NORMAL OPERATION THESE SHOULD NOT BE INSIDE THIS IF BLOCK BUT SHOULD BE CHECKED REGARDLESS
-			if (gb.nonce_o !== nonBufRd.cb.nonce) begin
-				if (env.verbose) $display("ERROR: GOLD nonce: %b", gb.nonce_o);
-				err_count += 1;
-			end
-			if (gb.overflow_o !== nonBufRd.cb.overflow) begin
-				if (env.verbose) $display("ERROR: GOLD overflow: %b", gb.overflow_o);
-				err_count += 1;
-			end
 		end
-
+		if (gb.nonce_o !== nonBufRd.cb.nonce) begin
+			if (env.verbose) $display("ERROR: GOLD nonce: %b", gb.nonce_o);
+			err_count += 1;
+		end
+		if (gb.error_o !== nonBufRd.cb.error) begin
+			if (env.verbose) $display("ERROR: GOLD error: %b", gb.error_o);
+			err_count += 1;
+		end
 		return err_count;
 	endfunction
 
@@ -151,7 +149,7 @@ program bench #(parameter COUNTBITS=6, parameter DELAY_C = 129, parameter NUM_CO
 			if (chip.cb.resultValid)
 				$display("* RESULT [DUT]: %b", chip.cb.success);
 
-			if (ix_result == (1<<COUNTBITS)*$size(env.blocks)) return;
+			if (ix_result == (BROADCAST_CNT)*$size(env.blocks)) return;
 		end
 	endtask
 

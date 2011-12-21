@@ -10,7 +10,7 @@ module lattice_ff_output #(parameter COUNTBITS = 4) (
 	wire [COUNTBITS-1 : 0] prefix;
 
 	assign outputs_o.success = this_stage.success | success;
-	assign outputs_o.nonce_prefix = this_stage.success ? this_stage.nonce_prefix : prefix;
+	assign outputs_o.processor_index = this_stage.success ? this_stage.processor_index : prefix;
 
 	ff #(.WIDTH(1)) f1 (
 		.clk,
@@ -19,7 +19,7 @@ module lattice_ff_output #(parameter COUNTBITS = 4) (
 	);
 	ff #(.WIDTH(COUNTBITS)) f2 (
 		.clk,
-		.data_i(outputs_i.nonce_prefix),
+		.data_i(outputs_i.processor_index),
 		.data_o(prefix)
 	);
 

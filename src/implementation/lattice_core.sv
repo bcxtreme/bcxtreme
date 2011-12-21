@@ -1,5 +1,5 @@
 
-module lattice_core #(parameter COUNTBITS = 6, parameter INDEX = 0, parameter ROUND_PIPELINE_DEPTH = 1)
+module lattice_core #(parameter INDEX = 0, parameter ROUND_PIPELINE_DEPTH = 1)
 (
 	input clk,
 	input rst,
@@ -13,7 +13,6 @@ module lattice_core #(parameter COUNTBITS = 6, parameter INDEX = 0, parameter RO
 	
 	sha_standard_pipelined_core #(.ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH), .PROCESSORINDEX(INDEX)) sha (
 		.clk,
-		.rst,
 		.in(data_i),
 		.doublehash(hash),
 		.difficulty
@@ -26,7 +25,7 @@ module lattice_core #(parameter COUNTBITS = 6, parameter INDEX = 0, parameter RO
 		.success(data_o.success)
 	);
 
-	assign data_o.nonce_prefix = INDEX;
+	assign data_o.processor_index = INDEX;
 
 endmodule
 		

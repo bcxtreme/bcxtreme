@@ -26,9 +26,6 @@ class golden_hashvalidator;
 		le_diff[7:0] = difficulty_i[31:24];	
 		
 		target =  le_diff[23:0] << (8*(le_diff[31:24]-3));
-		//$display("Difficulty: %x, target: %x",difficulty_i, target);
-		//target = {32'b0, 16'hffff, 208'b0}; // lowest possible difficulty
-
 	endfunction
 	
 
@@ -52,7 +49,6 @@ class golden_hashvalidator;
 			get_target();
 			reverse_hash(); //need to byte reverse the hash before comparing
 
-			$display("le_hash: %x\n target: %x", le_hash, target);
 			if(le_hash < target) //check if the output matches difficulty
 				success = 'b1;
 		end

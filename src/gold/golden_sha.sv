@@ -1,5 +1,5 @@
 
-class golden_sha #(parameter DELAY_C = 10, parameter INDEX=0, parameter NUM_CORES=1);
+class golden_sha #(parameter DELAY_C = 10, parameter NUM_CORES=1);
 
 	// Inputs
 	bit validIn_i;
@@ -22,7 +22,11 @@ class golden_sha #(parameter DELAY_C = 10, parameter INDEX=0, parameter NUM_CORE
 	local bit nonce_buf[DELAY_C + 1];
 	local bit[31:0] nonce;
 
-	function new();
+	local bit[31:0] INDEX;
+
+
+	function new(bit[31:0] index);
+		INDEX = index;
 		// Initialize buffers
 		for (int i = 0; i <= DELAY_C; i++) begin
 			hash_buf[i] = 0;

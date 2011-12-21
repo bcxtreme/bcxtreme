@@ -1,5 +1,5 @@
 
-class golden_bcminer  #(parameter COUNTBITS = 6, parameter DELAY_C = 129, parameter NUM_CORES = 1);
+class golden_bcminer  #(parameter BROADCAST_CNT = 100, parameter DELAY_C = 129, parameter NUM_CORES = 1);
 
 	bit rst_i;
 	
@@ -15,13 +15,16 @@ class golden_bcminer  #(parameter COUNTBITS = 6, parameter DELAY_C = 129, parame
 	// Nonce Buffer Interface
 	bit readReady_i;
 	bit nonce_o;
-	bit overflow_o;
+	bit error_o;
 
 	// Golden units
-	local golden_blockstorage #(.COUNTBITS(COUNTBITS)) gblock;
+	local golden_blockstorage #(.BROADCAST_CNT(BROADCAST_CNT)) gblock;
 	// NOTE: Delay for DELAY_C cycles to account for the ShaCore, then NUM_CORES to account for the pipelining of the outputs
-	local golden_sha #(.INDEX(32'h42a14600), .DELAY_C(DELAY_C + NUM_CORES - 1)) sha;
-	local golden_hashvalidator hval;
+	// NOTE: Previously, the index was hard-coded to 32'h42a14600
+	local golden_sha #(.DELAY_C(DELAY_C + NUM_CORES - 1), .NUM_CORES(NUM_CORES)) sha[NUM_CORES];
+	local golden_hashvalidator hval[NUM_CORES];
+	local golden_noncedecoder #(.NUMPROCESSORS(NUM_CORES), .NONCESPACE(BROADCAST_CNT*NUM_CORES)) ndec;
+	local golden_noncebuffer nbuf;
 
 	// Reset the output pins and the internal state
 	task reset();
@@ -29,18 +32,22 @@ class golden_bcminer  #(parameter COUNTBITS = 6, parameter DELAY_C = 129, parame
 		resultValid_o = 0;
 		success_o = 0;
 		nonce_o = 0;
-		overflow_o = 0;
+		error_o = 0;
 
 		gblock = new();
-		sha = new();
-		hval = new();
+		for (int i = 0; i < NUM_CORES; i++) begin
+			sha[i] = new(i);
+			hval[i] = new();
+		end
+		ndec = new();
+		nbuf = new();
 	endtask
 
 	// Simulate a cycle
 	task cycle();
 		bit newBlock;
-		bit validOut;
 		bit[351:0] state;
+		bit [31:0] valid_nonce;
 
 		if (rst_i) begin
 			reset();
@@ -53,30 +60,54 @@ class golden_bcminer  #(parameter COUNTBITS = 6, parameter DELAY_C = 129, parame
 
 		gblock.cycle();
 
-
-		// Sha Core
-		sha.validIn_i = gblock.validOut_o;
-		sha.newBlockIn_i = gblock.newBlock_o;
-		sha.initialState_i = gblock.initialState_o;
-
-		sha.cycle();
-		//$display("Input to hashvalidator %x",sha.hash_o);
-		// Hash Validator
-		hval.validIn_i = sha.validOut_o;
-		hval.newBlockIn_i = sha.newBlockOut_o;
-		hval.hash_i = sha.hash_o;
-		hval.difficulty_i = sha.difficulty_o;
-	
-		hval.cycle();
-
 		writeReady_o = gblock.writeReady_o;
-		//resultValid_o=sha.validOut_o;
-		resultValid_o = hval.validOut_o;
-		success_o = hval.success_o;
-		//success_o = (^ sha.hash_o);
-		nonce_o = hval.newBlockOut_o;
-		//nonce_o = sha.newBlockOut_o;
 
+
+		// Sha Core & Hash Validator
+		for (int i = 0; i < NUM_CORES; i++) begin
+			sha[i].validIn_i = gblock.validOut_o;
+			sha[i].newBlockIn_i = gblock.newBlock_o;
+			sha[i].initialState_i = gblock.initialState_o;
+
+			sha[i].cycle();
+
+			hval[i].validIn_i = sha[i].validOut_o;
+			hval[i].newBlockIn_i = sha[i].newBlockOut_o;
+			hval[i].hash_i = sha[i].hash_o;
+			hval[i].difficulty_i = sha[i].difficulty_o;
+		
+			hval[i].cycle();
+		end
+
+		// Accumulate results
+		resultValid_o = hval[0].validOut_o;
+		success_o = hval[0].success_o;
+		newBlock = hval[0].newBlockOut_o;
+		for (int i = 1; i < NUM_CORES; i++) begin
+			ValidOutSymmetry: assert (resultValid_o == hval[i].validOut_o) else $warning("Golden cores not synchronized ValidOut");
+			NewBlockSymmetry: assert (newBlock == hval[i].newBlockOut_o) else $warning("Golden cores not synchronized NewBlockOut");
+			success_o = hval[i].success_o & success_o;
+			if (hval[i].success_o) valid_nonce = sha[i].nonce_o;
+		end
+
+		// Pass through NonceDecoder
+		ndec.valid_i = resultValid_o;
+		ndec.newblock_i = newBlock;
+		ndec.success_i = success_o;
+
+		ndec.cycle();
+
+		// Nonce Buffer
+		nbuf.validIn_i = ndec.valid_o;
+		nbuf.successIn_i = ndec.success_o;
+		nbuf.nonceIn_i = ndec.nonce_o;
+
+		nbuf.cycle();
+
+		resultValid_o = nbuf.validOut_o;
+		success_o = nbuf.successOut_o;
+		nonce_o = nbuf.nonceOut_o;
+		error_o = nbuf.error_o;
 	endtask
 
 endclass

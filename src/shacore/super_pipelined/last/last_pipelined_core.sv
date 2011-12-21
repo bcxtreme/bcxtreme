@@ -9,7 +9,12 @@ output logic[31:0] difficulty
 );
 
 HashState round1delayed; //The round 1 state, but delayed 64 cycles.
-hash_state_delay_buffer #(.DELAY(64*ROUND_PIPELINE_DEPTH)) hsdb(.clk,.newblock(in.newblock),.in(in.hashstate),.out(round1delayed));
+hash_state_delay_buffer #(.DELAY(64*ROUND_PIPELINE_DEPTH)) hsdb(
+	.clk,
+	.newblock(in.newblock),
+	.in(in.hashstate),
+	.out(round1delayed)
+);
 
 logic valid_pipeline[64:15];
 logic newblock_pipeline[64:15];
@@ -22,7 +27,18 @@ sha_pipelined_pre_pipeline #(.PROCESSORINDEX(PROCESSORINDEX),.NUMPROCESSORS(NUMP
 
 //Standard sha rounds with attached message expander for the rest.
 for(genvar i=15; i<64; i++) begin
-  sha_last_pipelined_stage #(.K(Kfunction(i)),.ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) s(.clk,.rst,.state_i(hashstate_pipeline[i]),.W_i(W_pipeline[i]),.valid_i(valid_pipeline[i]),.newblock_i(newblock_pipeline[i]),.state_o(hashstate_pipeline[i+1]),.W_o(W_pipeline[i+1]),.valid_o(valid_pipeline[i+1]),.newblock_o(newblock_pipeline[i+1]));
+	sha_last_pipelined_stage #(.K(Kfunction(i)), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) s(
+		.clk,
+		.rst,
+		.state_i(hashstate_pipeline[i]),
+		.W_i(W_pipeline[i]),
+		.valid_i(valid_pipeline[i]),
+		.newblock_i(newblock_pipeline[i]),
+		.state_o(hashstate_pipeline[i+1]),
+		.W_o(W_pipeline[i+1]),
+		.valid_o(valid_pipeline[i+1]),
+		.newblock_o(newblock_pipeline[i+1])
+	);
 end
 
 //The SHA256 hash of the block... remember, we need to double hash this to get a proper output.
@@ -37,7 +53,16 @@ logic[15:0][31:0] hash2_W_pipeline[64:0];
 
 //An additional pipeline stage to do the final add of the first SHA round and output the
 // padded message words into hash2_W_pipeline[0]
-sha_last_pipelined_pad_hash hp(.clk,.rst,.instate(firsthash),.valid_i(valid_pipeline[64]),.newblock_i(newblock_pipeline[64]),.valid_o(hash2_valid_pipeline[0]),.newblock_o(hash2_newblock_pipeline[0]),.padded(hash2_W_pipeline[0]));
+sha_last_pipelined_pad_hash hp(
+	.clk,
+	.rst,
+	.instate(firsthash),
+	.valid_i(valid_pipeline[64]),
+	.newblock_i(newblock_pipeline[64]),
+	.valid_o(hash2_valid_pipeline[0]),
+	.newblock_o(hash2_newblock_pipeline[0]),
+	.padded(hash2_W_pipeline[0])
+);
 
 HashState init;
 sha_initial_hashstate is(.state(init));
@@ -45,7 +70,18 @@ assign hash2_hashstate_pipeline[0]=init;
 
 //Apply the first 16 rounds, just rotating the history without applying the message expander function
 for(i=0; i<15; i++) begin
-  sha_last_pipelined_preserve_history_stage #(.K(Kfunction(i)),.ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) s(.clk,.rst,.state_i(hash2_hashstate_pipeline[i]),.valid_i(hash2_valid_pipeline[i]),.newblock_i(hash2_newblock_pipeline[i]),.W_i(hash2_W_pipeline[i]),.W_o(hash2_W_pipeline[i+1]),.valid_o(hash2_valid_pipeline[i+1]),.newblock_o(hash2_newblock_pipeline[i+1]),.state_o(hash2_hashstate_pipeline[i+1]));
+	sha_last_pipelined_preserve_history_stage #(.K(Kfunction(i)), .ROUND_PIPELINE_DEPTH(ROUND_PIPELINE_DEPTH)) s(
+		.clk,
+		.rst,
+		.state_i(hash2_hashstate_pipeline[i]),
+		.valid_i(hash2_valid_pipeline[i]),
+		.newblock_i(hash2_newblock_pipeline[i]),
+		.W_i(hash2_W_pipeline[i]),
+		.W_o(hash2_W_pipeline[i+1]),
+		.valid_o(hash2_valid_pipeline[i+1]),
+		.newblock_o(hash2_newblock_pipeline[i+1]),
+		.state_o(hash2_hashstate_pipeline[i+1])
+	);
 end
 
 //The remaining rounds of the second hash.
