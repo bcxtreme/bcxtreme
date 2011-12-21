@@ -23,7 +23,7 @@ class golden_bcminer  #(parameter BROADCAST_CNT = 100, parameter DELAY_C = 129, 
 	// NOTE: Previously, the index was hard-coded to 32'h42a14600
 	local golden_sha #(.DELAY_C(DELAY_C + NUM_CORES - 1), .NUM_CORES(NUM_CORES)) sha[NUM_CORES];
 	local golden_hashvalidator hval[NUM_CORES];
-	local golden_noncedecoder #(.NUMPROCESSORS(NUM_CORES), .NONCESPACE($clog2(BROADCAST_CNT))) ndec;
+	local golden_noncedecoder #(.NUMPROCESSORS(NUM_CORES), .NONCESPACE(BROADCAST_CNT*NUM_CORES)) ndec;
 	local golden_noncebuffer nbuf;
 
 	// Reset the output pins and the internal state

@@ -1,4 +1,4 @@
-class golden_noncedecoder #(parameter NUMPROCESSORS=10,parameter INDEXBITS=$clog2(NUMPROCESSORS),parameter NONCESPACE=(1<<6));
+class golden_noncedecoder #(parameter NUMPROCESSORS=10,parameter NONCESPACE=(1<<6),parameter INDEXBITS=$clog2(NUMPROCESSORS));
 
 
 	// Nonce Input interface
@@ -20,52 +20,33 @@ class golden_noncedecoder #(parameter NUMPROCESSORS=10,parameter INDEXBITS=$clog
 	local bit[31:0] nonce;
 
 	// Misc internal state
-	local int cycles_since_newblock;
-
-	function new();
-
-	endfunction
+	local int base_nonce;
 
 	task cycle();
-
 		if(valid_i) begin
+			if(base_nonce+NUMPROCESSORS>=NONCESPACE) begin
+				valid_o=1'b1;
+				success_o=success;
+				nonce_o=nonce;
+			end else 
+				valid_o=1'b0;
+
 			if(newblock_i) begin
-				cycles_since_newblock = 0;
+				base_nonce= 0;
+				success=0;
+				nonce=0;
 			end
 			else begin
-				cycles_since_newblock = cycles_since_newblock + NUMPROCESSORS;
+				base_nonce = base_nonce + NUMPROCESSORS;
 			end
 		
 			if (success_i) begin 
-				nonce_o = cycles_since_newblock + index_i;
-
-				valid_o = 1'b1;
-			end
-			else begin
-				valid_o = 1'b0;
+				nonce = base_nonce + index_i;
+				success = 1'b1;
 			end
 			
-			if(valid_o) begin
-				success_o = 1'b1;
-			end			
-			else begin
-				success_o = 1'b0;
-				nonce_o = 0;
-			end
-
-			/*
-			valid_o=valid;
-			success_o=success;
-			nonce_o=nonce;
-			*/
 		end
 
-	/*	valid=valid_i;
-		success=//TODO: HANDLE THE LOGIC FOR SUCCESS (should only be high once at the end of every block)
-		index=index_i;
-		cycles_since_newblock++;
-		if(newblock&valid) cycles_since_newblock=0;
-		nonce=cycles_since_newblock*NONCESPERPROCESSOR+index;*/
 	endtask
 endclass
 
