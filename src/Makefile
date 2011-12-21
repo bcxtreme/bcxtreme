@@ -23,7 +23,7 @@ SHACORE_BENCH=test/shacore/*.sv
 
 VCS=vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all
 
-.PHONY: help clean bench shacore_bench test
+.PHONY: help clean bench shacore_bench test sharound_syn messageround_syn synthesis
 
 
 bench:
@@ -34,6 +34,19 @@ shacore_bench:
 
 test: bench
 	./simulator.exe
+
+synthesis: sharound_syn messageround_syn
+	dc_shell -f dsyn.tcl
+
+sharound_syn:
+	cd shacore/precompiled/sharound;\
+	dc_shell -f dsyn.tcl;\
+	cd ../../..;
+
+messageround_syn:
+	cd shacore/precompiled/messageschedule;\
+	dc_shell -f dsyn.tcl;\
+	cd ../../..;
 
 help:
 	@echo "The following make targets are supported:"; \
