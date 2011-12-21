@@ -1,0 +1,23 @@
+Dashboard
+
+Date: Tue Dec 20 23:09:39 2011
+
+User: rdm2128
+
+Version: D-2009.12
+Command line: urg -dir simulator.exe.cm -format text -lca 
+
+
+-------------------------------------------------------------------------------
+Total Coverage Summary 
+SCORE  LINE   
+ 99.03  99.03 
+
+
+-------------------------------------------------------------------------------
+Hierarchical coverage data for top-level instances 
+SCORE  LINE   NAME                                            
+  0.00   0.00 $unit::bcminer.sv::gold/SHA256.sv...@1195630314 
+  0.78   0.78 seventhreecompressor                            
+ 99.34  99.34 top                                             
+
