@@ -20,7 +20,7 @@ nonce_decoder #(.BROADCAST_CNT(5), .NUM_CORES(4)) test(
 	.nonce_o
 );
 initial begin
- // $vcdpluson;
+  $vcdpluson;
   rawinput.processor_index = 2;
   rawinput.success = 0;
 
