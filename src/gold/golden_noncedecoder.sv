@@ -21,13 +21,15 @@ class golden_noncedecoder #(parameter NUMPROCESSORS=10,parameter NONCESPACE=(1<<
 
 	// Misc internal state
 	local int base_nonce;
+	local bit is_accumulating;
 
 	task cycle();
 		if(valid_i) begin
-			if(base_nonce+NUMPROCESSORS>=NONCESPACE) begin
+			if (is_accumulating && base_nonce+NUMPROCESSORS>=NONCESPACE) begin
 				valid_o=1'b1;
 				success_o=success;
 				nonce_o=nonce;
+				is_accumulating = 0;
 			end else 
 				valid_o=1'b0;
 
@@ -35,15 +37,16 @@ class golden_noncedecoder #(parameter NUMPROCESSORS=10,parameter NONCESPACE=(1<<
 				base_nonce= 0;
 				success=0;
 				nonce=0;
+				is_accumulating = 1;
 			end
-			else begin
+			else if (is_accumulating) begin
 				base_nonce = base_nonce + NUMPROCESSORS;
+				if (success_i) begin 
+					nonce = base_nonce + index_i;
+					success = 1'b1;
+				end
 			end
 		
-			if (success_i) begin 
-				nonce = base_nonce + index_i;
-				success = 1'b1;
-			end
 			
 		end
 
