@@ -1,6 +1,6 @@
 
 The layout of files follows the following scheme:
----
+=================================================
 
 /test 
 Contains early versions of golden models and interfaces that were used to 
@@ -40,6 +40,9 @@ for the bitcoin project
     code_coverage.txt
     The code coverage report
 
+    Makefile
+    A makefile to run out tests, outlined below
+
 /doc 
 Contains the documentation that covers the various aspects of design, 
 testing and use
@@ -59,3 +62,20 @@ ultimately performance
 our full design no matter how lightly we set the optimization and contraint settings.  Thus 
 since the SHA core is the bottleneck of our design, more specifically the sha round, we have 
 included reports from synthesis of both.
+
+
+Makefile Explanation
+====================
+
+The following options are supported:
+
+    * bench: Compiles our design for testing.
+    * test: Runs the compiled testbench using the current config.ini configuration
+    * coverage: Compiles the simulator, runs it, and does coverage analysis
+    * synthesis: Synthesizes the entire design
+    * shacore_bench: Compiles the ShaCore simulator separately
+    * coresynthesis: Synthesizes the ShaCore
+    * sharound_syn: Synthesizes a single Sha round
+    * messageround_syn: Synthesizes a single message round
+    * help: Displays help information
+    * clean: Cleans the repository

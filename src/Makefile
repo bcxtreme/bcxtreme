@@ -32,6 +32,11 @@ bench:
 shacore_bench:
 	$(VCS) $(SHACORE_TOP) $(SHARED) $(INTERFACES) $(DUT) $(GOLD) $(SHACORE_BENCH) -o simulator.exe
 
+coverage:
+	$(VCS) $(TOP) $(SHARED) $(INTERFACES) $(DUT) $(GOLD) $(BENCH) -o simulator.exe -cm line -lca
+	./simulator.exe -cm line -lca
+	urg -dir simulator.exe.cm -format text -lca
+	
 test: bench
 	./simulator.exe
 coresynthesis:
