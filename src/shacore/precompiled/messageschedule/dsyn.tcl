@@ -40,7 +40,7 @@ set CLK "clk"                  ;# The name of your clock
 set virtual 0                        ;# 1 if virtual clock, 0 if real clock
 
 # Timing and loading information                
-set clkPeriod_ns 2     ;# desired clock period (in ns) 
+set clkPeriod_ns 1     ;# desired clock period (in ns) 
 
 # Input delay tells DC how long after the clock before an input becomes
 # valid. 

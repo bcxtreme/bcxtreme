@@ -1,4 +1,4 @@
-module sha_message_expander_pipeline #(parameter PIPELINE_DEPTH=1) (
+module sha_message_expander_pipeline #(parameter PIPELINE_DEPTH=3) (
 input logic clk,
 input logic[15:0][31:0] W_i,
 output logic[15:0][31:0] W_o

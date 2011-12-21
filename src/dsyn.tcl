@@ -33,20 +33,21 @@ define_design_lib WORK -path ./WORK
 ##################################################################
 
 set RTL_PATH  "./src/"
-set myFiles [glob ../../../shared/*.sv $RTL_PATH/*.sv]
+set myFiles [glob bcminer.sv shared/*.sv interfaces/*.sv implementation/*.sv shacore/*.sv shacore/precompiled/sharound/src/*.sv  shacore/precompiled/messageschedule/src/*.sv shacore/super_pipelined/*.sv shacore/super_pipelined/standard/*.sv shacore/super_pipelined/last/*.sv]
+
 set fileFormat sverilog              ;# verilog or sverilog
-set basename sha_round                     ;# Top-level module name
+set basename bcminer                     ;# Top-level module name
 set CLK "clk"                  ;# The name of your clock 
 set virtual 0                        ;# 1 if virtual clock, 0 if real clock
 
 # Timing and loading information                
-set clkPeriod_ns 2     ;# desired clock period (in ns) 
+set clkPeriod_ns 15     ;# desired clock period (in ns) 
 
 # Input delay tells DC how long after the clock before an input becomes
 # valid. 
 set inDelay_ns [expr $clkPeriod_ns*.1]  ;# delay from clock to inputs valid
 set outDelay_ns [expr $clkPeriod_ns*.1] ;# delay from clock to output valid
-set inputDrive INVX16_LVT
+set inputDrive INVX16
 set LoadLib $design_db         ;# name of library the cell comes from
 set myLoadPin "ZN"             ;# name of pin that the outputs drive
 set CLK_SKEW 0.10
@@ -73,7 +74,7 @@ set write_pow 1         ;# report file for power estimate
 set write_ref 1         ;# report file for power estimate
 
 # compiler switches...                  
-set useUltra 1                      ;# 1 for compile_ultra, 0 for compile
+set useUltra 0                      ;# 1 for compile_ultra, 0 for compile
                                      # mapEffort, useUngroup are for    
                                      # non-ultra compile...         
 set mapEffort1      low            ;# First pass - low, medium, or high
