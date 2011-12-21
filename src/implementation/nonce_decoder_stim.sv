@@ -24,7 +24,7 @@ string header;
 
 initial begin
   $vcdpluson;
-  rawinput.nonce_prefix = 5;
+  rawinput.nonce_prefix = 2;
   rawinput.success = 0;
 
   $display( "Direct stim initialized" );  
@@ -52,6 +52,17 @@ initial begin
   newblock_i = 0;
 
   #30
+
+  newblock_i = 1;
+  #1
+  newblock_i = 0;
+
+  #1
+  rawinput.success = 1;
+  #1
+  rawinput.success = 0;
+
+  #5
 
   valid_i = 0;
 
