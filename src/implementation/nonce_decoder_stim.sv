@@ -19,17 +19,13 @@ nonce_decoder #(.BROADCAST_CNT(5), .NUM_CORES(4)) test(
 	.success_o,
 	.nonce_o
 );
-
-string header;
-
 initial begin
  // $vcdpluson;
   rawinput.processor_index = 2;
   rawinput.success = 0;
 
   $display( "Direct stim initialized" );  
-  header = "[rst] [valid_i] [newblock_i]  [success_i] [nonce_prefix_i]      [valid_o] [success_o]  [nonce_o]       ticks|clock";
-  $display( header );
+  $display("[rst] [valid_i] [newblock_i]  [success_i] [nonce_prefix_i]      [valid_o] [success_o]  [nonce_o]       ticks|clock");
   $monitor( "    %d       %d         %d            %d           %d              %d          %d   %d|%d",
             rst, valid_i, newblock_i, rawinput.success, rawinput.processor_index, valid_o, success_o, nonce_o, ticks, clk );
   
