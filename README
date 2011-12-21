@@ -10,6 +10,36 @@ refine and test the functional specification as it was developed
 Contains the actual implementation, golden models, testbenches and stim files
 for the bitcoin project
 
+    /interfaces
+     Interface files used throughout the DUT
+
+    /shared
+     Shared SV files common to the design, such as flip-flops
+
+    /implementation
+     DUT SV files that implement most of the non-ShaCore functionality
+
+    /shacore
+     DUT SV files that implement the ShaCore functionality
+
+    /gold
+     Golden models for our design. golden_bcminer.sv is the main goldem model
+
+    /test
+     Testbench files
+
+    bcminer.sv
+    The main module for our bitcoin miner
+
+    top.sv
+    The top file for our design; used for testing
+
+    config.ini
+    The configuration file for our testbench suite
+
+    code_coverage.txt
+    The code coverage report
+
 /doc 
 Contains the documentation that covers the various aspects of design, 
 testing and use
