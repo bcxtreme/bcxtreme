@@ -56,7 +56,6 @@ module bcminer #(parameter BROADCAST_CNT = 1024, parameter ROUND_PIPELINE_DEPTH=
 		.newBlockOut
 	);
 
-	// XXX: Not sure what nonce space is...
 	nonce_decoder #(.NUM_CORES(NUM_CORES), .BROADCAST_CNT(BROADCAST_CNT) ) ndecode (
 		.clk,
 		.rst(chip.rst),
@@ -68,11 +67,19 @@ module bcminer #(parameter BROADCAST_CNT = 1024, parameter ROUND_PIPELINE_DEPTH=
 		.nonce_o(nonce)
 	);
 
+	nonce_buffer nbuffer (
+		.clk,
+		.rst(chip.rst),
+		.valid(resultValid),
+		.success(success),
+		.nonce_i(nonce),
+		.readready(nonBufWrt.readReady),
+		.nonce_o(nonBufWrt.nonce),
+		.overflow(nonBufWrt.overflow)
+	);
 
 	assign chip.resultValid = resultValid;
 	assign chip.success = success;
-	assign nonBufWrt.nonce = (& nonce);
-	assign nonBufWrt.overflow = newBlockOut;
 
 endmodule
 	

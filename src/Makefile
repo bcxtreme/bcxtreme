@@ -15,7 +15,8 @@ LATTICE=implementation/lattice_ff_input.sv implementation/lattice_ff_output.sv \
         implementation/lattice_core.sv implementation/lattice_core_last.sv \
         implementation/lattice_block.sv implementation/lattice_block_first.sv implementation/lattice_block_last.sv
 NONCEDECODER=implementation/nonce_decoder.sv
-DUT=$(NONCEDECODER) $(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) $(LATTICE) bcminer.sv
+NONCEBUFFER=implementation/nonce_buffer.sv
+DUT=$(NONCEDECODER) $(NONCEBUFFER) $(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) $(LATTICE) bcminer.sv
 
 SHACORE_TOP=shacore_top.sv
 SHACORE_BENCH=test/shacore/*.sv
