@@ -1,0 +1,74 @@
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : sha_round
+Version: D-2010.03-SP1
+Date   : Tue Dec 20 23:17:33 2011
+****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
+
+Operating Conditions: TYPICAL   Library: saed90nm_typ
+Wire Load Model Mode: enclosed
+
+  Startpoint: W[7] (input port clocked by clk)
+  Endpoint: DP_OP_29J1_124_5282/R_1180
+            (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  sha_round          70000                 saed90nm_typ
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock clk (rise edge)                                   0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  input external delay                                    0.10       0.10 f
+  W[7] (in)                                               0.00       0.10 f
+  DP_OP_29J1_124_5282/U1060/S (FADDX1)                    2.49       2.59 f
+  U1153/Q (XOR3X1)                                        0.77       3.36 r
+  DP_OP_29J1_124_5282/R_1180/D (DFFX1)                    0.31       3.67 r
+  data arrival time                                                  3.67
+
+  clock clk (rise edge)                                   1.00       1.00
+  clock network delay (ideal)                             0.00       1.00
+  DP_OP_29J1_124_5282/R_1180/CLK (DFFX1)                  0.00       1.00 r
+  library setup time                                     -0.07       0.93
+  data required time                                                 0.93
+  --------------------------------------------------------------------------
+  data required time                                                 0.93
+  data arrival time                                                 -3.67
+  --------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -2.73
+
+
+1
+ 
+****************************************
+Report : area
+Design : sha_round
+Version: D-2010.03-SP1
+Date   : Tue Dec 20 23:17:33 2011
+****************************************
+
+Library(s) Used:
+
+    saed90nm_typ (File: /sim/synopsys/SAED_EDK90nm/Digital_Standard_Cell_Library/synopsys/models/saed90nm_typ.db)
+
+Number of ports:              577
+Number of nets:              3484
+Number of cells:             2864
+Number of references:          48
+
+Combinational area:       19342.540945
+Noncombinational area:    30592.511641
+Net Interconnect area:    3299.971198  
+
+Total cell area:          49935.052586
+Total area:               53235.023784
+1
