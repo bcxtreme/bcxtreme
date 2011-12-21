@@ -8,7 +8,7 @@ class golden_noncebuffer;
 	bit readReady_i;
 
 	//OUTPUTS
-	bit overflow_o;
+	bit error_o;
 	bit nonceOut_o;
 	bit validOut_o;
 	bit successOut_o;
@@ -25,20 +25,20 @@ class golden_noncebuffer;
 		// Grab any new successful nonce
 		if (validIn_i && successIn_i) begin
 			if (nonce_is_unread)
-				overflow_o = 1;
-		else begin
+				error_o = 1;
+		end else begin
 			buffer = nonceIn_i;
 			nonce_is_unread = 1;
 		end
 
 		// Clock out the next bit of the nonce, if that's what we're doing
 		if (is_clocking_out) begin
-			if (index_of_bit == 32)
+			if (index_of_out == 32) begin
 				is_clocking_out = 0;
 				nonce_is_unread = 0;
-			else begin
-				nonceOut_o = buffer[index_of_bit];
-				index_of_bit += 1;
+			end else begin
+				nonceOut_o = buffer[index_of_out];
+				index_of_out += 1;
 			end
 		end
 		
@@ -48,5 +48,5 @@ class golden_noncebuffer;
 			index_of_out = 0;
 		end
 	endtask
-endmodule
+endclass
 
