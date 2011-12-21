@@ -10,7 +10,7 @@ class golden_noncebuffer;
 	//OUTPUTS
 	bit overflow_o;
 	bit nonceOut_o;
-	bit validOut_i;
+	bit validOut_o;
 	bit successOut_o;
 	
 
@@ -21,9 +21,9 @@ class golden_noncebuffer;
 
 	int index_of_out_bit;	
 	
-	//function void clockout_nonce();
+	function void clockout_nonce();
 		
-//	endfunction
+	endfunction
 
 	function void noncebuffer_result();
 		validOut_o = validIn_i;

@@ -10,44 +10,9 @@ module nonce_decoder #(parameter NUM_CORES=10, parameter BROADCAST_CNT=100)
 	output logic success_o,
 	output logic[31:0] nonce_o
 );
-	parameter PARTITIONBITS = $clog2(NUM_CORES);
-
-	wire success_i = rawinput_i.success;
-	wire [PARTITIONBITS -1 : 0] processor_index_i = rawinput_i.nonce_prefix;
-
-	// is_last_reading: 1 when we are reading in the last valid input
-	logic is_last_reading_new, is_last_reading_old;
-	rff #(.WIDTH(1)) last_reading_ff(.clk, .rst, .data_i(is_last_reading_new), .data_o(is_last_reading_o));
-	assign is_last_reading_new = is_reading_old & (count_old == (BROADCAST_CNT - 1));
-
-	// is_reading: 1 when we receive a newBlock, 0 when we output our result from it
-	logic is_reading_old, is_reading_new;
-	rff #(.WIDTH(1)) reading_ff(.clk, .rst, .data_i(is_reading_new), .data_o(is_reading_old));
-	assign is_reading_new <= newblock_i ? 1 : (found_new_nonce ? 0 : (is_reading_old ? (count_new < BROADCAST_CNT) : 0))
-	 
-	// count: starts at 0, increments by NUM_CORES for each valid block we receive, resets on newblock
-	logic[31:0] count_old, count_new;
-	ff #(.WIDTH(32)) f(.clk,.data_i(count_new),.data_o(count_old));
-	assign count_new <= valid_i ? (newblock_i ? 0 : (count_old+NUM_CORES)) : count_old;
-
-	// nonce_tmp: the nonce of the current inputs, possibly
-	logic[31:0] nonce_tmp;
-	assign nonce_tmp=count_new + processor_index_i;
-	
-	// found_new_nonce: true if we found a valid nonce this cycle
-	logic found_new_nonce = success_i & is_reading_old;
-
-	// validNonce: hold the last correct nonce
-	logic [31:0] validNonce_new, validNonce_old;
-	rff #(.WIDTH(32)) validNonce_ff(.clk, .rst, .data_i(validNonce_new), .data_o(validNonce_old));
-	assign validNonce_new = found_new_nonce ? nonce_tmp : validNonce_old;
-
-	// success: True when we found a bitcoin during this session
-	logic success_new, success_old;
-	rff #(.WIDTH(1)) success_ff(.clk, .rst, .data_i(success_new), .data_o(success_old));
-	assign success_new = is_reading_old & (success_i);
-
-	assign valid_o = is_last_reading_old;
-	assign success_o = is_last_reading_old & success_old;
-	assign nonce_o = validNonce_old;
+	// XXX: Un-implemented! This is here so it compiles....
+	assign valid_o = newblock_i;
+	assign success_o = 1'b1;
+	assign nonce_o = rawinput_i.nonce_prefix;
 endmodule
+	
