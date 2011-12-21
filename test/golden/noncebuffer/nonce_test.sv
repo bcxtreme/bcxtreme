@@ -5,16 +5,15 @@ program nonce_test();
 	initial begin
 		test = new();
 		
-		test.rst = 0;
-		test.validIn = 1;
-		test.success = 1;
-		test.readReady = 1;
-		test.nonceIn = 'h42a14695;
+		test.validIn_i = 1;
+		test.successIn_i = 1;
+		test.readReady_i = 1;
+		test.nonceIn_i = 'h42a14695;
 		repeat(100) begin
-		test.noncebuffer_test();
+		test.cycle();
 		
-		$display("nonce out %x", test.nonceOut);
-		$display("overflow %x", test.overflow);		
+		$display("nonce out %x", test.nonceOut_o);
+		$display("overflow %x", test.overflow_o);		
 		end
 	end
 

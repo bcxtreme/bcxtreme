@@ -21,9 +21,6 @@ class golden_noncebuffer;
 
 	int index_of_out_bit;	
 	
-	function void clockout_nonce();
-		
-	endfunction
 
 	function void noncebuffer_result();
 		validOut_o = validIn_i;
