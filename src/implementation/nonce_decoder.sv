@@ -40,7 +40,7 @@ module nonce_decoder #(parameter NUM_CORES=10, parameter BROADCAST_CNT=100)
 	rff #(.WIDTH(1)) lastboflblk_ff(.clk, .rst, .data_i(is_last_of_block), .data_o(was_last_of_block));
 
 	// count: starts at 0, increments by NUM_CORES for each valid block we receive, resets on newblock
-	ff #(.WIDTH(32)) f(.clk,.rst,.data_i(count_new),.data_o(count_old));
+	ff #(.WIDTH(32)) f(.clk,.data_i(count_new),.data_o(count_old));
 	always_comb begin
 		if (!valid_i)
 			count_new = count_old;

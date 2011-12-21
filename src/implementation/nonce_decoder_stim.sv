@@ -6,10 +6,9 @@ int ticks = 0;
 logic rst;
 
 logic valid_i, newblock_i, success_o, valid_o;
-// processorResultsIfc #(.NUM_CORES(4)) rawinput(clk);
+processorResultsIfc #(.NUM_CORES(4)) rawinput(clk);
 logic [31:0] nonce_o;
 
-/*
 nonce_decoder #(.BROADCAST_CNT(5), .NUM_CORES(4)) test(
 	.clk,
 	.rst,
@@ -20,11 +19,9 @@ nonce_decoder #(.BROADCAST_CNT(5), .NUM_CORES(4)) test(
 	.success_o,
 	.nonce_o
 );
-*/
 
 string header;
 
-/*
 initial begin
  // $vcdpluson;
   rawinput.processor_index = 2;
@@ -69,7 +66,6 @@ end
 always begin
  #1 clk = ~clk;
 end
-*/
 
 always @( posedge clk) begin
   //$display("up, clock = %b", clock );

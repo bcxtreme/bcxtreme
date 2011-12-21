@@ -1,4 +1,5 @@
-interface processorResultsIfc #(parameter NUM_CORES=10, PARTITIONBITS=$clog2(NUMPROCESSORS))(input logic clk);
+interface processorResultsIfc #(parameter NUM_CORES=10)(input logic clk);
+	parameter PARTITIONBITS = $clog2(NUM_CORES);
 	logic success;
 	logic[PARTITIONBITS-1:0] processor_index;
 
