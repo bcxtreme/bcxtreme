@@ -21,9 +21,12 @@ DUT=$(NONCEDECODER) $(NONCEBUFFER) $(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) $(LATTI
 SHACORE_TOP=shacore_top.sv
 SHACORE_BENCH=test/shacore/*.sv
 
-VCS=vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all
+COVERF=line
+CODECOVERFLAGS=-cm $(COVERF)
+VCS=vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all $(CODECOVERFLAGS) -lca
+URG=urg -dir simulator.exe.cm -grade -format text -lca
 
-.PHONY: help clean bench shacore_bench test sharound_syn messageround_syn synthesis coresynthesis
+.PHONY: help clean bench shacore_bench test
 
 
 bench:
@@ -34,23 +37,8 @@ shacore_bench:
 
 test: bench
 	./simulator.exe
-coresynthesis:
-	dc_shell -f coredsyn.tcl;\
-	icc_shell -f corepsyn.tcl;
-
-synthesis: sharound_syn messageround_syn
-	dc_shell -f dsyn.tcl
-	icc_shell -f psyn.tcl
-
-sharound_syn:
-	cd shacore/precompiled/sharound;\
-	dc_shell -f dsyn.tcl;\
-	cd ../../..;
-
-messageround_syn:
-	cd shacore/precompiled/messageschedule;\
-	dc_shell -f dsyn.tcl;\
-	cd ../../..;
+cover: bench
+	$(URG)
 
 help:
 	@echo "The following make targets are supported:"; \
