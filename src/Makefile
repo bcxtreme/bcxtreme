@@ -21,12 +21,9 @@ DUT=$(NONCEDECODER) $(NONCEBUFFER) $(BLOCKSTORAGE) $(SHACORE) $(HASHVAL) $(LATTI
 SHACORE_TOP=shacore_top.sv
 SHACORE_BENCH=test/shacore/*.sv
 
-COVERF=line
-CODECOVERFLAGS=-cm $(COVERF)
-VCS=vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all $(CODECOVERFLAGS) -lca
-URG=urg -dir simulator.exe.cm -grade -format text -lca
+VCS=vcs -PP -sverilog +define+SV -notice +define+VPD +lint=all
 
-.PHONY: help clean bench shacore_bench test
+.PHONY: help clean bench shacore_bench test sharound_syn messageround_syn synthesis coresynthesis
 
 
 bench:
@@ -35,10 +32,30 @@ bench:
 shacore_bench:
 	$(VCS) $(SHACORE_TOP) $(SHARED) $(INTERFACES) $(DUT) $(GOLD) $(SHACORE_BENCH) -o simulator.exe
 
+coverage:
+	$(VCS) $(TOP) $(SHARED) $(INTERFACES) $(DUT) $(GOLD) $(BENCH) -o simulator.exe -cm line -lca
+	./simulator.exe -cm line -lca
+	urg -dir simulator.exe.cm -format text -lca
+	
 test: bench
 	./simulator.exe
-cover: bench
-	$(URG)
+coresynthesis:
+	dc_shell -f coredsyn.tcl;\
+	icc_shell -f corepsyn.tcl;
+
+synthesis: sharound_syn messageround_syn
+	dc_shell -f dsyn.tcl
+	icc_shell -f psyn.tcl
+
+sharound_syn:
+	cd shacore/precompiled/sharound;\
+	dc_shell -f dsyn.tcl;\
+	cd ../../..;
+
+messageround_syn:
+	cd shacore/precompiled/messageschedule;\
+	dc_shell -f dsyn.tcl;\
+	cd ../../..;
 
 help:
 	@echo "The following make targets are supported:"; \
