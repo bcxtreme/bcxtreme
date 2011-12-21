@@ -8,7 +8,7 @@ class golden_noncebuffer;
 	bit readReady_i;
 
 	//OUTPUTS
-	bit error_o;
+	bit overflow_o;
 	bit nonceOut_o;
 	bit validOut_o;
 	bit successOut_o;
@@ -16,43 +16,37 @@ class golden_noncebuffer;
 
 	//BUFFERS
 	bit [31:0] buffer;
-	bit storing = 1'b0;
-	bit clockingout = 1'b0;
-
-	int index_of_out_bit;	
+	int index_of_out;
+	bit is_clocking_out;
+	bit nonce_is_unread;
 	
 
-	function void noncebuffer_result();
-		validOut_o = validIn_i;
-		successOut_o = successIn_i;
-		
-		if(validIn_i && successIn_i) begin
-
-			storing = 1'b1;
-			if(storing) begin
-				if(clockingout) begin //if second nonce is found before first is clocked out
-					error_o = 1'b1;
-				end
-				else begin
-					buffer = nonceIn_i; //store nonceIn
-				end
-			end
-			storing = 1'b0;
-		end
-
-		if(readReady_i) begin
-			clockingout = 1'b1;
-			if(clockingout) begin	
-				//clockout_nonce();  TODO
-				for (int i = 0; i < 32; i++) begin		
-					nonceOut_o = buffer[i];//clock out most recent nonce
-				end		
-			end
-			clockingout = 1'b0;
-		end
-	endfunction
-
 	task cycle();
-		noncebuffer_result();
+		// Grab any new successful nonce
+		if (validIn_i && successIn_i) begin
+			if (nonce_is_unread)
+				overflow_o = 1;
+		else begin
+			buffer = nonceIn_i;
+			nonce_is_unread = 1;
+		end
+
+		// Clock out the next bit of the nonce, if that's what we're doing
+		if (is_clocking_out) begin
+			if (index_of_bit == 32)
+				is_clocking_out = 0;
+				nonce_is_unread = 0;
+			else begin
+				nonceOut_o = buffer[index_of_bit];
+				index_of_bit += 1;
+			end
+		end
+		
+		// Initiate a reading of the Nonce, if requested
+		if (readReady_i) begin
+			is_clocking_out = 1;
+			index_of_out = 0;
+		end
 	endtask
-endclass
+endmodule
+
