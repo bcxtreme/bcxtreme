@@ -9,7 +9,9 @@ logic valid_i, newblock_i, success_o, valid_o;
 processorResultsIfc #(.NUM_CORES(4)) rawinput(clk);
 logic [31:0] nonce_o;
 
-nonce_decoder #(.BROADCAST_CNT(5), .NUM_CORES(4)) test(
+default clocking cb @(posedge clk);
+endclocking
+nonce_decoder #(.BROADCAST_CNT(10), .NUM_CORES(4)) test(
 	.clk,
 	.rst,
 	.valid_i,
@@ -32,26 +34,33 @@ initial begin
   clk = 0;
   ticks = 0;
   rst = 1;
-  #2
+  ##1
   rst = 0;
   valid_i = 0;
   newblock_i = 0;
   rawinput.success = 0;
 
-  #6;
+  ##6;
   
   valid_i = 1;
   newblock_i = 1;
 
-  #1
+  ##1
 
   newblock_i = 0;
 
-  #30
-
+  ##10
+  newblock_i=1;
+  ##1
+  newblock_i=0;
+  ##5
+  rawinput.success=1;
+  ##1
+  rawinput.success=0;
+  ##5
   valid_i = 0;
 
-  #4
+  ##4
 
   $finish; 
 

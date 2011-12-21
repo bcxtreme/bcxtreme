@@ -29,18 +29,20 @@ module nonce_decoder #(parameter NUM_CORES=10, parameter BROADCAST_CNT=100)
 		else if (newblock_i)
 			is_reading = 1;
 		else if (was_reading)
-			is_reading = (count_new < TARGET);
+			is_reading = (count_new <= TARGET);
 		else 
 			is_reading=0;
 	end
 	
 	logic is_last_of_block;
 	logic was_last_of_block;
+
 	assign is_last_of_block= (count_old+NUM_CORES)==TARGET;
+
 	rff #(.WIDTH(1)) lastboflblk_ff(.clk, .rst, .data_i(is_last_of_block), .data_o(was_last_of_block));
 
 	// count: starts at 0, increments by NUM_CORES for each valid block we receive, resets on newblock
-	ff #(.WIDTH(32)) f(.clk,.data_i(count_new),.data_o(count_old));
+	rff #(.WIDTH(32)) f(.clk,.rst,.data_i(count_new),.data_o(count_old));
 	always_comb begin
 		if (!valid_i)
 			count_new = count_old;
