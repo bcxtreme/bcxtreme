@@ -35,7 +35,7 @@ class golden_noncebuffer;
 		
 		// Initiate a reading of the Nonce, if requested
 		if (readReady_i) begin
-			if(is_clockout_out)
+			if(is_clocking_out)
 				error_o='1;
 			is_clocking_out = 1;
 			index_of_out = 0;

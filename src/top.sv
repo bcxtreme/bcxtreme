@@ -1,5 +1,6 @@
 
 `timescale 1ns/1ns
+`define BENCHING
 
 module top();
 	bit clk = 0;
