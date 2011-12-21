@@ -1,5 +1,5 @@
 
-module lattice_core #(parameter INDEX = 0, parameter ROUND_PIPELINE_DEPTH = 1)
+module lattice_core #(parameter INDEX = 0, parameter ROUND_PIPELINE_DEPTH = 3)
 (
 	input clk,
 	input rst,

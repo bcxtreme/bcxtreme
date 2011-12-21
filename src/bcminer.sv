@@ -1,6 +1,6 @@
 
 
-module bcminer #(parameter BROADCAST_CNT = 1024, parameter ROUND_PIPELINE_DEPTH=1, parameter NUM_CORES=10)
+module bcminer #(parameter BROADCAST_CNT = 1024, parameter ROUND_PIPELINE_DEPTH=3, parameter NUM_CORES=10)
 (
 	input clk,
 	minerIfc.dut chip,
