@@ -33,12 +33,12 @@ class golden_noncebuffer;
 
 		// Clock out the next bit of the nonce, if that's what we're doing
 		if (is_clocking_out) begin
+			index_of_out++;
 			if (index_of_out == 32) begin
 				is_clocking_out = 0;
 				nonce_is_unread = 0;
 			end else begin
 				nonceOut_o = buffer[index_of_out];
-				index_of_out += 1;
 			end
 		end
 		
@@ -46,6 +46,7 @@ class golden_noncebuffer;
 		if (readReady_i) begin
 			is_clocking_out = 1;
 			index_of_out = 0;
+			nonceOut_o = buffer[index_of_out];
 		end
 	endtask
 endclass
