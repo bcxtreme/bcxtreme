@@ -59,9 +59,16 @@ messageround_syn:
 
 help:
 	@echo "The following make targets are supported:"; \
-	 echo "  bench  - builds the testbench for the bcminer"; \
-	 echo "  clean  - cleans the testbench and intermediate files"; \
-	 echo "  help   - show this help information";
+	 echo "  bench            - builds the testbench for the bcminer"; \
+	 echo "  shacore_bench    - builds the testbench for the ShaCore"; \
+	 echo "  coverage         - runs the code coverage tool"; \
+	 echo "  test             - compiles the bench, then runs simulator.exe"; \
+	 echo "  synthesis        - synthesize the entire design"; \
+	 echo "  coresynthesis    - synthesize the ShaCore"; \
+	 echo "  sharound_syn     - synthesize a single Sha round"; \
+	 echo "  messageround_syn - synthesize a single message round"; \
+	 echo "  clean            - cleans the testbench and intermediate files"; \
+	 echo "  help             - show this help information";
 
 clean:
 	rm -rf *.o *~ *.vpd sim* csrc DVEfiles *daidir *.exe ucli.key
